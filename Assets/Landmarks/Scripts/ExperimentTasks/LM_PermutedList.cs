@@ -17,13 +17,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public enum ShuffleMethod
-{
-    none, 
-    random,
-    linked,
-    tiered
-}
 
 public class LM_PermutedList : ExperimentTask
 {
@@ -32,11 +25,6 @@ public class LM_PermutedList : ExperimentTask
     private ObjectList listToPermute;
     public int subset = 3;
     public bool shuffle = true;
-    [Tooltip("none:\tAB-AC-BA-BC-CA-CB\n" +
-             "random:\tBC-AC-AD-CB-BA-CA\n" +
-             "linked:\tCA-AB-BA-AC-CB-BC\n" +
-             "tierd:\tCB-CA-AB-AC-BA-BC")]
-    public ShuffleMethod shuffleMethod = ShuffleMethod.none;
     [Tooltip("Sort such that the last item of n-1 is the first item of n")] public bool link = false;
     private static bool linked = false;
     public EndListMode endListBehavior;
@@ -88,24 +76,16 @@ public class LM_PermutedList : ExperimentTask
 
 
         // Shuffle if necessary
-        switch (shuffleMethod)
+        if (shuffle)
         {
-            case ShuffleMethod.none:
-                break;
-            case ShuffleMethod.random:
-                FisherYatesShuffle(permutedList);
-                break;
-            case ShuffleMethod.linked:
-                permutedList = SortForLinking(permutedList);
-                Debug.Log("Linked list contains " + permutedList.Count + "sets");
-                break;
-            case ShuffleMethod.tiered:
-                // FIXME FIXME
-                break;
-            default:
-                break;
+            FisherYatesShuffle(permutedList);
         }
 
+        if (link)
+        {
+            permutedList = SortForLinking(permutedList);
+            Debug.Log("Linked list contains " + permutedList.Count + "sets");
+        }
 
         for (int i = 0; i < subset; i++)
         {

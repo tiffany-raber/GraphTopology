@@ -18,6 +18,7 @@ public enum HideTargetOnStart
 public class NavigationTask : ExperimentTask
 {
     [Header("Task-specific Properties")]
+    [Tooltip("Leave blank for free exploration")]
     public ObjectList destinations;
 	public GameObject currentTarget;
 
@@ -64,6 +65,7 @@ public class NavigationTask : ExperimentTask
     private float scaledPlayerDistance = 0;
     private float optimalDistance;
     private LM_DecisionPoint[] decisionPoints;
+    private bool exploration;
 
 
     // 4/27/2022 Added for Loop Closure Task
@@ -98,21 +100,21 @@ public class NavigationTask : ExperimentTask
                 " free exploration with specified time Alloted or distance alloted" +
                 " (whichever is less)");
 
-            // Make a dummy placeholder for exploration task to avoid throwing errors
-            var tmp = new List<GameObject>();
-            tmp.Add(gameObject);
-            gameObject.AddComponent<ObjectList>();
-            gameObject.GetComponent<ObjectList>().objects = tmp;
-           
-  
-            destinations = gameObject.GetComponent<ObjectList>();
+            exploration = true;
 
+            //// Make a dummy placeholder for exploration task to avoid throwing errors
+            //var tmp = new List<GameObject>();
+            //tmp.Add(gameObject);
+            //gameObject.AddComponent<ObjectList>();
+            //gameObject.GetComponent<ObjectList>().objects = tmp;
+            //destinations = gameObject.GetComponent<ObjectList>();
         }
 
         hud.showEverything();
 		hud.showScore = showScoring;
 
-        currentTarget = destinations.currentObject();
+        if (exploration) currentTarget = gameObject;
+        else currentTarget = destinations.currentObject();
 
         // update the trial count on the overlay
         //if (overlayTargetObject != null & currentTarget != null) overlayTargetObject.text = string.Format("{0}", currentTarget.name);
@@ -152,39 +154,44 @@ public class NavigationTask : ExperimentTask
 
 
         // Handle if we're hiding the target object
-        if (hideTargetOnStart != HideTargetOnStart.Off)
+        if (hideTargetOnStart != HideTargetOnStart.Off && !exploration)
         {
             if (hideTargetOnStart == HideTargetOnStart.SetInactive)
             {
-                currentTarget.GetComponent<Collider>().enabled = false;
+                //foreach (var c in currentTarget.GetComponents<Collider>()) c.enabled = false;
+                manager.DisableRecursive(currentTarget);
             }
             else if (hideTargetOnStart == HideTargetOnStart.SetInvisible)
             {
-                currentTarget.GetComponent<MeshRenderer>().enabled = false;
+                manager.HideRecursive(currentTarget);
+                manager.DisableRecursive(currentTarget, ignoreSelf: true); // turn off walls but not target collision
             }
             else if (hideTargetOnStart == HideTargetOnStart.DisableCompletely)
             {
-                //fixme - at some point should write LM methods to turn off objects, their renderers, their colliders, and/or their lights (including children)
-                // currentTarget.GetComponent<Collider>().enabled = false;
-                // currentTarget.GetComponent<MeshRenderer>().enabled = false;
-                // var halo = (Behaviour) currentTarget.GetComponent("Halo");
-                // if(halo != null) halo.enabled = false;
-                currentTarget.SetActive(false);
+                manager.HideRecursive(currentTarget);
+                //foreach (var c in currentTarget.GetComponents<Collider>()) c.enabled = false;
+                manager.DisableRecursive(currentTarget);
+                foreach (var child in currentTarget.GetComponentsInChildren<Transform>())
+                {
+                    var halo = (Behaviour)child.GetComponent("Halo");
+                    if (halo != null) halo.enabled = false;
+                }
             }
             else if (hideTargetOnStart == HideTargetOnStart.SetProbeTrial)
             {
-                currentTarget.GetComponent<Collider>().enabled = false;
-                currentTarget.GetComponent<MeshRenderer>().enabled = false;
-                
+                manager.HideRecursive(currentTarget);
+                manager.DisableRecursive(currentTarget);
+                //foreach (var c in currentTarget.GetComponents<Collider>()) c.enabled = false;
+
             }
             
         }
-        else
+        else if (!exploration)
         {
             currentTarget.SetActive(true); // make sure the target is visible unless the bool to hide was checked
             try
             {
-                currentTarget.GetComponent<MeshRenderer>().enabled = true;
+                manager.HideRecursive(currentTarget, true);
             }
             catch (System.Exception ex)
             {
@@ -270,33 +277,36 @@ public class NavigationTask : ExperimentTask
 		}
 
         //show target after set time
-        if (hideTargetOnStart != HideTargetOnStart.Off && Time.time - startTime > showTargetAfterSeconds)
+        if (hideTargetOnStart != HideTargetOnStart.Off && Time.time - startTime > showTargetAfterSeconds && !exploration)
         {
 
             switch (hideTargetOnStart)
             {
                 case HideTargetOnStart.SetInactive:
-                    currentTarget.GetComponent<Collider>().enabled = true;
+                    manager.DisableRecursive(currentTarget, true);
+                    //foreach (var c in currentTarget.GetComponents<Collider>()) c.enabled = true;
                     break;
                 case HideTargetOnStart.SetInvisible:
-                    currentTarget.GetComponent<MeshRenderer>().enabled = true;
+                    manager.HideRecursive(currentTarget, true);
+                    manager.DisableRecursive(currentTarget, restore:true, ignoreSelf: true); // turn off walls but not target collision
                     break;
                 case HideTargetOnStart.DisableCompletely:
-                    //fixme - at some point should write LM methods to turn off objects, their renderers, their colliders, and/or their lights (including children)
-                    currentTarget.GetComponent<Collider>().enabled = true;
-                    currentTarget.GetComponent<MeshRenderer>().enabled = true;
-                    var halo = (Behaviour)currentTarget.GetComponent("Halo");
-                    if (halo != null) halo.enabled = true;
+                    manager.HideRecursive(currentTarget, true);
+                    manager.DisableRecursive(currentTarget, true);
+                    //foreach (var c in currentTarget.GetComponents<Collider>()) c.enabled = true;
+                    foreach (var child in currentTarget.GetComponentsInChildren<Transform>())
+                    {
+                        var halo = (Behaviour)child.GetComponent("Halo");
+                        if (halo != null) halo.enabled = true;
+                    }
                     break;
                 case HideTargetOnStart.SetProbeTrial:
-                    currentTarget.GetComponent<Collider>().enabled = true;
-                    currentTarget.GetComponent<MeshRenderer>().enabled = true;
+                    manager.HideRecursive(currentTarget, true);
+                    manager.DisableRecursive(currentTarget, true);
+                    //foreach (var c in currentTarget.GetComponents<Collider>()) c.enabled = true;
                     break;
                 default:
                     Debug.Log("No hidden targets identified");
-                    currentTarget.SetActive(true);
-                    currentTarget.GetComponent<MeshRenderer>().enabled = true;
-                    currentTarget.GetComponent<Collider>().enabled = true;
                     break;
             }
         }
@@ -340,8 +350,11 @@ public class NavigationTask : ExperimentTask
         if (!isScaled & playerDistance >= distanceAllotted) return true;
         else if (isScaled & scaledPlayerDistance >= distanceAllotted) return true;
         // End the trial if they reach the max time allotted
-        if (Time.time - startTime >= timeAllotted) return true;
-
+        if (Time.time - startTime >= timeAllotted)
+        {
+            Debug.LogWarning("WTF.. END!");
+            return true;
+        }
 
         if (killCurrent == true)
 		{
@@ -417,12 +430,14 @@ public class NavigationTask : ExperimentTask
         }
 
         // re-enable everything on the gameobject we just finished finding
-        currentTarget.GetComponent<MeshRenderer>().enabled = true;
-        currentTarget.GetComponent<Collider>().enabled = true;
-        var halo = (Behaviour) currentTarget.GetComponent("Halo");
-        if(halo != null) halo.enabled = true;
-
-        
+        manager.HideRecursive(currentTarget, true);
+        manager.DisableRecursive(currentTarget, true);
+        //foreach (var c in currentTarget.GetComponents<Collider>()) c.enabled = true;
+        foreach (var child in currentTarget.GetComponentsInChildren<Transform>())
+        {
+            var halo = (Behaviour)child.GetComponent("Halo");
+            if (halo != null) halo.enabled = true;
+        }
 
         hud.setMessage("");
 		hud.showScore = false;
@@ -456,7 +471,7 @@ public class NavigationTask : ExperimentTask
             optimalDistance = float.NaN;
             excessPath = float.NaN;
         }
-        
+
 
         // log.log("LM_OUTPUT\tNavigationTask.cs\t" + masterTask.name + "\t" + this.name + "\n" +
         // 	"Task\tBlock\tTrial\tTargetName\tOptimalPath\tActualPath\tExcessPath\tRouteDuration\n" +
@@ -464,10 +479,10 @@ public class NavigationTask : ExperimentTask
         //     , 1);
 
         // More concise LM_TrialLog logging
-        taskLog.AddData(transform.name + "_target", currentTarget.name);
+        if (!exploration) taskLog.AddData(transform.name + "_target", currentTarget.name);
         taskLog.AddData(transform.name + "_actualPath", perfDistance.ToString());
-        taskLog.AddData(transform.name + "_optimalPath", optimalDistance.ToString());
-        taskLog.AddData(transform.name + "_excessPath", excessPath.ToString());
+        if (!exploration) taskLog.AddData(transform.name + "_optimalPath", optimalDistance.ToString());
+        if (!exploration) taskLog.AddData(transform.name + "_excessPath", excessPath.ToString());
         taskLog.AddData(transform.name + "_clockwiseTravel", clockwiseTravel.ToString());
         taskLog.AddData(transform.name + "_duration", navTime.ToString());
 
@@ -497,20 +512,16 @@ public class NavigationTask : ExperimentTask
         // Hide the overlay by setting back to empty string
         //if (overlayTargetObject != null) overlayTargetObject.text = "";
 
-        // If we created a dummy Objectlist for exploration, destroy it
-        Destroy(GetComponent<ObjectList>());
+        //// If we created a dummy Objectlist for exploration, destroy it
+        //Destroy(GetComponent<ObjectList>());
 
-        if (canIncrementLists)
-		{
-			destinations.incrementCurrent();
-		}
-        currentTarget = destinations.currentObject();
+        if (canIncrementLists) destinations.incrementCurrent();
+        if (!exploration) currentTarget = destinations.currentObject();
     }
 
 	public override bool OnControllerColliderHit(GameObject hit)
 	{
-		if ((hit == currentTarget | hit.transform.parent.gameObject == currentTarget) & 
-            hideTargetOnStart != HideTargetOnStart.DisableCompletely & hideTargetOnStart != HideTargetOnStart.SetInactive)
+		if (hit == currentTarget | hit.transform.parent.gameObject == currentTarget)
 		{
 			if (showScoring)
 			{

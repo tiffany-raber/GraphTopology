@@ -619,8 +619,40 @@ public class Experiment : MonoBehaviour
                                     // Swap.
             T tmp = array[j];
             array[j] = array[i - 1];
-            array[i - 1] = tmp;
+            array[i - 1] = tmp;        }
+    }
+
+
+    // Turn off all Renderers and Canvases on a gameobject and all of its children
+    public void HideRecursive(GameObject obj, bool restore = false)
+    {
+        if (obj.GetComponentsInChildren<Renderer>().Length > 0)
+        {
+            var mrs = obj.GetComponentsInChildren<Renderer>();
+            foreach (Renderer mr in mrs) mr.enabled = restore;
         }
+        else Debug.LogError("You are trying to hide or reveal a GameObject with no MeshRenderers");
+
+        if (obj.GetComponentsInChildren<Canvas>().Length > 0)
+        {
+            var mrs = obj.GetComponentsInChildren<Canvas>();
+            foreach (Canvas mr in mrs) mr.enabled = restore;
+        }
+    }
+
+    // Turn off all Colliders on a gameobject and all of its children
+    public void DisableRecursive(GameObject obj, bool restore = false, bool ignoreSelf = false)
+    {
+        if (obj.GetComponentsInChildren<Collider>().Length > 0)
+        {
+            var cs = obj.GetComponentsInChildren<Collider>();
+            foreach (Collider c in cs)
+            {
+                if (ignoreSelf && c.transform == obj.transform) continue;
+                c.enabled = restore;
+            }
+        }
+        else Debug.LogError("You are trying to disable or re-enable a GameObject with no Colliders");
     }
 
 
