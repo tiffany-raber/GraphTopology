@@ -39,6 +39,7 @@ public class GenericPointing : ExperimentTask
             try
             {
                 prompt = string.Format(prompt_text, element.currentObject().name);
+                taskLog.AddData(transform.name + "_target", element.currentObject().name);
                 element.incrementCurrent();
                 Debug.Log("INCREMENTED!");
             }
@@ -48,6 +49,7 @@ public class GenericPointing : ExperimentTask
             }
             
         }
+        
         Debug.Log(prompt_text);
         Debug.Log(prompt);
         hud.setMessage(prompt);
@@ -57,7 +59,10 @@ public class GenericPointing : ExperimentTask
 
     public override bool updateTask()
     {
-        if (Input.GetKeyDown(KeyCode.Return)) return true;
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            return true;
+        }
         else return false;
 
         // WRITE TASK UPDATE CODE HERE

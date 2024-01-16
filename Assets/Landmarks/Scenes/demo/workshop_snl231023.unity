@@ -2253,7 +2253,7 @@ MonoBehaviour:
   triggerLabel: 
   triggerOnStart: 0
   triggerOnEnd: 0
-  taskListType: 1
+  taskListType: 0
   skipConditions: []
   tasks: []
   objectsList: []
@@ -11121,12 +11121,12 @@ MonoBehaviour:
   triggerLabel: 
   triggerOnStart: 0
   triggerOnEnd: 0
-  taskListType: 0
+  taskListType: 1
   skipConditions: []
   tasks: []
   objectsList: []
   repeat: 1
-  overideRepeat: {fileID: 0}
+  overideRepeat: {fileID: 1058652019}
   repeatCount: 1
   currentTask: {fileID: 0}
   catchTrialCount: 0
