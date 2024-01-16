@@ -26,6 +26,7 @@ public class MoveObject : ExperimentTask {
 	public bool useLocalRotation = true;
 	
 	public bool swap;
+	public bool useDestinationSnapPoint;
 	private static Vector3 position;
 	private static Quaternion rotation;
 
@@ -49,18 +50,26 @@ public class MoveObject : ExperimentTask {
 		if ( destinations ) {
 			destination = destinations.currentObject();		
 		}
-		
+
+		// Temporary variable for the destination in case we are using a child's transform for movement
+		GameObject destinationLocationObject;
+		if (useDestinationSnapPoint) destinationLocationObject = destination.GetComponentInChildren<LM_SnapPoint>().gameObject;
+		else destinationLocationObject = destination;
+
+		// Lock in the start location
 		position = start.transform.position;
 		if (useLocalRotation) rotation = start.transform.localRotation;
         else rotation = start.transform.rotation;
 
+       
+		start.transform.position = destinationLocationObject.transform.position;
 		
-			start.transform.position = destination.transform.position;
-			log.log("TASK_ROTATE\t" + start.name + "\t" + this.GetType().Name + "\t" + start.transform.localEulerAngles.ToString("f1"),1);
 
-			if (useLocalRotation) start.transform.localRotation = destination.transform.localRotation;
-			else start.transform.rotation = destination.transform.rotation;
-			log.log("TASK_POSITION\t" + start.name + "\t" + this.GetType().Name + "\t" + start.transform.transform.position.ToString("f1"),1);
+		if (useLocalRotation) start.transform.localRotation = destinationLocationObject.transform.localRotation;
+		else start.transform.rotation = destinationLocationObject.transform.rotation;
+
+		log.log("TASK_ROTATE\t" + start.name + "\t" + this.GetType().Name + "\t" + start.transform.localEulerAngles.ToString("f1"), 1);
+		log.log("TASK_POSITION\t" + start.name + "\t" + this.GetType().Name + "\t" + start.transform.transform.position.ToString("f1"),1);
 		
 		if (swap) {
 			destination.transform.position = position;
