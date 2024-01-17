@@ -79,6 +79,7 @@ public class Experiment : MonoBehaviour
     public string logfile;
     [HideInInspector]
     public string dataPath;
+    public GameObject virtualDesert;
 
     private bool playback = false;
     private bool pause = true;

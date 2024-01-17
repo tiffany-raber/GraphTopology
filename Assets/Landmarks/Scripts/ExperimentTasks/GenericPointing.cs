@@ -53,7 +53,7 @@ public class GenericPointing : ExperimentTask
         Debug.Log(prompt_text);
         Debug.Log(prompt);
         hud.setMessage(prompt);
-        hud.showOnlyHUD();
+        hud.showEverything();
     }
 
 
