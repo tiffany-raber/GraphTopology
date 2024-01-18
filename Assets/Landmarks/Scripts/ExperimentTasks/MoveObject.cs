@@ -27,6 +27,9 @@ public class MoveObject : ExperimentTask {
 	
 	public bool swap;
 	public bool useDestinationSnapPoint;
+	[Tooltip("Specify an offset from the destination to move the object to and have it face the destination object")]
+	public Vector3 localOffsetFacing;
+
 	private static Vector3 position;
 	private static Quaternion rotation;
 
@@ -67,6 +70,14 @@ public class MoveObject : ExperimentTask {
 
 		if (useLocalRotation) start.transform.localRotation = destinationLocationObject.transform.localRotation;
 		else start.transform.rotation = destinationLocationObject.transform.rotation;
+
+		// If using an offset and having the start face the destination object
+		if (localOffsetFacing != Vector3.zero)
+		{
+			start.transform.position = destinationLocationObject.transform.position + destinationLocationObject.transform.TransformDirection(localOffsetFacing);
+
+			start.transform.LookAt(destinationLocationObject.transform);
+		}
 
 		log.log("TASK_ROTATE\t" + start.name + "\t" + this.GetType().Name + "\t" + start.transform.localEulerAngles.ToString("f1"), 1);
 		log.log("TASK_POSITION\t" + start.name + "\t" + this.GetType().Name + "\t" + start.transform.transform.position.ToString("f1"),1);

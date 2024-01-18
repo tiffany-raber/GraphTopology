@@ -2255,7 +2255,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-85208
+  m_Name: pb_Mesh-2708
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -5187,6 +5187,12 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: be6b47deae1839141b5dea85228cfa3e, type: 3}
+--- !u!1 &433562816 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3781252853062181422, guid: 3d4b2aac0f70f4474b0b78f3025f277a,
+    type: 3}
+  m_PrefabInstance: {fileID: 872232337}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &433757246
 Mesh:
   m_ObjectHideFlags: 0
@@ -9862,6 +9868,16 @@ PrefabInstance:
       propertyPath: skip
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4396226998460692561, guid: 3d4b2aac0f70f4474b0b78f3025f277a,
+        type: 3}
+      propertyPath: hideEnvironment
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4396226998460692561, guid: 3d4b2aac0f70f4474b0b78f3025f277a,
+        type: 3}
+      propertyPath: canIncrementLists
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4396226998460692564, guid: 3d4b2aac0f70f4474b0b78f3025f277a,
         type: 3}
       propertyPath: m_Name
@@ -9870,7 +9886,7 @@ PrefabInstance:
     - target: {fileID: 4396226998460692567, guid: 3d4b2aac0f70f4474b0b78f3025f277a,
         type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4396226998460692567, guid: 3d4b2aac0f70f4474b0b78f3025f277a,
         type: 3}
@@ -12409,6 +12425,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1522987205}
+  - {fileID: 1453807156}
   - {fileID: 872232338}
   - {fileID: 1570324342}
   - {fileID: 1490752343}
@@ -12428,7 +12445,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skip: 0
-  canIncrementLists: 1
+  canIncrementLists: 0
   interval: 0
   interruptTasks: {fileID: 0}
   interruptInterval: 0
@@ -21200,6 +21217,76 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9ebc158e2cb794fb3aeffcbee7d8d7ef, type: 3}
+--- !u!1 &1453807155
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1453807156}
+  - component: {fileID: 1453807157}
+  m_Layer: 0
+  m_Name: MovePlayer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1453807156
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1453807155}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1072376039}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1453807157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1453807155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 201e9890d1a764c8ea736797b2ca29a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skip: 0
+  canIncrementLists: 1
+  interval: 0
+  interruptTasks: {fileID: 0}
+  interruptInterval: 0
+  repeatInterrupts: 9999
+  currentInterrupt: 0
+  pausedTasks: {fileID: 0}
+  parentTask: {fileID: 0}
+  firstPersonCamera: {fileID: 0}
+  overheadCamera: {fileID: 0}
+  debugButton: {fileID: 0}
+  actionButton: {fileID: 0}
+  vrEnabled: 0
+  taskLog: {fileID: 0}
+  triggerLabel: 
+  triggerOnStart: 0
+  triggerOnEnd: 0
+  start: {fileID: 0}
+  destination: {fileID: 433562816}
+  destinationListName: 
+  destinations: {fileID: 0}
+  swap: 0
+  randomRotation: 0
+  scaledPlayer: 0
+  ignoreY: 0
+  blockRepeat: 0
 --- !u!1001 &1454481145
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21554,7 +21641,7 @@ Transform:
   m_Children:
   - {fileID: 707725175}
   m_Father: {fileID: 1072376039}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1490752344
 MonoBehaviour:
@@ -22051,7 +22138,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skip: 0
-  canIncrementLists: 1
+  canIncrementLists: 0
   interval: 0
   interruptTasks: {fileID: 0}
   interruptInterval: 0
@@ -22073,7 +22160,8 @@ MonoBehaviour:
   destinations: {fileID: 2013007052}
   useLocalRotation: 0
   swap: 0
-  useDestinationSnapPoint: 1
+  useDestinationSnapPoint: 0
+  localOffsetFacing: {x: -8, y: 0, z: 0}
 --- !u!1001 &1529653492
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23059,7 +23147,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1072376039}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1572414549
 PrefabInstance:

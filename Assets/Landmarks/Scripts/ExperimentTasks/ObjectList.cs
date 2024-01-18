@@ -108,11 +108,14 @@ public class ObjectList : ExperimentTask {
         foreach (GameObject obj in objs)
         {
 			// Check any other ObjectLists provided and don't add the current object from those lists
-			if (ignoreCurrentFromOtherLists.Count > 0) foreach (var ol in ignoreCurrentFromOtherLists)
+			if (ignoreCurrentFromOtherLists.Count > 0)
+			{
+				foreach (var ol in ignoreCurrentFromOtherLists)
 				{
 					if (ol.currentObject() == obj) continue;
 					else objects.Add(obj);
 				}
+			}
 			else objects.Add(obj);
 
 			foreach (var o in objects) log.log("TASK_ADD\t" + name + "\t" + this.GetType().Name + "\t" + o.name + "\t" + "null", 1);
@@ -130,7 +133,15 @@ public class ObjectList : ExperimentTask {
 	
 	public override void TASK_END() {
 		base.endTask();
-	}
+
+        if (canIncrementLists)
+		{
+			foreach (var ol in ignoreCurrentFromOtherLists)
+			{
+				ol.incrementCurrent();
+			}
+		}
+    }
 	
 	public GameObject currentObject() {
 		if (current >= objects.Count) {

@@ -40,7 +40,7 @@ public class GenericPointing : ExperimentTask
             {
                 prompt = string.Format(prompt_text, element.currentObject().name);
                 taskLog.AddData(transform.name + "_target", element.currentObject().name);
-                element.incrementCurrent();
+                // element.incrementCurrent();
                 Debug.Log("INCREMENTED!");
             }
             catch (System.Exception ex)
@@ -82,6 +82,13 @@ public class GenericPointing : ExperimentTask
         base.endTask();
 
         // WRITE TASK EXIT CODE HERE
+        if (canIncrementLists)
+        {
+            foreach (var ol in prompt_elements)
+            {
+                ol.incrementCurrent();
+            }
+        }
         Debug.Log("Done!");
 
     }
