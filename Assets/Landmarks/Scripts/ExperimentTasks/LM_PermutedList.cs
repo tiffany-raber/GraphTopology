@@ -100,35 +100,25 @@ public class LM_PermutedList : ExperimentTask
                 Debug.Log("Linked list contains " + permutedList.Count + "sets");
                 break;
             case ShuffleMethod.sortByFirstList:
+                // fixme THIS NEEDS COMMENTS
                 FisherYatesShuffle(permutedList);
-                var firstList = permutedList[0];
-                var firstListOrder = firstList.Distinct();
+                var firstListNames = new List<GameObject>();
+                foreach (var sublist in permutedList) firstListNames.Add(sublist[0]);
+                var firstListOrder = firstListNames.Distinct().ToList();
                 
                 var newIndices = new List<int>();
                 foreach (var thing in firstListOrder)
                 {
-                    // FIXME this isn't doing what it's supposed to
-                    var results = Enumerable.Range(0, firstList.Count).Where(i => firstList[i] == thing).ToList();
+                    Debug.LogWarning(thing.ToString());
+                    var results = Enumerable.Range(0, firstListNames.Count).Where(i => firstListNames[i] == thing).ToList();
                     foreach (var result in results) newIndices.Add(result);
                 }
-                foreach (var sublist in permutedList)
-                {
-                    var tmp = newIndices.Select(index => sublist[index]).ToList();
-                    sublist.Clear();
-                    foreach (var itm in tmp) sublist.Add(itm);
-                }
+                // COOL AWESOME WAY TO CREATE A RANDOM INDEX AND RE-USE IT FOR SORTING OTHER LISTS
+                var tmp = newIndices.Select(index => permutedList[index]).ToList();
+                permutedList.Clear();
+                foreach (var itm in tmp) permutedList.Add(itm);
 
-                // This isn't what I was actually planning to do but good to know for future syncing
-                //// create a reference list of indices for the list, shuffle, and apply to all lists
-                //var indices = Enumerable.Range(0, permutedList[0].Count).ToList();
-                //FisherYatesShuffle(indices);
-                //foreach (var sublist in permutedList)
-                //{
-                //    var tmp = indices.Select(index => sublist[index]).ToList();
-                //    sublist.Clear();
-                //    foreach (var itm in tmp) sublist.Add(itm);
-                //}
-                
+
                 break;
             default:
                 break;
