@@ -22,7 +22,7 @@ public enum ShuffleMethod
     none, 
     random,
     linked,
-    tiered
+    sortByFirstList
 }
 
 public class LM_PermutedList : ExperimentTask
@@ -99,16 +99,24 @@ public class LM_PermutedList : ExperimentTask
                 permutedList = SortForLinking(permutedList);
                 Debug.Log("Linked list contains " + permutedList.Count + "sets");
                 break;
-            case ShuffleMethod.tiered:
-                // Using an already shuffled objectlist that has since been permuted, sort each sublist from first to last,
-                // grouping all similar items in earlier lists before moving on to the next and so on (only the bottom level is shuffled)
-                Debug.LogWarning("When using tiered shuffle, be sure the input ObjectList has the shuffle option checked");
-                // for (int i = 0; i < subset - 1)
-                    // record the current item
-                    // scan the list for the next appearance
-                    // move the next non-matching item in the list to the end
-                    // move the next matching item to be after the initial one
-                    // make sure any time one sublist is modified, all others are as well
+            case ShuffleMethod.sortByFirstList:
+                FisherYatesShuffle(permutedList);
+                var firstList = permutedList[0];
+                var firstListOrder = firstList.Distinct();
+                
+                var newIndices = new List<int>();
+                foreach (var thing in firstListOrder)
+                {
+                    // FIXME this isn't doing what it's supposed to
+                    var results = Enumerable.Range(0, firstList.Count).Where(i => firstList[i] == thing).ToList();
+                    foreach (var result in results) newIndices.Add(result);
+                }
+                foreach (var sublist in permutedList)
+                {
+                    var tmp = newIndices.Select(index => sublist[index]).ToList();
+                    sublist.Clear();
+                    foreach (var itm in tmp) sublist.Add(itm);
+                }
 
                 // This isn't what I was actually planning to do but good to know for future syncing
                 //// create a reference list of indices for the list, shuffle, and apply to all lists
