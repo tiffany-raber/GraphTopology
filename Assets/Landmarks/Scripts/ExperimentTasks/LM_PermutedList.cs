@@ -17,6 +17,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+public enum ShuffleMethod
+{
+    none, 
+    random,
+    linked,
+    tiered
+}
 
 public class LM_PermutedList : ExperimentTask
 {
@@ -25,6 +32,11 @@ public class LM_PermutedList : ExperimentTask
     private ObjectList listToPermute;
     public int subset = 3;
     public bool shuffle = true;
+    [Tooltip("none:\tAB-AC-BA-BC-CA-CB\n" +
+             "random:\tBC-AC-AD-CB-BA-CA\n" +
+             "linked:\tCA-AB-BA-AC-CB-BC\n" +
+             "tierd:\tCB-CA-AB-AC-BA-BC")]
+    public ShuffleMethod shuffleMethod = ShuffleMethod.none;
     [Tooltip("Sort such that the last item of n-1 is the first item of n")] public bool link = false;
     private static bool linked = false;
     public EndListMode endListBehavior;
@@ -76,16 +88,44 @@ public class LM_PermutedList : ExperimentTask
 
 
         // Shuffle if necessary
-        if (shuffle)
+        switch (shuffleMethod)
         {
-            FisherYatesShuffle(permutedList);
+            case ShuffleMethod.none:
+                break;
+            case ShuffleMethod.random:
+                FisherYatesShuffle(permutedList);
+                break;
+            case ShuffleMethod.linked:
+                permutedList = SortForLinking(permutedList);
+                Debug.Log("Linked list contains " + permutedList.Count + "sets");
+                break;
+            case ShuffleMethod.tiered:
+                // Using an already shuffled objectlist that has since been permuted, sort each sublist from first to last,
+                // grouping all similar items in earlier lists before moving on to the next and so on (only the bottom level is shuffled)
+                Debug.LogWarning("When using tiered shuffle, be sure the input ObjectList has the shuffle option checked");
+                // for (int i = 0; i < subset - 1)
+                    // record the current item
+                    // scan the list for the next appearance
+                    // move the next non-matching item in the list to the end
+                    // move the next matching item to be after the initial one
+                    // make sure any time one sublist is modified, all others are as well
+
+                // This isn't what I was actually planning to do but good to know for future syncing
+                //// create a reference list of indices for the list, shuffle, and apply to all lists
+                //var indices = Enumerable.Range(0, permutedList[0].Count).ToList();
+                //FisherYatesShuffle(indices);
+                //foreach (var sublist in permutedList)
+                //{
+                //    var tmp = indices.Select(index => sublist[index]).ToList();
+                //    sublist.Clear();
+                //    foreach (var itm in tmp) sublist.Add(itm);
+                //}
+                
+                break;
+            default:
+                break;
         }
 
-        if (link)
-        {
-            permutedList = SortForLinking(permutedList);
-            Debug.Log("Linked list contains " + permutedList.Count + "sets");
-        }
 
         for (int i = 0; i < subset; i++)
         {
