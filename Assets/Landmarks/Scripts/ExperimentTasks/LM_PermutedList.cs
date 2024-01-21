@@ -35,7 +35,7 @@ public class LM_PermutedList : ExperimentTask
     [Tooltip("none:\tAB-AC-BA-BC-CA-CB\n" +
              "random:\tBC-AC-AD-CB-BA-CA\n" +
              "linked:\tCA-AB-BA-AC-CB-BC\n" +
-             "tierd:\tCB-CA-AB-AC-BA-BC")]
+             "sortByFirstList:\tCB-CA-AB-AC-BA-BC")]
     public ShuffleMethod shuffleMethod = ShuffleMethod.none;
     [Tooltip("Sort such that the last item of n-1 is the first item of n")] public bool link = false;
     private static bool linked = false;
