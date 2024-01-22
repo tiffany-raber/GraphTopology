@@ -29,8 +29,10 @@ public class LM_PermutedList : ExperimentTask
 {
     [Header("Task-specific Properties")]
     public ObjectList[] inputLists;
-    private ObjectList listToPermute;
-    public int subset = 3;
+    [Tooltip("Leave objects as 'None' to automatically generate child ObjectLists.\n" +
+        "Assign pre-configured ObjectLists for greater control (recommended).")]
+    public List<ObjectList> outputLists = new List<ObjectList>();
+    private int subset;
     public bool shuffle = true;
     [Tooltip("none:\tAB-AC-BA-BC-CA-CB\n" +
              "random:\tBC-AC-AD-CB-BA-CA\n" +
@@ -46,7 +48,6 @@ public class LM_PermutedList : ExperimentTask
     //[HideInInspector]
     public List<List<GameObject>> permutedList = new List<List<GameObject>>();
 
-
     public override void startTask()
     {
         TASK_START();
@@ -61,8 +62,9 @@ public class LM_PermutedList : ExperimentTask
         // Deal with the kind of list we are using
         if (inputLists.Length == 1)
         {
+            subset = outputLists.Count;
             // Generate permutations
-            listToPermute = inputLists[0];
+            var listToPermute = inputLists[0];
             permutedList = Permute(listToPermute.objects, subset).ToList();
         }
         else if (inputLists.Length > 1)
@@ -100,44 +102,42 @@ public class LM_PermutedList : ExperimentTask
                 Debug.Log("Linked list contains " + permutedList.Count + "sets");
                 break;
             case ShuffleMethod.sortByFirstList:
-                // fixme THIS NEEDS COMMENTS
+                // Shuffle the list and extract the unique objects from the first subset list in the shuffled order
                 FisherYatesShuffle(permutedList);
                 var firstListNames = new List<GameObject>();
                 foreach (var sublist in permutedList) firstListNames.Add(sublist[0]);
                 var firstListOrder = firstListNames.Distinct().ToList();
-                
+                // Go through each unique object in first subset list and find the index of all appearances
                 var newIndices = new List<int>();
                 foreach (var thing in firstListOrder)
                 {
-                    Debug.LogWarning(thing.ToString());
                     var results = Enumerable.Range(0, firstListNames.Count).Where(i => firstListNames[i] == thing).ToList();
                     foreach (var result in results) newIndices.Add(result);
                 }
-                // COOL AWESOME WAY TO CREATE A RANDOM INDEX AND RE-USE IT FOR SORTING OTHER LISTS
+                // Re-sort the permuted list based on the new, grouped indices we just created
                 var tmp = newIndices.Select(index => permutedList[index]).ToList();
                 permutedList.Clear();
                 foreach (var itm in tmp) permutedList.Add(itm);
-
-
                 break;
             default:
                 break;
         }
 
-
+        // Create/Configure human-readable ObjectLists in the Hierarchy/Inspector
         for (int i = 0; i < subset; i++)
         {
-            var ol = new GameObject();
-            
-            ol.AddComponent<ObjectList>();
-            var thing = Instantiate(ol, transform);
-            thing.name = this.name + "_subset" + i;
-
-            foreach (var entry in permutedList)
+            // Generate a new child ObjectList if not pre-specified in outputLists
+            if (outputLists[i] == null)
             {
-                thing.GetComponent<ObjectList>().objects.Add(entry[i]);
+                var ol = new GameObject();
+                ol.AddComponent<ObjectList>();
+                var thing = Instantiate(ol, transform);
+                thing.name = this.name + "_subset" + i;
+                outputLists[i] = thing.GetComponent<ObjectList>();
+                Destroy(ol);
             }
-            Destroy(ol);
+            // Populate output list with items from the permuted list (if any items already exist, these will be appended)
+            foreach (var entry in permutedList) outputLists[i].objects.Add(entry[i]);
         }
     }
 

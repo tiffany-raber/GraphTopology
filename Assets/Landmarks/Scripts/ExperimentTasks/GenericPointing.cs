@@ -34,6 +34,7 @@ public class GenericPointing : ExperimentTask
         }
 
         // Configure the prompt for the HUD
+        // FIXME
         foreach (var element in prompt_elements)
         {
             try
