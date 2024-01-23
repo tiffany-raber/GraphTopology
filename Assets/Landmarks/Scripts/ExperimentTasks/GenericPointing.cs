@@ -34,22 +34,30 @@ public class GenericPointing : ExperimentTask
         }
 
         // Configure the prompt for the HUD
-        // FIXME
-        foreach (var element in prompt_elements)
+        var promptVars = new string[prompt_elements.Count];
+        Debug.Log(promptVars.Length);
+        for (int iElement = 0; iElement < prompt_elements.Count; iElement++)
         {
-            try
-            {
-                prompt = string.Format(prompt_text, element.currentObject().name);
-                taskLog.AddData(transform.name + "_target", element.currentObject().name);
-                // element.incrementCurrent();
-                Debug.Log("INCREMENTED!");
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError("Possible mismatch between prompt elements specified and elements provided");
-            }
-            
+            Debug.Log(prompt_elements[iElement].currentObject().name);
+            promptVars[iElement] = prompt_elements[iElement].currentObject().transform.name;
         }
+        prompt = string.Format(prompt_text, promptVars);
+        //foreach (var element in prompt_elements)
+        //{
+            
+        //    try
+        //    {
+        //        prompt = string.Format(prompt_text, element.currentObject().name);
+        //        taskLog.AddData(transform.name + "_target", element.currentObject().name);
+        //        // element.incrementCurrent();
+        //        Debug.Log("INCREMENTED!");
+        //    }
+        //    catch (System.Exception ex)
+        //    {
+        //        Debug.LogError("Possible mismatch between prompt elements specified and elements provided");
+        //    }
+            
+        //}
         
         Debug.Log(prompt_text);
         Debug.Log(prompt);

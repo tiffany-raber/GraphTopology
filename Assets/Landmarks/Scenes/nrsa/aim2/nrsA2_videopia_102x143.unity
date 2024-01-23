@@ -4225,8 +4225,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1918633727}
-  m_RootOrder: 3
+  m_Father: {fileID: 1601392053}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &391846734
 MonoBehaviour:
@@ -5758,7 +5758,7 @@ MonoBehaviour:
   triggerLabel: 
   triggerOnStart: 0
   triggerOnEnd: 0
-  prompt_text: You are at the {0}; point to the {0}.
+  prompt_text: You are at the {0}; point to the {1}.
   prompt_elements:
   - {fileID: 1371847994}
   - {fileID: 391846734}
@@ -6033,7 +6033,7 @@ Transform:
   m_Children:
   - {fileID: 491721120}
   m_Father: {fileID: 1918633727}
-  m_RootOrder: 4
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &505964726
 MonoBehaviour:
@@ -20238,8 +20238,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1918633727}
-  m_RootOrder: 2
+  m_Father: {fileID: 1601392053}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1371847994
 MonoBehaviour:
@@ -25936,7 +25936,9 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1371847993}
+  - {fileID: 391846733}
   m_Father: {fileID: 1918633727}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -28865,8 +28867,6 @@ Transform:
   m_Children:
   - {fileID: 721172987}
   - {fileID: 1601392053}
-  - {fileID: 1371847993}
-  - {fileID: 391846733}
   - {fileID: 505964725}
   m_Father: {fileID: 1502745653}
   m_RootOrder: 0
