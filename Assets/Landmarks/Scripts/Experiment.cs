@@ -38,6 +38,7 @@ public enum EndListMode
 public enum UserInterface
 {
     KeyboardMouse,
+    KeyboardSingleAxis,
     ViveRoomspace,
     ViveVirtualizer,
     ViveKatwalk
@@ -146,11 +147,11 @@ public class Experiment : MonoBehaviour
         playerCamera = lmPlayer.cam;
         hud = lmPlayer.headsUpDisplay;
         usingVR = lmPlayer.usesVR;
+        //if (!hud.hudRig.transform.IsChildOf(lmPlayer.transform)) hud.hudRig.transform.SetParent(lmPlayer.transform);
 
         // Initialize controller properties
         playerCamera.gameObject.AddComponent<AudioListener>();
         playerCamera.enabled = true;
-        hud.showOnlyHUD();
         player.tag = "Player";
 
         // Deactivate all other controllers
@@ -161,6 +162,9 @@ public class Experiment : MonoBehaviour
                 child.gameObject.SetActive(false);
             }
         }
+
+        hud.ReCenter(avatar.transform);
+        hud.showOnlyHUD();
 
         // Assign other experiment variables
         tasks = GameObject.Find("LM_Timeline").GetComponent<TaskList>();
@@ -375,6 +379,9 @@ public class Experiment : MonoBehaviour
                 case "KeyboardMouse":
                     userInterface = UserInterface.KeyboardMouse;
                     break;
+                case "KeyboardSingleAxis":
+                    userInterface = UserInterface.KeyboardSingleAxis;
+                    break;
                 case "ViveVirtualizer":
                     userInterface = UserInterface.ViveVirtualizer;
                     break;
@@ -395,6 +402,11 @@ public class Experiment : MonoBehaviour
         {
             case UserInterface.KeyboardMouse:
                 lmPlayer = GameObject.Find("KeyboardMouseController").GetComponent<LM_PlayerController>();
+
+                break;
+
+            case UserInterface.KeyboardSingleAxis:
+                lmPlayer = GameObject.Find("KeyboardSingleAxisController").GetComponent<LM_PlayerController>();
 
                 break;
 
