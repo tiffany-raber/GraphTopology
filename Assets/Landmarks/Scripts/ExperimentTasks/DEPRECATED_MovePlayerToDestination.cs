@@ -19,7 +19,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class MovePlayerToDestination : ExperimentTask {
+public class DEPRECATED_MovePlayerToDestination : ExperimentTask {
 
 	[Header("Task-specific Properties")]
     public GameObject destination;

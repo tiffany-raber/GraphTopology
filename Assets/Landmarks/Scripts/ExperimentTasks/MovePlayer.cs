@@ -18,7 +18,7 @@ using UnityEngine;
 using System.Collections;
 using UnityStandardAssets.Characters.FirstPerson;
 
-public class MoveSpawn : ExperimentTask {
+public class MovePlayer : ExperimentTask {
     
     [HideInInspector] public GameObject start;
 
