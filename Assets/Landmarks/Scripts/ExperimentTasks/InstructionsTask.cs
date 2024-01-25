@@ -53,6 +53,7 @@ public class InstructionsTask : ExperimentTask {
 
     public bool restrictMovement = true; // MJS do we want to keep them still during this?
     public bool selfPaced = true; // can they press return to end the task?
+    public KeyCode continueKey = KeyCode.Return;
 
     void OnDisable ()
     {
@@ -201,7 +202,7 @@ public class InstructionsTask : ExperimentTask {
         //------------------------------------------
         if (selfPaced)  
         {
-            if (Input.GetButtonDown("Return") | Input.GetKeyDown(KeyCode.Return))
+            if (Input.GetButtonDown("Return") | Input.GetKeyDown(continueKey))
             {
                 log.log("INPUT_EVENT    PlayerPressedReturn    1", 1);
                 return true;

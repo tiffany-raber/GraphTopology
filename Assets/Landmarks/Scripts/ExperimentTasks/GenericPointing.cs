@@ -35,10 +35,8 @@ public class GenericPointing : ExperimentTask
 
         // Configure the prompt for the HUD
         var promptVars = new string[prompt_elements.Count];
-        Debug.Log(promptVars.Length);
         for (int iElement = 0; iElement < prompt_elements.Count; iElement++)
         {
-            Debug.Log(prompt_elements[iElement].currentObject().name);
             promptVars[iElement] = prompt_elements[iElement].currentObject().transform.name;
         }
         prompt = string.Format(prompt_text, promptVars);
@@ -58,8 +56,7 @@ public class GenericPointing : ExperimentTask
         //    }
             
         //}
-        
-        Debug.Log(prompt_text);
+       
         Debug.Log(prompt);
         hud.setMessage(prompt);
         hud.showEverything();
