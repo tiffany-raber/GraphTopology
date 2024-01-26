@@ -28,12 +28,11 @@ public class MovePlayer : ExperimentTask {
 	public ObjectList destinations;
 
 	public bool swap;
-	private static Vector3 position;
-	private static Vector3 rotation;
 
     public bool randomRotation;
 	public bool scaledPlayer = false;
     public bool ignoreY = false;
+    public Vector3 localOffsetFacing;
 
     //variables used for block repetition
     public bool blockRepeat;
@@ -63,7 +62,7 @@ public class MovePlayer : ExperimentTask {
         {
             start = scaledAvatar;
         } else start = avatar;
-        Debug.Log("Player identified: " + start.gameObject.name);
+        // Debug.Log("Player identified: " + start.gameObject.name);
 
         // Find destinations with string destinationsName
         if (destinations == null && destinationListName != "") // only if destinations is blank and destinationsName is not
@@ -72,41 +71,54 @@ public class MovePlayer : ExperimentTask {
             // Debug.Log("moving the " + start.gameObject.name + " to " + destinations.currentObject());
         }
         // otherwise, use destination or destinations.
-
         if (destinations) {
             destination = destinations.currentObject();
-            Debug.Log("Destination selected: " + destination.name +
-                " (" + destination.transform.position.x + ", " +
-                destination.transform.position.z + ")");
+            //Debug.Log("Destination selected: " + destination.name +
+            //    " (" + destination.transform.position.x + ", " +
+            //    destination.transform.position.z + ")");
         }
 
-        position = start.transform.position;
-        rotation = start.transform.eulerAngles;
+        // Temporary transforms that can be easily modified
+        var originPos = start.transform.position;
+        var originRot = start.transform.eulerAngles;
+        var terminusPos = destination.transform.position;
+        var terminusRot = destination.transform.eulerAngles;
 
-
-        // Change the position (2D or 3D)
+        // -----------------
+        // Move the player
+        // -----------------
+        // Character controller component must be disabled to move the player like this
+        if (localOffsetFacing != Vector3.zero) terminusPos += destination.transform.TransformDirection(localOffsetFacing);
+        if (ignoreY) terminusPos.y = originPos.y;
         start.GetComponentInChildren<CharacterController>().enabled = false;
-        Vector3 tempPos = start.transform.position;
-        tempPos.x = destination.transform.position.x;
-        if (!ignoreY)
-        {
-            tempPos.y = destination.transform.position.y;
-        }
-        tempPos.z = destination.transform.position.z;
-        start.transform.position = tempPos;
+        start.transform.position = terminusPos;
         log.log("TASK_POSITION\t" + start.name + "\t" + this.GetType().Name + "\t" + start.transform.transform.position.ToString("f1"), 1);
-        Debug.Log("Player now at: " + destination.name +
-                " (" + start.transform.position.x + ", " +
-                start.transform.position.z + ")");
         start.GetComponentInChildren<CharacterController>().enabled = true;
 
-        // Set the rotation to random if selected
-        if (randomRotation)
+        // -----------------
+        // Rotate the player
+        // -----------------
+        // Turn off any FirstPersonController (FPC) components in order to modify
+        var fpc = start.GetComponent<FirstPersonController>();
+        if (fpc != null) fpc.enabled = false;
+        // Modify and/or set
+        if (localOffsetFacing != Vector3.zero)
         {
-        Vector3 tempRot = start.transform.eulerAngles;
-        tempRot.y = Random.Range(0, 359.999f);
-        start.transform.eulerAngles = tempRot;
+            Debug.LogWarning("Using the provided 'localOffsetFacing' property to point the player at the original destination.\n" +
+                "\tIf 'randomRotation' was selected, it will be ignored.");
+            start.transform.LookAt(destination.transform);
         }
+        else
+        {
+            if (randomRotation) terminusRot.y = Random.Range(0, 360 - Mathf.Epsilon);
+            start.transform.eulerAngles = terminusRot;
+        }
+        manager.playerCamera.transform.localEulerAngles = Vector3.zero;
+        // turn the FPC back on
+        if (fpc != null) fpc.ResetMouselook();
+        if (fpc != null) fpc.enabled = true;
+        
+        
 
         if (!isScaled)
         {
@@ -128,10 +140,11 @@ public class MovePlayer : ExperimentTask {
         //Debug.Log(avatar.transform.position);
         //Debug.Log("-------------------------------------------------");
 
-        if (swap) {
-						destination.transform.position = position;
-						destination.transform.eulerAngles = rotation;
-				}
+        if (swap)
+        {
+            destination.transform.position = originPos;
+            destination.transform.eulerAngles = originRot;
+        }
 	}
 
 	public override bool updateTask () {
