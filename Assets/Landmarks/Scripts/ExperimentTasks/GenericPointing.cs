@@ -12,6 +12,15 @@ public class GenericPointing : ExperimentTask
     [Header("Task-specific Properties")]
     [TextArea] public string prompt_text = "Point to the {0}.";
     public List<ObjectList> prompt_elements = new List<ObjectList>();
+
+    // fMRI compatible time logging
+    private float cueOnset = -1f;
+    private float cueDuration;
+    private float promptOnset;
+    private float promptDuration;
+    private float pointOnset;
+    private float pointDuration;
+    public int secondsToShowEnvironment = 0;
     private string prompt;
 
     public override void startTask()
@@ -40,38 +49,32 @@ public class GenericPointing : ExperimentTask
             promptVars[iElement] = prompt_elements[iElement].currentObject().transform.name;
         }
         prompt = string.Format(prompt_text, promptVars);
-        //foreach (var element in prompt_elements)
-        //{
-            
-        //    try
-        //    {
-        //        prompt = string.Format(prompt_text, element.currentObject().name);
-        //        taskLog.AddData(transform.name + "_target", element.currentObject().name);
-        //        // element.incrementCurrent();
-        //        Debug.Log("INCREMENTED!");
-        //    }
-        //    catch (System.Exception ex)
-        //    {
-        //        Debug.LogError("Possible mismatch between prompt elements specified and elements provided");
-        //    }
-            
-        //}
-       
-        Debug.Log(prompt);
-        hud.setMessage(prompt);
-        hud.showEverything();
+        
     }
 
 
     public override bool updateTask()
     {
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (cueOnset < 0) cueOnset = Time.time;
+        var elapsedTime = Time.time - cueOnset;
+
+        if (secondsToShowEnvironment > 0) hud.showEverything();
+
+        // Once the environment disappears
+        if (elapsedTime > secondsToShowEnvironment)
         {
-            return true;
+            if (hud.HudState == CullState.showEverything)
+            {
+                hud.showOnlyHUD();
+                promptOnset = Time.time;
+                hud.setMessage(prompt);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Return)) return true;
+            else return false;
         }
         else return false;
 
-        // WRITE TASK UPDATE CODE HERE
     }
 
 
@@ -87,16 +90,20 @@ public class GenericPointing : ExperimentTask
     {
         base.endTask();
 
-        // WRITE TASK EXIT CODE HERE
-        if (canIncrementLists)
-        {
-            foreach (var ol in prompt_elements)
-            {
-                ol.incrementCurrent();
-            }
-        }
-        Debug.Log("Done!");
+        // Logging
+        taskLog.AddData(transform.name + "_cue_onset_s", cueOnset.ToString());
+        taskLog.AddData(transform.name + "_cue_duration_s", cueDuration.ToString());
+        taskLog.AddData(transform.name + "_prompt_onset_s", promptOnset.ToString());
+        taskLog.AddData(transform.name + "_prompt_duration_s", promptDuration.ToString());
+        taskLog.AddData(transform.name + "_point_onset_s", pointOnset.ToString());
+        taskLog.AddData(transform.name + "_point_duration_s", pointDuration.ToString());
 
+        // WRITE TASK EXIT CODE HERE
+        hud.setMessage("");
+        if (canIncrementLists) foreach (var ol in prompt_elements) ol.incrementCurrent();
+        cueOnset = -1f;
+
+        Debug.LogWarning("Trial Completed");
     }
 
 }

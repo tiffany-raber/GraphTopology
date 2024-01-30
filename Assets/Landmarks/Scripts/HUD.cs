@@ -20,6 +20,14 @@ using UnityEngine.UI;
 using System;
 using VRStandardAssets.Utils;
 
+public enum CullState
+{
+	showOnlyHud,
+	showEverything,
+	showOnlyTargets,
+	showNothing
+}
+
 public class HUD : MonoBehaviour
 {
 
@@ -79,7 +87,7 @@ public class HUD : MonoBehaviour
 	public int InstructionDuration = 99999; // MJS - allow different duration for instructions tasks
 
 	[HideInInspector] public long playback_time = 0;
-
+	private CullState hudState = CullState.showEverything;
 
     public void Awake()
 	{
@@ -191,6 +199,9 @@ public class HUD : MonoBehaviour
 		}
 		cam[0].clearFlags = CameraClearFlags.Skybox;
 		cam[1].clearFlags = CameraClearFlags.Skybox;
+
+		if (manager.virtualDesert != null) manager.virtualDesert.SetActive(false);
+		hudState = CullState.showEverything;
 	}
 
 	public void showNothing()
@@ -202,6 +213,9 @@ public class HUD : MonoBehaviour
 
 		cam[0].clearFlags = CameraClearFlags.SolidColor;
 		cam[1].clearFlags = CameraClearFlags.SolidColor;
+
+		if (manager.virtualDesert != null) manager.virtualDesert.SetActive(false);
+		hudState = CullState.showNothing;
 	}
 
 	public void showOnlyHUD()
@@ -213,6 +227,9 @@ public class HUD : MonoBehaviour
 
 		cam[0].clearFlags = CameraClearFlags.SolidColor;
 		cam[1].clearFlags = CameraClearFlags.SolidColor;
+
+		manager?.virtualDesert.SetActive(true);
+		hudState = CullState.showOnlyHud;
 	}
 
     public void showOnlyTargets()
@@ -224,6 +241,9 @@ public class HUD : MonoBehaviour
 
         cam[0].clearFlags = CameraClearFlags.SolidColor;
         cam[1].clearFlags = CameraClearFlags.SolidColor;
+
+		if (manager.virtualDesert != null) manager.virtualDesert.SetActive(true);
+		hudState = CullState.showOnlyTargets;
     }
 
 
@@ -470,5 +490,11 @@ public class HUD : MonoBehaviour
 		hudRig.transform.eulerAngles = new Vector3(hudRig.transform.eulerAngles.x, t.eulerAngles.y, hudRig.transform.eulerAngles.z); // rotation
 
     }
+
+	public CullState HudState
+	{
+		get { return hudState; }
+		set { hudState = value; }
+	}
 
 }

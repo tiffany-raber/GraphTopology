@@ -326,7 +326,7 @@ public class TaskList : ExperimentTask
     {
         base.endTask();
 
-        if (overideRepeat)
+        if (overideRepeat && canIncrementLists)
         {
             overideRepeat.incrementCurrent();
         }

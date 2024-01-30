@@ -167,7 +167,7 @@ public class MovePlayer : ExperimentTask {
             }
             else
             {
-                destinations.incrementCurrent();
+                if (canIncrementLists) destinations.incrementCurrent();
             }
             destination = destinations.currentObject();
 		}
@@ -182,7 +182,7 @@ public class MovePlayer : ExperimentTask {
         if (count == repetition)
         {
             count = 1;
-            destinations.incrementCurrent();
+            if (canIncrementLists) destinations.incrementCurrent();
         }
         else //increment count
         {

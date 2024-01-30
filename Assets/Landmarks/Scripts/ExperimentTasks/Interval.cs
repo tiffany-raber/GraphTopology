@@ -10,7 +10,7 @@ public class Interval : ExperimentTask
     public bool equalIncrements = true;
     public bool shuffle = true;
 
-    private float startTime;
+    private float startTime = -1f;
     private float[] intervalList = new float[0];
     private int currentIntervalIndex;
 
@@ -48,7 +48,7 @@ public class Interval : ExperimentTask
                 Debug.Log(interval.ToString());
                 for (int iInt = 0; iInt < intervalList.Length; iInt++)
                 {
-                    intervalList[iInt] = Mathf.Round(10*nextValue)/10; // gives us some extra precision while hitting the upper bound of the range
+                    intervalList[iInt] = Mathf.Round(nextValue); // gives us some extra precision while hitting the upper bound of the range
                     nextValue += interval;
                 }
             }
@@ -68,7 +68,7 @@ public class Interval : ExperimentTask
 
     public override bool updateTask()
     {
-        if (startTime == 0f) startTime = Time.time;
+        if (startTime < 0) startTime = Time.time;
         // Just wait until the specified time has passed
         while (Time.time - startTime < intervalList[currentIntervalIndex] / 1000) // convert to seconds
         {
@@ -91,7 +91,12 @@ public class Interval : ExperimentTask
     {
         base.endTask();
 
+        // Log data
+        taskLog.AddData(transform.name + "_onset_s", startTime.ToString());
+        taskLog.AddData(transform.name + "_duration_s", (intervalList[currentIntervalIndex]/1000).ToString());
+
         // Update the interval for next time
+        startTime = -1f;
         currentIntervalIndex++;
     }
 

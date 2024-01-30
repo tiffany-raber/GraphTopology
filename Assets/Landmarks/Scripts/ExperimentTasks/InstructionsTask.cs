@@ -54,6 +54,10 @@ public class InstructionsTask : ExperimentTask {
     public bool restrictMovement = true; // MJS do we want to keep them still during this?
     public bool selfPaced = true; // can they press return to end the task?
     public KeyCode continueKey = KeyCode.Return;
+    public bool logging;
+
+    private float onset = -1f;
+    private float duration;
 
     void OnDisable ()
     {
@@ -132,29 +136,18 @@ public class InstructionsTask : ExperimentTask {
         if (blackout) hud.showOnlyHUD();
         else hud.showEverything();
 
-        if (masterText == "")
-        {
-            if (message)
-            {
-                string msg = message.text;
-                if (currentText != null) msg = string.Format(msg, currentText);
-                if (currentObject != null) msg = string.Format(msg, currentObject.name);
-                if (multiObjects.Length > 0) msg = string.Format(msg, currentMultiObjects);
-                hud.setMessage(msg);
-            }
-            else if (!message & texts)
-            {
-                string msg = currentText;
-                if (currentObject != null) msg = string.Format(msg, currentObject.name);
-                hud.setMessage(msg);
-            }
-        }
-        else
-        {
-            string msg = masterText;
-            hud.setMessage(msg);
-        }
-       
+        string msg;
+        if (masterText == "" && message) msg = message.text;
+        else if (masterText == "" && !message && texts) msg = currentText;
+        else msg = masterText;
+
+        if (currentText != null) msg = string.Format(msg, currentText);
+        if (currentObject != null) msg = string.Format(msg, currentObject.name);
+        if (multiObjects.Length > 0) msg = string.Format(msg, currentMultiObjects);
+        hud.setMessage(msg);
+
+        if (msg == "") hud.SecondsToShow = 0;
+
 
         hud.flashStatus("");
 
@@ -186,7 +179,10 @@ public class InstructionsTask : ExperimentTask {
         else hud.actionButton.SetActive(false);
     }
     // Update is called once per frame
-    public override bool updateTask () {
+    public override bool updateTask ()
+    {
+        if (onset < 0) onset = Time.time;
+        duration = Time.time - onset;
 
         if (skip) {
             //log.log("INFO    skip task    " + name,1 );
@@ -223,8 +219,6 @@ public class InstructionsTask : ExperimentTask {
             return KillCurrent ();
         }
 
-
-
         return false;
     }
 
@@ -235,6 +229,14 @@ public class InstructionsTask : ExperimentTask {
 
     public override void TASK_END() {
         base.endTask ();
+
+        // Log data if requested
+        if (logging)
+        {
+            taskLog.AddData(transform.name + "_onset_s", onset.ToString());
+            taskLog.AddData(transform.name + "_duration_s", duration.ToString());
+            if (objects != null) taskLog.AddData(transform.name + "_object", currentObject.ToString());
+        }
 
         hud.setMessage ("");
         hud.SecondsToShow = hud.GeneralDuration;
@@ -272,6 +274,8 @@ public class InstructionsTask : ExperimentTask {
             manager.player.GetComponentInChildren<CharacterController>().enabled = true;
             manager.scaledPlayer.GetComponent<ThirdPersonCharacter>().immobilized = false;
         }
+
+        onset = -1f;
     }
 
 }

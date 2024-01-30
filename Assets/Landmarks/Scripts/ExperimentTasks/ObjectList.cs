@@ -134,13 +134,14 @@ public class ObjectList : ExperimentTask {
 	public override void TASK_END() {
 		base.endTask();
 
-        if (canIncrementLists)
-		{
-			foreach (var ol in ignoreCurrentFromOtherLists)
-			{
-				ol.incrementCurrent();
-			}
-		}
+		// Not sure this code is functioning correctly (and may be causing issues)
+		//if (canIncrementLists)
+		//{
+		//	foreach (var ol in ignoreCurrentFromOtherLists)
+		//	{
+		//		ol.incrementCurrent();
+		//	}
+		//}
     }
 	
 	public GameObject currentObject() {
