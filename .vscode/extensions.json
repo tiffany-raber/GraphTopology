@@ -1,5 +1,6 @@
 {
     "recommendations": [
-        "GrapeCity.gc-excelviewer"
+        "GrapeCity.gc-excelviewer",
+        "visualstudiotoolsforunity.vstuc"
     ]
 }

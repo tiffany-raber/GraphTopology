@@ -5610,7 +5610,7 @@ GameObject:
   - component: {fileID: 491721120}
   - component: {fileID: 491721121}
   m_Layer: 0
-  m_Name: Point
+  m_Name: point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5660,7 +5660,11 @@ MonoBehaviour:
   triggerLabel: 
   triggerOnStart: 0
   triggerOnEnd: 0
-  timeAllotted_s: 10
+  ccwButton: 276
+  cwButton: 275
+  submitButton: 273
+  rotationSpeedMultiplier: 1
+  useBodyNotCameraForRotation: 0
 --- !u!1001 &497411692
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19260,7 +19264,7 @@ PrefabInstance:
     - target: {fileID: 5534916921364503261, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5696298218110792130, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
         type: 3}
@@ -28193,7 +28197,7 @@ GameObject:
   - component: {fileID: 1918633727}
   - component: {fileID: 1918633728}
   m_Layer: 0
-  m_Name: retrieval-fp
+  m_Name: retrieval
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
