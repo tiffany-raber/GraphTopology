@@ -2452,8 +2452,8 @@ MonoBehaviour:
   triggerOnEnd: 0
   instruction: {fileID: 0}
   message: {fileID: 0}
-  masterText: 
-  objects: {fileID: 0}
+  masterText: '{0}'
+  objects: {fileID: 391846734}
   multiObjects: []
   texts: {fileID: 0}
   blackout: 0
