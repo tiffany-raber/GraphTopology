@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static System.Runtime.CompilerServices.RuntimeHelpers;
@@ -6,7 +7,15 @@ using static System.Runtime.CompilerServices.RuntimeHelpers;
 public class TurnToPoint : ExperimentTask
 {
     [Header("Task-specific Properties")]
+    [Tooltip("Leave blank to use the player/avatar")]
+    public ObjectList listOfOrigins;
+    public ObjectList listOfHeadings;
+    public ObjectList listOfTargets;
+    private GameObject currentOrigin;
+    private GameObject currentHeading;
+    private GameObject currentTarget;
     private float onset;
+    [Header("Input")]
     private float responseMovementOnset;
     private float responseLatency;
     public KeyCode  ccwButton = KeyCode.LeftArrow;
@@ -16,15 +25,17 @@ public class TurnToPoint : ExperimentTask
     public bool useBodyNotCameraForRotation;
     private Transform rotationSource;
     private float lastFrameY;
-    private float initialY; 
+    private float initialGlobalY; 
+    private float initialLocalY;
     private float totalClockwiseRotation; 
-    private float finalY; 
     private bool hasMoved; // has the player started adjusting the facing direction yet?
+    private float finalGlobalY; 
+    private float finalLocalY;
+    private float correctGlobalY;
+    private float correctLocalY;
     private bool responded;
     private float signedError;
     private float absoluteError;
-
-    
 
     public override void startTask()
     {
@@ -45,13 +56,24 @@ public class TurnToPoint : ExperimentTask
             return;
         }
 
-        // WRITE TASK STARTUP CODE HERE
+        // Initialize variables that change from trial-to-trial
         if (useBodyNotCameraForRotation) rotationSource = avatar.GetComponent<LM_PlayerController>().collisionObject.transform;
         else rotationSource = avatar.GetComponent<LM_PlayerController>().cam.transform;
-        initialY = rotationSource.eulerAngles.y;
+        lastFrameY = Single.NaN;
         totalClockwiseRotation = 0;
-
         onset = -1f;
+        responded = false;
+        hasMoved =false;
+        if (listOfOrigins != null) currentOrigin = listOfOrigins.currentObject();
+        else currentOrigin = avatar.GetComponent<LM_PlayerController>().cam.gameObject;
+        currentHeading = listOfHeadings.currentObject();
+        currentTarget = listOfTargets.currentObject();
+
+        // Calculate geometry
+        initialLocalY = Experiment.Vector3Angle2D(currentOrigin.transform.position, currentHeading.transform.position);
+        initialGlobalY = rotationSource.eulerAngles.y;
+
+        hud.showOnlyHUD();
     }
 
 
@@ -62,8 +84,12 @@ public class TurnToPoint : ExperimentTask
         responseLatency = Time.time - onset;
 
         // Keep track of rotations as we go
-        totalClockwiseRotation += rotationSource.eulerAngles.y - lastFrameY;
-        lastFrameY = rotationSource.eulerAngles.y;
+        if (lastFrameY == Single.NaN)
+        {
+            totalClockwiseRotation += rotationSource.eulerAngles.y - lastFrameY;
+            lastFrameY = rotationSource.eulerAngles.y;
+        }
+       
         if (totalClockwiseRotation > 0 && !hasMoved)
         {
             responseMovementOnset = Time.time;
@@ -73,14 +99,14 @@ public class TurnToPoint : ExperimentTask
         // Handle the response input 
         if (Input.GetKeyDown(submitButton) && !responded)
         {
-            finalY = rotationSource.eulerAngles.y;
+            finalGlobalY = rotationSource.eulerAngles.y;
             responded = true;
             if (interval == 0) return true; // end with response unless duration/interval is specified
         }
         // If we're using a fixed duration just end when times up (regardless of response status
         if (interval > 0 && Time.time - onset > 0)
         {
-            finalY = rotationSource.eulerAngles.y; // still record if time ran out
+            finalGlobalY = rotationSource.eulerAngles.y; // still record if time ran out
             return true;
         }
 
@@ -108,13 +134,21 @@ public class TurnToPoint : ExperimentTask
         if (interval != 0) taskLog.AddData(transform.name + "_duration_s", (interval / 1000).ToString());
         else taskLog.AddData(transform.name + "_duration_s", responseLatency.ToString());
         taskLog.AddData(transform.name + "_responseLatency", responseLatency.ToString());
-        taskLog.AddData(transform.name + "_initialY", initialY.ToString());
-        taskLog.AddData(transform.name + "_finalY", finalY.ToString());
+        taskLog.AddData(transform.name + "_initialY_allo", initialGlobalY.ToString());
+        taskLog.AddData(transform.name + "_initialY_ego", initialLocalY.ToString());
+        taskLog.AddData(transform.name + "_finalY_allo", finalGlobalY.ToString());
+        taskLog.AddData(transform.name + "_finalY_ego", finalLocalY.ToString());
         taskLog.AddData(transform.name + "_responded", responded.ToString());
         taskLog.AddData(transform.name + "_signedError", signedError.ToString());
         taskLog.AddData(transform.name + "_absError", absoluteError.ToString());
 
         // Clean up
+        if (canIncrementLists)
+        {
+            if (listOfOrigins != null) listOfOrigins.incrementCurrent();
+            listOfHeadings.incrementCurrent();
+            listOfTargets.incrementCurrent();
+        }
     }
 
 }

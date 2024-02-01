@@ -621,6 +621,9 @@ public class Experiment : MonoBehaviour
         go.transform.localScale = scale;
     }
 
+    //--------------------------------
+    // Utility Methods
+    //--------------------------------
 
     public static void Shuffle<T>(T[] array)
     {
@@ -635,6 +638,23 @@ public class Experiment : MonoBehaviour
             array[i - 1] = tmp;        }
     }
 
+    //recursive calls
+    public void MoveToLayer(Transform root, int layer)
+    {
+        root.gameObject.layer = layer;
+        foreach (Transform child in root) MoveToLayer(child, layer);
+    }
+
+	// Calculate the planar distance between placement and targets (i.e., ignore the y-axis height of the copies)
+	public static float Vector3Distance2D(Vector3 v1, Vector3 v2)
+	{
+		return (Mathf.Sqrt(Mathf.Pow(Mathf.Abs(v1.x - v2.x), 2f) + Mathf.Pow(Mathf.Abs(v1.z - v2.z), 2f)));
+	}
+
+	public static float Vector3Angle2D(Vector3 v1, Vector3 v2) 
+	{
+		return Vector2.SignedAngle(new Vector2(v1.x, v1.z), new Vector2(v2.x, v2.z));
+	}
 
     // Turn off all Renderers and Canvases on a gameobject and all of its children
     public void HideRecursive(GameObject obj, bool restore = false)
@@ -669,7 +689,10 @@ public class Experiment : MonoBehaviour
     }
 
 
-    // MJS - Function to allow for flexible behavior at end of scene
+    //--------------------------------
+    // Housekeeping Methods
+    //--------------------------------
+
     async Task EndScene()
     {
         // ---------------------------------------------------------------------

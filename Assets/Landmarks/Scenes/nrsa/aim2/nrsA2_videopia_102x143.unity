@@ -2400,7 +2400,7 @@ GameObject:
   - component: {fileID: 215161109}
   - component: {fileID: 215161110}
   m_Layer: 0
-  m_Name: orient
+  m_Name: view_heading
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2452,8 +2452,8 @@ MonoBehaviour:
   triggerOnEnd: 0
   instruction: {fileID: 0}
   message: {fileID: 0}
-  masterText: '{0}'
-  objects: {fileID: 391846734}
+  masterText: 
+  objects: {fileID: 1371847994}
   multiObjects: []
   texts: {fileID: 0}
   blackout: 0
@@ -5660,6 +5660,9 @@ MonoBehaviour:
   triggerLabel: 
   triggerOnStart: 0
   triggerOnEnd: 0
+  listOfOrigins: {fileID: 0}
+  listOfHeadings: {fileID: 1371847994}
+  listOfTargets: {fileID: 391846734}
   ccwButton: 276
   cwButton: 275
   submitButton: 273
@@ -9297,7 +9300,7 @@ GameObject:
   - component: {fileID: 823613747}
   - component: {fileID: 823613748}
   m_Layer: 0
-  m_Name: prompt
+  m_Name: target_prompt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9331,7 +9334,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skip: 0
   canIncrementLists: 0
-  interval: 1000
+  interval: 2000
   interruptTasks: {fileID: 0}
   interruptInterval: 0
   repeatInterrupts: 9999
@@ -14281,7 +14284,7 @@ PrefabInstance:
     - target: {fileID: 6279364624764035789, guid: 4e09813be04144d928219cb9abe866cf,
         type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6279364624764035789, guid: 4e09813be04144d928219cb9abe866cf,
         type: 3}
@@ -28219,7 +28222,7 @@ Transform:
   - {fileID: 1472651412}
   - {fileID: 505964725}
   m_Father: {fileID: 1502745653}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1918633728
 MonoBehaviour:
