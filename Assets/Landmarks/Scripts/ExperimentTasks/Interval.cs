@@ -45,7 +45,6 @@ public class Interval : ExperimentTask
             {
                 var nextValue = (float)meanInterval - plusOrMinus;
                 var interval = (float)(meanInterval + plusOrMinus - nextValue) / (intervalList.Length - 1);
-                Debug.Log(interval.ToString());
                 for (int iInt = 0; iInt < intervalList.Length; iInt++)
                 {
                     intervalList[iInt] = Mathf.Round(nextValue); // gives us some extra precision while hitting the upper bound of the range
@@ -63,6 +62,8 @@ public class Interval : ExperimentTask
             // Randomize the order if requested
             if (shuffle) Experiment.Shuffle(intervalList);
         }
+
+        hud.SecondsToShow = 0;
     }
 
 
@@ -95,9 +96,11 @@ public class Interval : ExperimentTask
         taskLog.AddData(transform.name + "_onset_s", startTime.ToString());
         taskLog.AddData(transform.name + "_duration_s", (intervalList[currentIntervalIndex]/1000).ToString());
 
-        // Update the interval for next time
+        // Housekeeping
         startTime = -1f;
         currentIntervalIndex++;
+
+        hud.SecondsToShow = hud.GeneralDuration;
     }
 
 }

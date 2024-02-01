@@ -645,17 +645,45 @@ public class Experiment : MonoBehaviour
         foreach (Transform child in root) MoveToLayer(child, layer);
     }
 
-	// Calculate the planar distance between placement and targets (i.e., ignore the y-axis height of the copies)
-	public static float Vector3Distance2D(Vector3 v1, Vector3 v2)
-	{
-		return (Mathf.Sqrt(Mathf.Pow(Mathf.Abs(v1.x - v2.x), 2f) + Mathf.Pow(Mathf.Abs(v1.z - v2.z), 2f)));
-	}
+	// // Calculate the planar distance between placement and targets (i.e., ignore the y-axis height of the copies)
+	// public static float Vector3Distance2D(Vector3 v1, Vector3 v2)
+	// {
+	// 	return (Mathf.Sqrt(Mathf.Pow(Mathf.Abs(v1.x - v2.x), 2f) + Mathf.Pow(Mathf.Abs(v1.z - v2.z), 2f)));
+	// }
 
-	public static float Vector3Angle2D(Vector3 v1, Vector3 v2) 
-	{
-		return Vector2.SignedAngle(new Vector2(v1.x, v1.z), new Vector2(v2.x, v2.z));
-	}
 
+    /// <summary>
+    /// Calculate the planar angle between two points measured at a third vertex point.
+    /// </summary>
+    /// <param name="a">The transform of the point at the end of the arm/vector to measure from.</param>
+    /// <param name="b">The transform of the point where the two arms/vectors meet.</param>
+    /// <param name="to">The transform of the point at the end of the arm/vector to measure to.</param>
+    /// <param name="signed">Whether or not to use a signed angle (default is unsigned)</param>
+    /// <returns>The measured (signed) angle as a float.</returns>
+	public static float CalculateAngleThreePoints(Vector3 pointA, Vector3 pointB, Vector3 pointC, bool signed = false) 
+	{
+        // convert each Vector3 to a Vector2 by stripping the y-value from the Vector3
+        var a  = new Vector2(pointA.x, pointA.z);
+        var b = new Vector2(pointB.x, pointB.z);
+        var c = new Vector2(pointC.x, pointC.z);
+        
+        // // Calculate the length of each side of the triangle formed by ABC using the Euclidean distance formula
+        // var ab = Mathf.Sqrt(Mathf.Pow(a.x - b.x, 2) + Mathf.Pow(a.y - b.y, 2));
+        // var bc = Mathf.Sqrt(Mathf.Pow(b.x - c.x, 2) + Mathf.Pow(b.y - c.y, 2));
+        // var ac = Mathf.Sqrt(Mathf.Pow(a.x - c.x, 2) + Mathf.Pow(a.y - c.y, 2));
+        var ba = a - b;
+        var bc = c - b;
+
+        // // Use the law of cosines
+        // var measurement = Mathf.Rad2Deg * Mathf.Acos((Mathf.Pow(ab, 2) + Mathf.Pow(ac, 2) - Mathf.Pow(bc, 2)) / (2 * ab * bc));
+        var measurement = Mathf.Rad2Deg * (Mathf.Atan2(bc.y, bc.x) - Mathf.Atan2(ba.y, ba.x));
+
+        while (measurement > 180) measurement -= 360;
+        while (measurement < -180) measurement += 360;
+
+        return measurement;
+	}
+    
     // Turn off all Renderers and Canvases on a gameobject and all of its children
     public void HideRecursive(GameObject obj, bool restore = false)
     {

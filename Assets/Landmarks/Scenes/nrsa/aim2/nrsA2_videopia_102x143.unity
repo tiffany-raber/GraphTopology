@@ -2460,7 +2460,7 @@ MonoBehaviour:
   text_color: {r: 1, g: 1, b: 1, a: 1}
   instructionFont: {fileID: 0}
   instructionSize: 12
-  actionButtonOn: 1
+  actionButtonOn: 0
   customButtonText: 
   restrictMovement: 1
   selfPaced: 0
@@ -5663,10 +5663,7 @@ MonoBehaviour:
   listOfOrigins: {fileID: 0}
   listOfHeadings: {fileID: 1371847994}
   listOfTargets: {fileID: 391846734}
-  ccwButton: 276
-  cwButton: 275
   submitButton: 273
-  rotationSpeedMultiplier: 1
   useBodyNotCameraForRotation: 0
 --- !u!1001 &497411692
 PrefabInstance:
@@ -9360,7 +9357,7 @@ MonoBehaviour:
   text_color: {r: 1, g: 1, b: 1, a: 1}
   instructionFont: {fileID: 0}
   instructionSize: 12
-  actionButtonOn: 1
+  actionButtonOn: 0
   customButtonText: 
   restrictMovement: 1
   selfPaced: 0
@@ -14284,7 +14281,7 @@ PrefabInstance:
     - target: {fileID: 6279364624764035789, guid: 4e09813be04144d928219cb9abe866cf,
         type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6279364624764035789, guid: 4e09813be04144d928219cb9abe866cf,
         type: 3}
@@ -28222,7 +28219,7 @@ Transform:
   - {fileID: 1472651412}
   - {fileID: 505964725}
   m_Father: {fileID: 1502745653}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1918633728
 MonoBehaviour:

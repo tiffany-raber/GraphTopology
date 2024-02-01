@@ -15,13 +15,9 @@ public class TurnToPoint : ExperimentTask
     private GameObject currentHeading;
     private GameObject currentTarget;
     private float onset;
-    [Header("Input")]
     private float responseMovementOnset;
     private float responseLatency;
-    public KeyCode  ccwButton = KeyCode.LeftArrow;
-    public KeyCode cwButton = KeyCode.RightArrow;
     public KeyCode submitButton = KeyCode.UpArrow;
-    public int rotationSpeedMultiplier = 1;
     public bool useBodyNotCameraForRotation;
     private Transform rotationSource;
     private float lastFrameY;
@@ -70,9 +66,16 @@ public class TurnToPoint : ExperimentTask
         currentTarget = listOfTargets.currentObject();
 
         // Calculate geometry
-        initialLocalY = Experiment.Vector3Angle2D(currentOrigin.transform.position, currentHeading.transform.position);
+        initialLocalY = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
+                                                             currentOrigin.transform.position, 
+                                                             currentOrigin.transform.position + currentOrigin.transform.forward);
         initialGlobalY = rotationSource.eulerAngles.y;
+        correctLocalY = Experiment.CalculateAngleThreePoints(currentHeading.transform.position, 
+                                                             currentOrigin.transform.position, 
+                                                             currentTarget.transform.position);
 
+        Debug.Log(initialLocalY);
+        Debug.Log(correctLocalY);
         hud.showOnlyHUD();
     }
 
@@ -107,6 +110,10 @@ public class TurnToPoint : ExperimentTask
         if (interval > 0 && Time.time - onset > 0)
         {
             finalGlobalY = rotationSource.eulerAngles.y; // still record if time ran out
+            finalLocalY = Experiment.CalculateAngleThreePoints( currentHeading.transform.position, 
+                                                                currentOrigin.transform.position, 
+                                                                currentOrigin.transform.position + currentOrigin.transform.forward);
+            
             return true;
         }
 
@@ -127,7 +134,8 @@ public class TurnToPoint : ExperimentTask
         base.endTask();
 
         // Calculations
-
+        Debug.Log(finalLocalY);
+        
         // Logging
         taskLog.AddData(transform.name + "event_onset_s", onset.ToString());
         taskLog.AddData(transform.name + "mvmt_onset_s", responseMovementOnset.ToString());
