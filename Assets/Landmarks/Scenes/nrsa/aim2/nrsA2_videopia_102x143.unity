@@ -28197,7 +28197,7 @@ GameObject:
   - component: {fileID: 1918633727}
   - component: {fileID: 1918633728}
   m_Layer: 0
-  m_Name: retrieval
+  m_Name: FirstPersonPointing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
