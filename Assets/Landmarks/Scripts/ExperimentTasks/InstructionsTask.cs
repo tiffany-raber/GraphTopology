@@ -153,7 +153,7 @@ public class InstructionsTask : ExperimentTask {
 
         if (restrictMovement)
         {
-            manager.player.GetComponentInChildren<CharacterController>().enabled = false;
+            manager.RestrictMovement(true);
             manager.scaledPlayer.GetComponent<ThirdPersonCharacter>().immobilized = true;
         }
 
@@ -271,7 +271,7 @@ public class InstructionsTask : ExperimentTask {
         // If we turned movement off; turn it back on
         if (restrictMovement)
         {
-            manager.player.GetComponentInChildren<CharacterController>().enabled = true;
+            manager.RestrictMovement(false);
             manager.scaledPlayer.GetComponent<ThirdPersonCharacter>().immobilized = false;
         }
 

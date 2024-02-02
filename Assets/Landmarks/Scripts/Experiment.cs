@@ -27,6 +27,7 @@ using Valve.VR;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using TMPro;
+using UnityStandardAssets.Characters.FirstPerson;
 
 public enum EndListMode
 {
@@ -639,7 +640,7 @@ public class Experiment : MonoBehaviour
     }
 
     //recursive calls
-    public void MoveToLayer(Transform root, int layer)
+    public static void MoveToLayer(Transform root, int layer)
     {
         root.gameObject.layer = layer;
         foreach (Transform child in root) MoveToLayer(child, layer);
@@ -683,6 +684,14 @@ public class Experiment : MonoBehaviour
 
         return measurement;
 	}
+
+    public void RestrictMovement(bool yes)
+    {
+        avatar.GetComponentInChildren<CharacterController>().enabled = !yes;
+
+        if (GetComponentInChildren<FirstPersonController>()) GetComponentInChildren<FirstPersonController>().enabled = !yes;
+        if (GetComponentInChildren<LM_MovementController>()) GetComponentInChildren<LM_MovementController>().enabled = !yes;
+    }
     
     // Turn off all Renderers and Canvases on a gameobject and all of its children
     public void HideRecursive(GameObject obj, bool restore = false)

@@ -2432,7 +2432,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f2b24b10a1d6446ea483dff9d3e43da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skip: 0
+  skip: 1
   canIncrementLists: 0
   interval: 4000
   interruptTasks: {fileID: 0}
@@ -2456,7 +2456,7 @@ MonoBehaviour:
   objects: {fileID: 1371847994}
   multiObjects: []
   texts: {fileID: 0}
-  blackout: 0
+  blackout: 1
   text_color: {r: 1, g: 1, b: 1, a: 1}
   instructionFont: {fileID: 0}
   instructionSize: 12
@@ -5663,8 +5663,10 @@ MonoBehaviour:
   listOfOrigins: {fileID: 0}
   listOfHeadings: {fileID: 1371847994}
   listOfTargets: {fileID: 391846734}
-  submitButton: 273
+  restrictMovement: 1
+  submitButton: 13
   useBodyNotCameraForRotation: 0
+  promptTarget: 1
 --- !u!1001 &497411692
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9329,7 +9331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f2b24b10a1d6446ea483dff9d3e43da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skip: 0
+  skip: 1
   canIncrementLists: 0
   interval: 2000
   interruptTasks: {fileID: 0}
@@ -20840,6 +20842,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8699694106452443399, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8951910282649149699, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9001404822901735859, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
         type: 3}

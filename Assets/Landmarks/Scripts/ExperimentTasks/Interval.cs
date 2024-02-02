@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Interval : ExperimentTask
 {
@@ -63,7 +65,10 @@ public class Interval : ExperimentTask
             if (shuffle) Experiment.Shuffle(intervalList);
         }
 
-        hud.SecondsToShow = 0;
+        // hud.SecondsToShow = 0;
+        hud.SecondsToShow = 99999;
+        hud.hudPanel.GetComponent<UnityEngine.UI.Image>().enabled = false;
+        hud.setMessage("+");
     }
 
 
@@ -99,7 +104,8 @@ public class Interval : ExperimentTask
         // Housekeeping
         startTime = -1f;
         currentIntervalIndex++;
-
+        hud.setMessage("");
+        hud.hudPanel.GetComponent<UnityEngine.UI.Image>().enabled = true;
         hud.SecondsToShow = hud.GeneralDuration;
     }
 
