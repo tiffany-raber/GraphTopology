@@ -4,14 +4,19 @@ using UnityEngine;
 
 public class scriptyscript : MonoBehaviour
 {
+    public bool randomHeading;
     // Start is called before the first frame update
     void Start()
     {
-        // random start orientation
-        var tmp = transform.eulerAngles;
-        int newz = Random.Range(0, 359);
-        tmp.z = newz;
-        transform.eulerAngles = tmp;
+        if (randomHeading)
+        {
+            // random start orientation
+            var tmp = transform.eulerAngles;
+            int newz = Random.Range(0, 359);
+            tmp.z = newz;
+            transform.eulerAngles = tmp;
+        }
+
     }
 
     // Update is called once per frame

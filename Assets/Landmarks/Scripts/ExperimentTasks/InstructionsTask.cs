@@ -198,7 +198,7 @@ public class InstructionsTask : ExperimentTask {
         //------------------------------------------
         if (selfPaced)  
         {
-            if (Input.GetButtonDown("Return") | Input.GetKeyDown(continueKey))
+            if (Input.GetKeyDown(continueKey))
             {
                 log.log("INPUT_EVENT    PlayerPressedReturn    1", 1);
                 return true;
