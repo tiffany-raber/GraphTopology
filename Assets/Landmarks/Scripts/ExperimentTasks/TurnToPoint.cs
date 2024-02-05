@@ -4,9 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using static System.Runtime.CompilerServices.RuntimeHelpers;
 
+public enum Perspective {
+    firstPerrson,
+    topDown
+}
+
 public class TurnToPoint : ExperimentTask
 {
     [Header("Task-specific Properties")]
+    public Perspective perspective; 
     [Tooltip("Leave blank to use the player/avatar")]
     public ObjectList listOfOrigins;
     public ObjectList listOfHeadings;
