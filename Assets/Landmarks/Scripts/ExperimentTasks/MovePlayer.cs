@@ -107,6 +107,8 @@ public class MovePlayer : ExperimentTask {
             Debug.LogWarning("Using the provided 'localOffsetFacing' property to point the player at the original destination.\n" +
                 "\tIf 'randomRotation' was selected, it will be ignored.");
             start.transform.LookAt(destination.transform);
+            // level off the viewpoint
+            start.transform.eulerAngles = new Vector3(0f, start.transform.eulerAngles.y, 0f);
         }
         else
         {

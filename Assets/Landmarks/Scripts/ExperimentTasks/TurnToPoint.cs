@@ -47,7 +47,6 @@ public class TurnToPoint : ExperimentTask
     [TextArea] private string prompt = "{0}";
     public bool promptTarget;
     private int targetLayer;
-    private float rotPerMin;
 
     public override void startTask()
     {
@@ -133,9 +132,7 @@ public class TurnToPoint : ExperimentTask
                     hasMoved = true;
                     responseMovementOnset = Time.time;
                 }
-                rotPerMin = deltaY / Time.deltaTime * 60f / 360f; // convert deg per sec to rpm
             }
-            else rotPerMin = 0f;
             lastFrame = rotationSource.eulerAngles;
 
             // Handle Recording the response (and ending for a response-dependent duration)

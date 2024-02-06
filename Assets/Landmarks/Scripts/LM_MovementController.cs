@@ -21,7 +21,7 @@ public class LM_MovementController : MonoBehaviour
     public float walkSpeed = 3;
     public float runSpeed = 10;
     private float speed;
-    public float yawSensitivity = 1.0f;
+    [Tooltip("°/s")] public float rotSpeed = 60f; // 60 deg/s = 10 rev/min
     public float pitchSensitivity = 1.0f;
     public bool decoupleHead;
     public bool clampVerticalRotation;
@@ -35,8 +35,6 @@ public class LM_MovementController : MonoBehaviour
     void Start()
     {
         cam = GetComponentInChildren<Camera>();
-
-        yawSensitivity *= 10f;
     }
 
     // Update is called once per frame
@@ -88,7 +86,7 @@ public class LM_MovementController : MonoBehaviour
         if (decoupleHead)
         {
             m_CameraTargetRot *= Quaternion.Euler(-pitch * pitchSensitivity * Time.fixedDeltaTime,
-                                                  yaw * yawSensitivity * Time.fixedDeltaTime,
+                                                  yaw * rotSpeed * Time.fixedDeltaTime,
                                                   roll);
 
             if (clampVerticalRotation) m_CameraTargetRot = ClampRotationAroundXAxis(m_CameraTargetRot);
@@ -96,7 +94,7 @@ public class LM_MovementController : MonoBehaviour
         }
         else
         {
-            m_CharacterTargetRot *= Quaternion.Euler(0f, yaw * yawSensitivity * Time.fixedDeltaTime, roll);
+            m_CharacterTargetRot *= Quaternion.Euler(0f, yaw * rotSpeed * Time.fixedDeltaTime, roll);
             m_CameraTargetRot *= Quaternion.Euler(-pitch * pitchSensitivity * Time.fixedDeltaTime, 0f, roll);
 
             if (clampVerticalRotation) m_CameraTargetRot = ClampRotationAroundXAxis(m_CameraTargetRot);
