@@ -29,6 +29,7 @@ public class TurnToPoint : ExperimentTask
     public bool useBodyNotCameraForRotation;
     private Transform rotationSource;
     private Vector3 lastFrame;
+    private float lastTime;
     private Vector3 initialPos;
     private float initialGlobalY;
     private float initialLocalY;
@@ -46,6 +47,7 @@ public class TurnToPoint : ExperimentTask
     [TextArea] private string prompt = "{0}";
     public bool promptTarget;
     private int targetLayer;
+    private float rotPerMin;
 
     public override void startTask()
     {
@@ -114,6 +116,7 @@ public class TurnToPoint : ExperimentTask
         {
             onset = Time.time;
             lastFrame = rotationSource.eulerAngles;
+            lastTime = Time.time;
             firstUpdate = true;
         }
         else
@@ -122,6 +125,7 @@ public class TurnToPoint : ExperimentTask
             if (lastFrame.y != rotationSource.eulerAngles.y)
             {
                 var deltaY = Mathf.DeltaAngle(rotationSource.eulerAngles.y, lastFrame.y);
+                var deltaT = Time.time - lastTime;
                 netClockwiseRotation += deltaY;
                 totalRotation += Mathf.Abs(deltaY);
                 if (totalRotation > 0 && !hasMoved)
@@ -129,8 +133,9 @@ public class TurnToPoint : ExperimentTask
                     hasMoved = true;
                     responseMovementOnset = Time.time;
                 }
-
+                rotPerMin = deltaY / Time.deltaTime * 60f / 360f; // convert deg per sec to rpm
             }
+            else rotPerMin = 0f;
             lastFrame = rotationSource.eulerAngles;
 
             // Handle Recording the response (and ending for a response-dependent duration)
