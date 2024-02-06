@@ -5,7 +5,7 @@ using UnityEngine;
 using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 public enum Perspective {
-    firstPerrson,
+    firstPerson,
     topDown
 }
 
@@ -47,6 +47,15 @@ public class TurnToPoint : ExperimentTask
     [TextArea] private string prompt = "{0}";
     public bool promptTarget;
     private int targetLayer;
+    
+    [Header("Properties Specific To Top-Down")]
+    public Canvas hudCanvas;
+    public GameObject originObject;
+    public GameObject topDownObject;
+    public GameObject targetIcon;
+    public KeyCode left = KeyCode.LeftArrow;
+    public KeyCode right = KeyCode.RightArrow;
+    [Tooltip("degrees per second")] public float rotSpeed = 60f; // 60 deg/s = 10 rev/min
 
     public override void startTask()
     {
@@ -67,7 +76,8 @@ public class TurnToPoint : ExperimentTask
             return;
         }
 
-        if (restrictMovement) avatar.GetComponentInChildren<CharacterController>().enabled = false;
+        if (restrictMovement) manager.RestrictMovement(true, false);
+        if (restrictMovement && perspective == Perspective.topDown) manager.RestrictMovement(true, true);
 
         // Initialize variables that change from trial-to-trial
         firstUpdate = false;
@@ -101,7 +111,21 @@ public class TurnToPoint : ExperimentTask
         hud.setMessage(prompt);
 
         // but Turn on the current object
-        currentTarget.SetActive(true);
+        switch (perspective)
+        {
+            case Perspective.firstPerson:
+                currentTarget.SetActive(true);
+                break;
+            case Perspective.topDown:
+                // copy the target and set it's transform to be the same as the targetIcon
+                GameObject ti = GameObject.Instantiate<GameObject>(currentHeading, targetIcon.transform.position, targetIcon.transform.rotation, topDownObject.transform);
+                ti.name = "temporaryTargetIcon";
+                ti.transform.localScale = targetIcon.transform.localScale;
+                targetIcon.SetActive(false);
+                break;
+            default:
+                break;
+        }
 
         targetLayer = currentHeading.layer;
 		Experiment.MoveToLayer(currentHeading.transform, hud.hudLayer);
@@ -215,7 +239,7 @@ public class TurnToPoint : ExperimentTask
             listOfTargets.incrementCurrent();
         }
 
-        if (restrictMovement) manager.RestrictMovement(false);
+        if (restrictMovement) manager.RestrictMovement(false, false);
 
         Experiment.MoveToLayer(currentHeading.transform, targetLayer);
         hud.setMessage("");

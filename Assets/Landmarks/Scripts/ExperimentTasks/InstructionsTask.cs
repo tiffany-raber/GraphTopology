@@ -22,9 +22,6 @@ using TMPro;
 
 public class InstructionsTask : ExperimentTask {
 
-
-    
-
     public static int instructionsCounter;
 
     [Header("Task-specific Properties")]
@@ -153,7 +150,7 @@ public class InstructionsTask : ExperimentTask {
 
         if (restrictMovement)
         {
-            manager.RestrictMovement(true);
+            manager.RestrictMovement(true, true);
             manager.scaledPlayer.GetComponent<ThirdPersonCharacter>().immobilized = true;
         }
 
@@ -271,7 +268,7 @@ public class InstructionsTask : ExperimentTask {
         // If we turned movement off; turn it back on
         if (restrictMovement)
         {
-            manager.RestrictMovement(false);
+            manager.RestrictMovement(false, false);
             manager.scaledPlayer.GetComponent<ThirdPersonCharacter>().immobilized = false;
         }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class otherScripty : MonoBehaviour
 {
-    public float sensitivity = 10;
+    public float rotSpeed = 60;
     private Vector3 orientation;
     private bool responded;
 
@@ -12,6 +12,7 @@ public class otherScripty : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (origin == null) origin = transform;
         orientation = transform.eulerAngles;
     }
 
@@ -19,8 +20,8 @@ public class otherScripty : MonoBehaviour
     void Update()
     {
         // rotate the response estimate
-        if (Input.GetKey(KeyCode.RightArrow)) transform.RotateAround(origin.position, Vector3.forward, sensitivity * Time.deltaTime);
-        else if (Input.GetKey(KeyCode.LeftArrow)) transform.RotateAround(origin.position, Vector3.back, sensitivity * Time.deltaTime);
+        if (Input.GetKey(KeyCode.Alpha1)) transform.RotateAround(origin.position, Vector3.forward, rotSpeed * Time.deltaTime);
+        else if (Input.GetKey(KeyCode.Alpha2)) transform.RotateAround(origin.position, Vector3.back, rotSpeed * Time.deltaTime);
 
         // Keep the image upright
         transform.eulerAngles = orientation;

@@ -21,7 +21,7 @@ public class LM_MovementController : MonoBehaviour
     public float walkSpeed = 3;
     public float runSpeed = 10;
     private float speed;
-    [Tooltip("°/s")] public float rotSpeed = 60f; // 60 deg/s = 10 rev/min
+    [Tooltip("degrees per second")] public float rotSpeed = 60f; // 60 deg/s = 10 rev/min
     public float pitchSensitivity = 1.0f;
     public bool decoupleHead;
     public bool clampVerticalRotation;
