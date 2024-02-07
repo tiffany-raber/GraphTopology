@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static System.Runtime.CompilerServices.RuntimeHelpers;
+using TMPro;
 
 public enum Perspective {
     firstPerson,
@@ -27,7 +28,7 @@ public class TurnToPoint : ExperimentTask
     private float timeAtResponse;
     public KeyCode submitButton = KeyCode.UpArrow;
     public bool useBodyNotCameraForRotation;
-    private Transform rotationSource;
+    private Transform PointingSource;
     private Vector3 lastFrame;
     private float lastTime;
     private Vector3 initialPos;
@@ -49,13 +50,15 @@ public class TurnToPoint : ExperimentTask
     private int targetLayer;
     
     [Header("Properties Specific To Top-Down")]
-    public Canvas hudCanvas;
+    public GameObject topDownInterface;
     public GameObject originObject;
     public GameObject topDownObject;
-    public GameObject targetIcon;
+    public GameObject headingIcon;
+    public TextMeshProUGUI targetprompt;
     public KeyCode left = KeyCode.LeftArrow;
     public KeyCode right = KeyCode.RightArrow;
     [Tooltip("degrees per second")] public float rotSpeed = 60f; // 60 deg/s = 10 rev/min
+    private GameObject ti; // target icon copy we'll use for the UI and then destroy after the trial
 
     public override void startTask()
     {
@@ -70,19 +73,15 @@ public class TurnToPoint : ExperimentTask
         if (!manager) Start();
         base.startTask();
 
+        // Skip if prompted
         if (skip)
         {
             log.log("INFO    skip task    " + name, 1);
             return;
         }
 
-        if (restrictMovement) manager.RestrictMovement(true, false);
-        if (restrictMovement && perspective == Perspective.topDown) manager.RestrictMovement(true, true);
-
         // Initialize variables that change from trial-to-trial
         firstUpdate = false;
-        if (useBodyNotCameraForRotation) rotationSource = avatar.GetComponent<LM_PlayerController>().collisionObject.transform;
-        else rotationSource = avatar.GetComponent<LM_PlayerController>().cam.transform;
         totalRotation = 0;
         netClockwiseRotation = 0;
         onset = -1f;
@@ -93,61 +92,95 @@ public class TurnToPoint : ExperimentTask
         currentHeading = listOfHeadings.currentObject();
         currentTarget = listOfTargets.currentObject();
 
-        // Calculate geometry
-        initialPos = rotationSource.position;
-        initialLocalY = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
-                                                             currentOrigin.transform.position,
-                                                             currentOrigin.transform.position + currentOrigin.transform.forward);
-        initialGlobalY = rotationSource.eulerAngles.y;
-        correctLocalY = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
-                                                             currentOrigin.transform.position,
-                                                             currentTarget.transform.position);
-        if (promptTarget) 
+        // Set the prompt requested
+        if (promptTarget)
         {
             hud.SecondsToShow = 99999;
             prompt = currentTarget.name;
         }
         else hud.SecondsToShow = 0;
-        hud.setMessage(prompt);
 
-        // but Turn on the current object
+        // Set up the trial format
         switch (perspective)
         {
             case Perspective.firstPerson:
+                if (useBodyNotCameraForRotation) PointingSource = avatar.GetComponent<LM_PlayerController>().collisionObject.transform;
+                else PointingSource = avatar.GetComponent<LM_PlayerController>().cam.transform;
+                hud.setMessage(prompt);
+                if (restrictMovement) manager.RestrictMovement(true, false);
                 currentTarget.SetActive(true);
+                targetLayer = currentHeading.layer;
+		        Experiment.MoveToLayer(currentHeading.transform, hud.hudLayer);
+                hud.showOnlyHUD();
                 break;
+
             case Perspective.topDown:
+                PointingSource = topDownObject.transform;
+                // Hide the HUD and put the prompt on the Top-Down UI
+                hud.setMessage(""); hud.SecondsToShow = 0;
+                topDownInterface.transform.position = avatar.GetComponentInChildren<LM_SnapPoint>().transform.position;
+                topDownInterface.transform.rotation = avatar.GetComponentInChildren<LM_SnapPoint>().transform.rotation;
+                topDownInterface.transform.gameObject.SetActive(true);
+                targetprompt.text = prompt;
+                if (restrictMovement) manager.RestrictMovement(true, true);
                 // copy the target and set it's transform to be the same as the targetIcon
-                GameObject ti = GameObject.Instantiate<GameObject>(currentHeading, targetIcon.transform.position, targetIcon.transform.rotation, topDownObject.transform);
+                ti = new GameObject();
+                ti = GameObject.Instantiate<GameObject>(currentHeading, headingIcon.transform.position, headingIcon.transform.rotation, headingIcon.transform.parent);
+                foreach (var child in ti.GetComponentsInChildren<Transform>()) child.gameObject.layer = headingIcon.layer;
                 ti.name = "temporaryTargetIcon";
-                ti.transform.localScale = targetIcon.transform.localScale;
-                targetIcon.SetActive(false);
+                ti.transform.localScale = headingIcon.transform.localScale;
+                headingIcon.SetActive(false);
+                hud.showOnlyHUD(false);
+                topDownObject.transform.localEulerAngles = Vector3.zero;
                 break;
             default:
                 break;
         }
 
-        targetLayer = currentHeading.layer;
-		Experiment.MoveToLayer(currentHeading.transform, hud.hudLayer);
-        hud.showOnlyHUD();
+        
+
+        // Calculate geometry
+        initialPos = PointingSource.position;
+        initialLocalY = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
+                                                             currentOrigin.transform.position,
+                                                             currentOrigin.transform.position + currentOrigin.transform.forward);
+        initialGlobalY = PointingSource.eulerAngles.y;
+        correctLocalY = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
+                                                             currentOrigin.transform.position,
+                                                             currentTarget.transform.position);
+
+        
+        
     }
 
 
     public override bool updateTask()
     {
+        switch (perspective)
+        {
+            case Perspective.firstPerson:
+                break;
+            case Perspective.topDown:
+                var rot = (float)(Convert.ToDouble(Input.GetKey(left)) - Convert.ToDouble(Input.GetKey(right)));
+                var targetRot = topDownObject.transform.localRotation;
+                targetRot *= Quaternion.Euler(0f, 0f, rot * rotSpeed * Time.deltaTime);
+                topDownObject.transform.localRotation = targetRot;
+                break;
+        }
+
         if (!firstUpdate)
         {
             onset = Time.time;
-            lastFrame = rotationSource.eulerAngles;
+            lastFrame = PointingSource.eulerAngles;
             lastTime = Time.time;
             firstUpdate = true;
         }
         else
         {
             // Track the player
-            if (lastFrame.y != rotationSource.eulerAngles.y)
+            if (lastFrame.y != PointingSource.eulerAngles.y)
             {
-                var deltaY = Mathf.DeltaAngle(rotationSource.eulerAngles.y, lastFrame.y);
+                var deltaY = Mathf.DeltaAngle(PointingSource.eulerAngles.y, lastFrame.y);
                 var deltaT = Time.time - lastTime;
                 netClockwiseRotation += deltaY;
                 totalRotation += Mathf.Abs(deltaY);
@@ -157,7 +190,7 @@ public class TurnToPoint : ExperimentTask
                     responseMovementOnset = Time.time;
                 }
             }
-            lastFrame = rotationSource.eulerAngles;
+            lastFrame = PointingSource.eulerAngles;
 
             // Handle Recording the response (and ending for a response-dependent duration)
             if (Input.GetKeyDown(submitButton) && !responded)
@@ -232,6 +265,17 @@ public class TurnToPoint : ExperimentTask
         taskLog.AddData(transform.name + "_finalY_ego", finalLocalY.ToString());
 
         // Clean up
+        switch (perspective)
+        {
+            case Perspective.firstPerson:
+
+                break;
+            case Perspective.topDown:
+                GameObject.Destroy(ti);
+                topDownInterface.transform.gameObject.SetActive(false);
+                break;
+        }
+
         if (canIncrementLists)
         {
             if (listOfOrigins != null) listOfOrigins.incrementCurrent();
@@ -249,8 +293,8 @@ public class TurnToPoint : ExperimentTask
     private void RecordResponse()
     {
         timeAtResponse = Time.time;
-        finalPos = rotationSource.position;
-        finalGlobalY = rotationSource.eulerAngles.y;
+        finalPos = PointingSource.position;
+        finalGlobalY = PointingSource.eulerAngles.y;
         finalLocalY = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
                                                             currentOrigin.transform.position,
                                                             currentOrigin.transform.position + currentOrigin.transform.forward);

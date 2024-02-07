@@ -187,7 +187,7 @@ public class HUD : MonoBehaviour
 	// Methods to manipulate rendering/culling
 	// ---------------------------------------------------
 
-	public void showEverything()
+	public void showEverything(bool showDesert = false)
 	{
 		this.enabled = true;
 		cam[0].cullingMask = 0 << hudLayer;
@@ -200,11 +200,11 @@ public class HUD : MonoBehaviour
 		cam[0].clearFlags = CameraClearFlags.Skybox;
 		cam[1].clearFlags = CameraClearFlags.Skybox;
 
-		if (manager.virtualDesert != null) manager.virtualDesert.SetActive(false);
+		if (manager.virtualDesert != null) manager.virtualDesert.SetActive(showDesert);
 		hudState = CullState.showEverything;
 	}
 
-	public void showNothing()
+	public void showNothing(bool showDesert = false)
 	{
 		cam[0].cullingMask = (0 << 30);
 		cam[1].cullingMask = (0 << 30);
@@ -214,11 +214,11 @@ public class HUD : MonoBehaviour
 		cam[0].clearFlags = CameraClearFlags.SolidColor;
 		cam[1].clearFlags = CameraClearFlags.SolidColor;
 
-		if (manager.virtualDesert != null) manager.virtualDesert.SetActive(false);
+		if (manager.virtualDesert != null) manager.virtualDesert.SetActive(showDesert);
 		hudState = CullState.showNothing;
 	}
 
-	public void showOnlyHUD()
+	public void showOnlyHUD(bool showDesert = true)
 	{
 		cam[0].cullingMask = (1 << hudLayer);
 		cam[1].cullingMask = (1 << hudLayer);
@@ -228,11 +228,11 @@ public class HUD : MonoBehaviour
 		cam[0].clearFlags = CameraClearFlags.SolidColor;
 		cam[1].clearFlags = CameraClearFlags.SolidColor;
 
-		manager?.virtualDesert.SetActive(true);
+		manager?.virtualDesert.SetActive(showDesert);
 		hudState = CullState.showOnlyHud;
 	}
 
-    public void showOnlyTargets()
+    public void showOnlyTargets(bool showDesert = true)
     {
 		cam[0].cullingMask = 1 << LayerMask.NameToLayer("Targets") | 1 << hudLayer;
         cam[1].cullingMask = 1 << LayerMask.NameToLayer("Targets") | 1 << hudLayer;
@@ -242,7 +242,7 @@ public class HUD : MonoBehaviour
         cam[0].clearFlags = CameraClearFlags.SolidColor;
         cam[1].clearFlags = CameraClearFlags.SolidColor;
 
-		if (manager.virtualDesert != null) manager.virtualDesert.SetActive(true);
+		if (manager.virtualDesert != null) manager.virtualDesert.SetActive(showDesert);
 		hudState = CullState.showOnlyTargets;
     }
 
