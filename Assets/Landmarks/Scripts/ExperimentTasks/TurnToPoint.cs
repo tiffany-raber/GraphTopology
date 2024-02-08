@@ -205,7 +205,7 @@ public class TurnToPoint : ExperimentTask
             // Track the player
             if (lastFrame.y != PointingSource.eulerAngles.y)
             {
-                var deltaY = Mathf.DeltaAngle(PointingSource.eulerAngles.y, lastFrame.y);
+                var deltaY = !topDown ? Mathf.DeltaAngle(PointingSource.eulerAngles.y, lastFrame.y) : Mathf.DeltaAngle(PointingSource.localEulerAngles.z, lastFrame.z);
                 var deltaT = Time.time - lastTime;
                 netClockwiseRotation += deltaY;
                 totalRotation += Mathf.Abs(deltaY);
@@ -215,7 +215,7 @@ public class TurnToPoint : ExperimentTask
                     responseMovementOnset = Time.time;
                 }
             }
-            lastFrame = PointingSource.eulerAngles;
+            lastFrame = !topDown ? PointingSource.eulerAngles : PointingSource.localEulerAngles;
 
             // Handle Recording the response (and ending for a response-dependent duration)
             if (Input.GetKeyDown(submitButton) && !responded)
@@ -255,7 +255,7 @@ public class TurnToPoint : ExperimentTask
         base.endTask();
 
         // Calculations
-        absoluteError = Mathf.DeltaAngle(finalLocalY, correctLocalY);
+        absoluteError = Mathf.Abs(Mathf.DeltaAngle(finalLocalY, correctLocalY));
         // FIXME FIXME - calculate signed error
         var underEstimated = Mathf.Abs(finalLocalY) < Mathf.Abs(correctLocalY);
         signedError = underEstimated ? -1 * absoluteError : absoluteError;
