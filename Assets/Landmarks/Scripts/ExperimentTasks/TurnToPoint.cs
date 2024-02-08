@@ -13,6 +13,7 @@ public enum Perspective {
 public class TurnToPoint : ExperimentTask
 {
     [Header("Task-specific Properties")]
+    public bool topDown;
     public Perspective perspective; 
     [Tooltip("Leave blank to use the player/avatar")]
     public ObjectList listOfOrigins;
@@ -59,6 +60,12 @@ public class TurnToPoint : ExperimentTask
     public KeyCode right = KeyCode.RightArrow;
     [Tooltip("degrees per second")] public float rotSpeed = 60f; // 60 deg/s = 10 rev/min
     private GameObject ti; // target icon copy we'll use for the UI and then destroy after the trial
+    [Header("Properties for stay-switch")]
+    public List<bool> topDownTrialList = new List<bool>();
+    private int topDownTrialIndex;
+    public bool dummyTrial = true;
+    private bool lastTopDown;
+    private int formatRepeatCount;
 
     public override void startTask()
     {
@@ -80,17 +87,40 @@ public class TurnToPoint : ExperimentTask
             return;
         }
 
+        // If a formatting list wasn't provided, set them all to whatever was set in inspector
+        if (topDownTrialList.Count == 0) for (int i = 0; i < parentTask.repeat; i++) topDownTrialList.Add(topDown);
+
         // Initialize variables that change from trial-to-trial
+        topDown = topDownTrialList[topDownTrialIndex];
         firstUpdate = false;
-        totalRotation = 0;
-        netClockwiseRotation = 0;
+        totalRotation = 0f;
+        netClockwiseRotation = 0f;
         onset = -1f;
         responded = false;
-        responseMovementOnset = Single.NaN;
-        if (listOfOrigins != null) currentOrigin = listOfOrigins.currentObject();
-        else currentOrigin = avatar.GetComponent<LM_PlayerController>().cam.gameObject;
-        currentHeading = listOfHeadings.currentObject();
-        currentTarget = listOfTargets.currentObject();
+        hasMoved = false;
+        responseMovementOnset = 0f;
+        if (topDownTrialIndex > 0) {
+            if (topDown != lastTopDown) formatRepeatCount = 0;
+            else formatRepeatCount++;
+        }
+
+        topDownInterface.SetActive(topDown);
+
+        // Do we want an intial dummy trial?
+        if (dummyTrial) 
+        {
+            currentOrigin = avatar.GetComponent<LM_PlayerController>().cam.gameObject;
+            currentHeading = GameObject.Instantiate(new GameObject(), currentOrigin.transform.position + Vector3.forward, Quaternion.Euler(Vector3.zero));
+            currentTarget = listOfTargets.objects[UnityEngine.Random.Range(0, listOfTargets.objects.Count)];
+        }
+        else
+        {
+            if (listOfOrigins != null) currentOrigin = listOfOrigins.currentObject();
+            else currentOrigin = avatar.GetComponent<LM_PlayerController>().cam.gameObject;
+            currentHeading = listOfHeadings.currentObject();
+            currentTarget = listOfTargets.currentObject();
+        }
+       
 
         // Set the prompt requested
         if (promptTarget)
@@ -101,43 +131,42 @@ public class TurnToPoint : ExperimentTask
         else hud.SecondsToShow = 0;
 
         // Set up the trial format
-        switch (perspective)
+        if (topDown)
         {
-            case Perspective.firstPerson:
-                if (useBodyNotCameraForRotation) PointingSource = avatar.GetComponent<LM_PlayerController>().collisionObject.transform;
-                else PointingSource = avatar.GetComponent<LM_PlayerController>().cam.transform;
-                hud.setMessage(prompt);
-                if (restrictMovement) manager.RestrictMovement(true, false);
-                currentTarget.SetActive(true);
-                targetLayer = currentHeading.layer;
-		        Experiment.MoveToLayer(currentHeading.transform, hud.hudLayer);
-                hud.showOnlyHUD();
-                break;
-
-            case Perspective.topDown:
-                PointingSource = topDownObject.transform;
-                // Hide the HUD and put the prompt on the Top-Down UI
-                hud.setMessage(""); hud.SecondsToShow = 0;
-                topDownInterface.transform.position = avatar.GetComponentInChildren<LM_SnapPoint>().transform.position;
-                topDownInterface.transform.rotation = avatar.GetComponentInChildren<LM_SnapPoint>().transform.rotation;
-                topDownInterface.transform.gameObject.SetActive(true);
-                targetprompt.text = prompt;
-                if (restrictMovement) manager.RestrictMovement(true, true);
-                // copy the target and set it's transform to be the same as the targetIcon
-                ti = new GameObject();
-                ti = GameObject.Instantiate<GameObject>(currentHeading, headingIcon.transform.position, headingIcon.transform.rotation, headingIcon.transform.parent);
-                foreach (var child in ti.GetComponentsInChildren<Transform>()) child.gameObject.layer = headingIcon.layer;
-                ti.name = "temporaryTargetIcon";
-                ti.transform.localScale = headingIcon.transform.localScale;
-                headingIcon.SetActive(false);
-                hud.showOnlyHUD(false);
-                topDownObject.transform.localEulerAngles = Vector3.zero;
-                break;
-            default:
-                break;
+            PointingSource = topDownObject.transform;
+            // Hide the HUD and put the prompt on the Top-Down UI
+            hud.setMessage(""); hud.SecondsToShow = 0;
+            topDownInterface.transform.position = new Vector3(
+                avatar.GetComponentInChildren<LM_SnapPoint>().transform.position.x,
+                manager.playerCamera.transform.position.y,
+                avatar.GetComponentInChildren<LM_SnapPoint>().transform.position.z);
+            topDownInterface.transform.rotation = avatar.GetComponentInChildren<LM_SnapPoint>().transform.rotation;
+            topDownInterface.transform.gameObject.SetActive(true);
+            targetprompt.text = prompt;
+            if (restrictMovement) manager.RestrictMovement(true, true);
+            // copy the target and set it's transform to be the same as the targetIcon
+            ti = new GameObject();
+            ti = GameObject.Instantiate<GameObject>(currentHeading, headingIcon.transform.position, headingIcon.transform.rotation, headingIcon.transform.parent);
+            foreach (var child in ti.GetComponentsInChildren<Transform>()) child.gameObject.layer = headingIcon.layer;
+            ti.name = "temporaryTargetIcon";
+            ti.transform.localScale = headingIcon.transform.localScale;
+            headingIcon.SetActive(false);
+            hud.showOnlyHUD(false);
+            topDownObject.transform.localEulerAngles = Vector3.zero;
+        }
+        else
+        {
+            if (useBodyNotCameraForRotation) PointingSource = avatar.GetComponent<LM_PlayerController>().collisionObject.transform;
+            else PointingSource = avatar.GetComponent<LM_PlayerController>().cam.transform;
+            hud.setMessage(prompt);
+            if (restrictMovement) manager.RestrictMovement(true, false);
+            currentTarget.SetActive(true);
+            targetLayer = currentHeading.layer;
+            Experiment.MoveToLayer(currentHeading.transform, hud.hudLayer);
+            hud.showOnlyHUD();
         }
 
-        
+
 
         // Calculate geometry
         initialPos = PointingSource.position;
@@ -156,16 +185,12 @@ public class TurnToPoint : ExperimentTask
 
     public override bool updateTask()
     {
-        switch (perspective)
+        if (topDown)
         {
-            case Perspective.firstPerson:
-                break;
-            case Perspective.topDown:
                 var rot = (float)(Convert.ToDouble(Input.GetKey(left)) - Convert.ToDouble(Input.GetKey(right)));
                 var targetRot = topDownObject.transform.localRotation;
                 targetRot *= Quaternion.Euler(0f, 0f, rot * rotSpeed * Time.deltaTime);
                 topDownObject.transform.localRotation = targetRot;
-                break;
         }
 
         if (!firstUpdate)
@@ -236,8 +261,13 @@ public class TurnToPoint : ExperimentTask
         signedError = underEstimated ? -1 * absoluteError : absoluteError;
 
         // LOG CRITITCAL TRIAL DATA
-        taskLog.AddData(transform.name + "_trial_type", "todo_string_stayOrSwitch");
-        taskLog.AddData(transform.name + "_stayCount", "todo_integer_trialsSinceLastSwitch");
+        taskLog.AddData(transform.name + "_dummyTrial", dummyTrial.ToString());
+        taskLog.AddData(transform.name + "_trial_type_topDown", topDown.ToString());
+        taskLog.AddData(transform.name + "_trial_type_switch", topDown == lastTopDown ? bool.FalseString : bool.TrueString);
+        taskLog.AddData(transform.name + "_stayCount", formatRepeatCount.ToString());
+        taskLog.AddData(transform.name + "_origin", currentOrigin.name);
+        taskLog.AddData(transform.name + "_heading",currentHeading.name);
+        taskLog.AddData(transform.name + "_target", currentTarget.name);
         taskLog.AddData(transform.name + "_responded", responded.ToString());
         taskLog.AddData(transform.name + "_overUnder", underEstimated ? "under" : "over");
         taskLog.AddData(transform.name + "_signedError", signedError.ToString());
@@ -265,18 +295,13 @@ public class TurnToPoint : ExperimentTask
         taskLog.AddData(transform.name + "_finalY_ego", finalLocalY.ToString());
 
         // Clean up
-        switch (perspective)
+        if (topDown)
         {
-            case Perspective.firstPerson:
-
-                break;
-            case Perspective.topDown:
-                GameObject.Destroy(ti);
-                topDownInterface.transform.gameObject.SetActive(false);
-                break;
+            GameObject.Destroy(ti);
+            topDownInterface.transform.gameObject.SetActive(false);
         }
 
-        if (canIncrementLists)
+        if (canIncrementLists && !dummyTrial)
         {
             if (listOfOrigins != null) listOfOrigins.incrementCurrent();
             listOfHeadings.incrementCurrent();
@@ -284,6 +309,12 @@ public class TurnToPoint : ExperimentTask
         }
 
         if (restrictMovement) manager.RestrictMovement(false, false);
+
+        if (dummyTrial) dummyTrial = !dummyTrial; // the next one shouldn't be a dummy trial
+
+        // update the format
+        lastTopDown = topDown;
+        topDownTrialIndex++;
 
         Experiment.MoveToLayer(currentHeading.transform, targetLayer);
         hud.setMessage("");
