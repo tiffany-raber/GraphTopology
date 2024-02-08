@@ -5812,6 +5812,7 @@ MonoBehaviour:
   triggerLabel: 
   triggerOnStart: 0
   triggerOnEnd: 0
+  topDown: 0
   perspective: 1
   listOfOrigins: {fileID: 0}
   listOfHeadings: {fileID: 1371847994}
@@ -5828,6 +5829,8 @@ MonoBehaviour:
   left: 276
   right: 275
   rotSpeed: 60
+  topDownTrialList: 0001000000010001000001000101010001000100010100010001000001
+  dummyTrial: 1
 --- !u!1001 &497411692
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21140,12 +21143,8 @@ PrefabInstance:
     - target: {fileID: 7924974381978167566, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
         type: 3}
       propertyPath: masterText
-      value: 'Please wait...
-
-        The task will begin shortly after the
-
-        experimeter
-        starts the scanner.'
+      value: "Imagine yourself at the center of the \nenvironment, facing \"North\".
+        When you are ready, \npress the \"5\" key to begin the task."
       objectReference: {fileID: 0}
     - target: {fileID: 7924974381978167566, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
         type: 3}
@@ -23148,7 +23147,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 1.44}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 900, y: 600}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1436643539
@@ -29870,7 +29869,7 @@ PrefabInstance:
     - target: {fileID: 6754479628067843933, guid: 9ebc158e2cb794fb3aeffcbee7d8d7ef,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.7910001
+      value: 2.351
       objectReference: {fileID: 0}
     - target: {fileID: 6754479628067843933, guid: 9ebc158e2cb794fb3aeffcbee7d8d7ef,
         type: 3}
