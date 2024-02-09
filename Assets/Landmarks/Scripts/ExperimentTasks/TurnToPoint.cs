@@ -33,14 +33,12 @@ public class TurnToPoint : ExperimentTask
     private Vector3 lastFrame;
     private float lastTime;
     private Vector3 initialPos;
-    private float initialGlobalY;
     private float initialLocalY;
     private float totalRotation;
     private float netClockwiseRotation;
     private Vector3 finalPos;
-    private float finalGlobalY;
-    private float finalLocalY;
-    private float correctLocalY;
+    private float responseAngle_actual;
+    private float responseAngle_correct;
     private bool responded;
     private float signedError;
     private float absoluteError;
@@ -173,8 +171,7 @@ public class TurnToPoint : ExperimentTask
         initialLocalY = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
                                                              currentOrigin.transform.position,
                                                              currentOrigin.transform.position + currentOrigin.transform.forward);
-        initialGlobalY = PointingSource.eulerAngles.y;
-        correctLocalY = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
+        responseAngle_correct = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
                                                              currentOrigin.transform.position,
                                                              currentTarget.transform.position);
 
@@ -255,9 +252,9 @@ public class TurnToPoint : ExperimentTask
         base.endTask();
 
         // Calculations
-        absoluteError = Mathf.Abs(Mathf.DeltaAngle(finalLocalY, correctLocalY));
+        absoluteError = Mathf.Abs(Mathf.DeltaAngle(responseAngle_actual, responseAngle_correct));
         // FIXME FIXME - calculate signed error
-        var underEstimated = Mathf.Abs(finalLocalY) < Mathf.Abs(correctLocalY);
+        var underEstimated = Mathf.Abs(responseAngle_actual) < Mathf.Abs(responseAngle_correct);
         signedError = underEstimated ? -1 * absoluteError : absoluteError;
 
         // LOG CRITITCAL TRIAL DATA
@@ -269,9 +266,19 @@ public class TurnToPoint : ExperimentTask
         taskLog.AddData(transform.name + "_heading",currentHeading.name);
         taskLog.AddData(transform.name + "_target", currentTarget.name);
         taskLog.AddData(transform.name + "_responded", responded.ToString());
+        taskLog.AddData(transform.name + "_responseAngle_correct", responseAngle_correct.ToString());
+        taskLog.AddData(transform.name + "_responseAngle_actual", responseAngle_actual.ToString());
         taskLog.AddData(transform.name + "_overUnder", underEstimated ? "under" : "over");
         taskLog.AddData(transform.name + "_signedError", signedError.ToString());
         taskLog.AddData(transform.name + "_absError", absoluteError.ToString());
+        // Additional POSITION AND ROTATION DATA
+        taskLog.AddData(transform.name + "_initialPosX", initialPos.x.ToString());
+        taskLog.AddData(transform.name + "_initialPosZ", initialPos.z.ToString());
+        taskLog.AddData(transform.name + "_initialY_ego", initialLocalY.ToString());
+        taskLog.AddData(transform.name + "_totalRotation", totalRotation.ToString());
+        taskLog.AddData(transform.name + "_netCWrotation", netClockwiseRotation.ToString());
+        taskLog.AddData(transform.name + "_finalPosX", finalPos.x.ToString());
+        taskLog.AddData(transform.name + "_finalPosZ", finalPos.z.ToString());
         // LOG EVENT TIMING (in an fMRI friendly-ish style)
         taskLog.AddData(transform.name + "_event_onset_s", onset.ToString());
         taskLog.AddData(transform.name + "_event_duration_s", ((interval != 0) ? (interval / 1000).ToString() : (timeAtResponse - onset).ToString())); // fancy if-else
@@ -281,18 +288,6 @@ public class TurnToPoint : ExperimentTask
         taskLog.AddData(transform.name + "_response_onset_s", timeAtResponse.ToString());
         taskLog.AddData(transform.name + "_response_duration_s", "0");
         taskLog.AddData(transform.name + "_responseLatency_s", (timeAtResponse - onset).ToString());
-        // LOG POSITION AND ROTATION DATA
-        taskLog.AddData(transform.name + "_initialPosX", initialPos.x.ToString());
-        taskLog.AddData(transform.name + "_initialPosZ", initialPos.z.ToString());
-        taskLog.AddData(transform.name + "_initialY_allo", initialGlobalY.ToString());
-        taskLog.AddData(transform.name + "_initialY_ego", initialLocalY.ToString());
-        taskLog.AddData(transform.name + "_correctY_ego", correctLocalY.ToString());
-        taskLog.AddData(transform.name + "_totalRotation", totalRotation.ToString());
-        taskLog.AddData(transform.name + "_netCWrotation", netClockwiseRotation.ToString());
-        taskLog.AddData(transform.name + "_finalPosX", finalPos.x.ToString());
-        taskLog.AddData(transform.name + "_finalPosZ", finalPos.z.ToString());
-        taskLog.AddData(transform.name + "_finalY_allo", finalGlobalY.ToString());
-        taskLog.AddData(transform.name + "_finalY_ego", finalLocalY.ToString());
 
         // Clean up
         if (topDown)
@@ -325,9 +320,11 @@ public class TurnToPoint : ExperimentTask
     {
         timeAtResponse = Time.time;
         finalPos = PointingSource.position;
-        finalGlobalY = PointingSource.eulerAngles.y;
-        finalLocalY = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
-                                                            currentOrigin.transform.position,
-                                                            currentOrigin.transform.position + currentOrigin.transform.forward);
+
+        if (!topDown) responseAngle_actual = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
+                                                                         currentOrigin.transform.position,
+                                                                         currentOrigin.transform.position + currentOrigin.transform.forward);
+        else responseAngle_actual = PointingSource.localEulerAngles.z;
+        
     }
 }
