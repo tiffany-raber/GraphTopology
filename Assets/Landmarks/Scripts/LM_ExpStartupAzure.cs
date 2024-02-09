@@ -86,7 +86,7 @@ public class LM_ExpStartupAzure : LM_ExpStartup
 
 
             // Put the subject ID into the config.subject field
-            config.subject = thisSubjectID.ToString();
+            config.id = thisSubjectID.ToString();
 
 
             // push a temporary hidden file to reserve that id on Azure
@@ -123,7 +123,7 @@ public class LM_ExpStartupAzure : LM_ExpStartup
 
                 // Use the subject ID to determine which condition/scene pair
                 int subCode;
-                int.TryParse(config.subject, out subCode);
+                int.TryParse(config.id, out subCode);
                 subCode -= firstSubjectId - 1; // remove the starting subject id value - 1
                 Debug.Log("subcode = " + subCode.ToString());
 
@@ -148,7 +148,7 @@ public class LM_ExpStartupAzure : LM_ExpStartup
             {
                 // Parse the idNumber (string --> int)
                 int subCode;
-                int.TryParse(config.subject, out subCode);
+                int.TryParse(config.id, out subCode);
                 subCode -= firstSubjectId - 1; // remove the starting subject id value - 1
                 Debug.Log("subcode = " + subCode.ToString());
 
@@ -255,7 +255,7 @@ public class LM_ExpStartupAzure : LM_ExpStartup
                 }
             }
 
-            GameObject.Find("VerificationCode").GetComponent<TextMeshProUGUI>().text = config.conditions[config.levelNumber] + config.subject;
+            GameObject.Find("VerificationCode").GetComponent<TextMeshProUGUI>().text = config.conditions[config.levelNumber] + config.id;
 
         }
     }
@@ -340,7 +340,7 @@ public class LM_ExpStartupAzure : LM_ExpStartup
         StreamWriter placeholderFile = new StreamWriter(Application.persistentDataPath + "/.reserved");
         placeholderFile.Close();
         
-        CloudBlockBlob blockBlob = container.GetBlockBlobReference(config.subject + "/.reserved");
+        CloudBlockBlob blockBlob = container.GetBlockBlobReference(config.id + "/.reserved");
 #if WINDOWS_UWP && ENABLE_DOTNET
 		StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(Application.streamingAssetsPath.Replace('/', '\\'));
 		StorageFile sf = await storageFolder.GetFileAsync(ImageToUpload);

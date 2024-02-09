@@ -235,18 +235,18 @@ public class Experiment : MonoBehaviour
             dataPath =
                 Application.persistentDataPath + "/" +
                 config.experiment + "/" +
-                config.subject + "/";
+                config.id + "/";
             if (config.appendLogFiles)
             {
                 logfile =
                    config.experiment + "_" +
-                   config.subject + ".log";
+                   config.id + ".log";
             }
             else
             {
                 logfile =
                     config.experiment + "_" +
-                    config.subject + "_" +
+                    config.id + "_" +
                     config.levelNames[config.levelNumber] + "_" +
                     config.conditions[config.levelNumber] + ".log";
             }
@@ -291,7 +291,7 @@ public class Experiment : MonoBehaviour
         //     dblog = new dbPlaybackLog(dataPath + logfile);
         // }
 
-        dblog.log("EXPERIMENT:\t" + PlayerPrefs.GetString("expID") + "\tSUBJECT:\t" + config.subject +
+        dblog.log("EXPERIMENT:\t" + PlayerPrefs.GetString("expID") + "\tSUBJECT:\t" + config.id +
                   "\tSTART_SCENE\t" + config.levelNames[config.levelNumber] + "\tSTART_CONDITION:\t" + config.conditions[config.levelNumber] + "\tUI:\t" + userInterface.ToString(), 1);
     }
 
@@ -874,7 +874,7 @@ public class Experiment : MonoBehaviour
         //increment the level number (accounting for the zero-base compared to a count (starts with 1)
         config.levelNumber++;
         // If there is another level, load it
-        if (config.levelNumber < config.levelNames.Count)
+        if (config.levelNumber < config.levelNames.Count && !config.singleSceneBuild)
         {
             // Load the next Scene
             if (usingVR)

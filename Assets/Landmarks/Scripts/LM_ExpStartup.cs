@@ -20,8 +20,9 @@ public class LM_ExpStartup : MonoBehaviour
 
     [Min(0)] [Tooltip(">0: Automatically select ascending from id provided\n" + "0: Manually select with GUI")]
         public int id = 0;
+    [Min(0)] private int run = 0;
     //public bool balanceConditionOrder = true;
-    public bool singleSceneBuild = true;
+    [HideInInspector] public bool singleSceneBuild = true; // could be deprecated?????
     [Tooltip("Can use some, all, or none")]
         public GuiElements guiElements;
 
@@ -137,7 +138,15 @@ public class LM_ExpStartup : MonoBehaviour
 
             readyConfig();
             
-            SceneManager.LoadScene(config.levelNames[config.levelNumber]);
+            try
+            {
+                SceneManager.LoadScene(config.levelNames[config.levelNumber]);
+            }
+            catch (System.Exception)
+            {
+                Debug.LogError("No scene was found... Check the build settings.");
+                throw;
+            }
         }
         else
         {
@@ -153,7 +162,8 @@ public class LM_ExpStartup : MonoBehaviour
         config.runMode = ConfigRunMode.NEW;
         config.bootstrapped = true;
         config.appPath = appDir;
-        config.subject = id.ToString();
+        config.id = id.ToString();
+        config.run = run;
         config.ui = guiElements.ui.options[guiElements.ui.value].text;
         if (existingData) config.Load();
         //config.level = config.levelNames[0];
@@ -199,6 +209,8 @@ public class LM_ExpStartup : MonoBehaviour
                         subidError = false;
                         existingData = true;
                         id = int.Parse(guiElements.subID.text);
+                        run = int.Parse(guiElements.runNum.text);
+                        
                         _errorMessage.text = "Loading SubjectID data from a previous session.";
                         _errorMessage.gameObject.SetActive(true);
                     }
@@ -212,6 +224,7 @@ public class LM_ExpStartup : MonoBehaviour
                 else
                 {
                     id = int.Parse(guiElements.subID.text);
+                    run = int.Parse(guiElements.subID.text);
                     subidError = false;
                     _errorMessage.gameObject.SetActive(false); // then and only then, will we release the flag
                 }
@@ -251,6 +264,7 @@ public class GuiElements
 {
     public TMP_Dropdown studyCodes;
     public TMP_InputField subID;
+    public TMP_InputField runNum;
     public TMP_Dropdown ui;
     public TMP_Dropdown condition;
     public TMP_Dropdown environment;

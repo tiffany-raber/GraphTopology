@@ -35,9 +35,10 @@ public class LM_TaskLog : MonoBehaviour
         Debug.LogWarning("LM_TaskLog is logging trial data!!!!!");
         exp = FindObjectOfType<Experiment>();
         output = new StreamWriter(exp.dataPath +
-                                    "/sub-" + exp.config.subject +
+                                    "/sub-" + exp.config.id +
+                                    ((exp.config.run == 0) ? "" : "_run-" + exp.config.run.ToString()) + 
                                     "_task-" + name +
-                                    "_behav.csv", append:true);
+                                    "_beh.csv", append:true);
         Debug.Log("Logging to: " + ((FileStream)(output.BaseStream)).Name);
 
         string header = string.Empty;

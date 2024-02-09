@@ -54,6 +54,7 @@ public class Config : MonoBehaviour
     public int practiceTrialCount;
     public List<string> levelNames = new List<string>();
     public bool randomSceneOrder;
+    public bool singleSceneBuild;
     [Tooltip("Read Only: Use as index for scence/condition")]
     public int levelNumber;
     public bool appendLogFiles = false;
@@ -68,9 +69,9 @@ public class Config : MonoBehaviour
     public string expPath = "default";
     [HideInInspector]
     public string subjectPath = "default";
-    public string subject = "default";
-    [HideInInspector]
-    public string session = "default";
+    public string id = "default";
+    [HideInInspector] public string session = "default";
+    [Min(1)] public int run = 1;
     //[HideInInspector]
     //public string level = "default";
     [HideInInspector]
@@ -237,14 +238,14 @@ public class Config : MonoBehaviour
         {
             path = Application.persistentDataPath + "/" +
                 experiment + "/" +
-                subject + "/";
+                id + "/";
         }
 
         BinaryFormatter formatter = new BinaryFormatter();
         FileStream stream = new FileStream(path + "progress.dat", FileMode.Create);
 
         ExpData data = new ExpData();
-        data.id = subject;
+        data.id = id;
         data.lastLevelFinished = levelNumber;
         data.levelNames = new List<string>();
         foreach (var lev in levelNames)
@@ -267,7 +268,7 @@ public class Config : MonoBehaviour
         {
             path = Application.persistentDataPath + "/" +
                 experiment + "/" +
-                subject + "/";
+                id + "/";
         }
         Debug.Log("Loading from " + path + "progress.dat");
         if (File.Exists(path + "progress.dat"))
@@ -279,7 +280,7 @@ public class Config : MonoBehaviour
             stream.Close();
 
             // Replace current values with loaded values
-            subject = data.id;
+            id = data.id;
             levelNumber = data.lastLevelFinished+1;
 
             levelNames.Clear();
@@ -301,7 +302,7 @@ public class Config : MonoBehaviour
         {
             path = Application.persistentDataPath + "/" +
                 experiment + "/" +
-                subject + "/";
+                id + "/";
         }
         File.Delete(path + "progress.dat");
     }
