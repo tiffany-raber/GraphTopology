@@ -306,9 +306,9 @@ public class TaskList : ExperimentTask
     {
         if (taskLog != null)
         {
-            Debug.Log(taskLog.gameObject.name);
-            Debug.Log(manager.gameObject.name);
-            Debug.Log(manager.config.name);
+            //Debug.Log(taskLog.gameObject.name);
+            //Debug.Log(manager.gameObject.name);
+            //Debug.Log(manager.config.name);
             // Really basic, redundant logging
             taskLog.AddData("id", manager.config.id);
             taskLog.AddData("condition", manager.config.condition);

@@ -6145,8 +6145,8 @@ MonoBehaviour:
   - aOnly
   tasks: []
   objectsList: []
-  repeat: 1
-  overideRepeat: {fileID: 391846734}
+  repeat: 29
+  overideRepeat: {fileID: 0}
   repeatCount: 1
   currentTask: {fileID: 0}
   catchTrialCount: 0
@@ -26142,6 +26142,7 @@ MonoBehaviour:
   outputLists:
   - {fileID: 1371847994}
   - {fileID: 391846734}
+  iterations: 4
   shuffle: 1
   shuffleMethod: 1
   link: 0

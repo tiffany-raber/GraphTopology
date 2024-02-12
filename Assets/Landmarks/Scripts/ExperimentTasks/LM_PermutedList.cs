@@ -33,6 +33,7 @@ public class LM_PermutedList : ExperimentTask
         "Assign pre-configured ObjectLists for greater control (recommended).")]
     public List<ObjectList> outputLists = new List<ObjectList>();
     private int subset;
+    public int iterations = 1;
     public bool shuffle = true;
     [Tooltip("none:\tAB-AC-BA-BC-CA-CB\n" +
              "random:\tBC-AC-AD-CB-BA-CA\n" +
@@ -95,7 +96,15 @@ public class LM_PermutedList : ExperimentTask
             case ShuffleMethod.none:
                 break;
             case ShuffleMethod.random:
-                FisherYatesShuffle(permutedList);
+                var pll = new List<List<List<GameObject>>>();
+                for (int i = 0; i < iterations; i++)
+                {
+                    var spl = permutedList;
+                    FisherYatesShuffle(spl);
+                    pll.Add(spl);
+                }
+                permutedList = pll.SelectMany(x => x).ToList();
+                Debug.Log("PERMUTED --------- " + permutedList.Count.ToString() + "... " + pll.Count.ToString());
                 break;
             case ShuffleMethod.linked:
                 permutedList = SortForLinking(permutedList);
