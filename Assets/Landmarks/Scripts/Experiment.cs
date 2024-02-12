@@ -101,7 +101,7 @@ public class Experiment : MonoBehaviour
 
     public TextMeshProUGUI trialCounter;
 
-    static System.Random random;
+    public static System.Random random;
     public bool idAsRandomSeed;
 
     // -------------------------------------------------------------------------

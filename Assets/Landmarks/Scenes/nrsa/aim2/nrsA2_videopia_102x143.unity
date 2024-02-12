@@ -5829,7 +5829,8 @@ MonoBehaviour:
   left: 276
   right: 275
   rotSpeed: 60
-  topDownTrialList: 0001010001000100000100000000000000000000000000000000000000
+  staySwitch: 0
+  topDownTrialList: 
   dummyTrial: 1
 --- !u!1001 &497411692
 PrefabInstance:

@@ -104,13 +104,14 @@ public class LM_PermutedList : ExperimentTask
                     pll.Add(spl);
                 }
                 permutedList = pll.SelectMany(x => x).ToList();
-                Debug.Log("PERMUTED --------- " + permutedList.Count.ToString() + "... " + pll.Count.ToString());
                 break;
             case ShuffleMethod.linked:
+                // FIXME add code to handle multiple iterations
                 permutedList = SortForLinking(permutedList);
                 Debug.Log("Linked list contains " + permutedList.Count + "sets");
                 break;
             case ShuffleMethod.sortByFirstList:
+                // FIXME add code to handle multiple iterations
                 // Shuffle the list and extract the unique objects from the first subset list in the shuffled order
                 FisherYatesShuffle(permutedList);
                 var firstListNames = new List<GameObject>();
