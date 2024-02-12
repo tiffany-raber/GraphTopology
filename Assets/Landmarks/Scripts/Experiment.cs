@@ -101,13 +101,15 @@ public class Experiment : MonoBehaviour
 
     public TextMeshProUGUI trialCounter;
 
+    static System.Random random;
+    public bool idAsRandomSeed;
+
     // -------------------------------------------------------------------------
     // -------------------------- Builtin Methods ------------------------------
     // -------------------------------------------------------------------------
 
     void Awake()
     {
-
         // ------------------------------
         // Clean up & Initialize Scene
         // ------------------------------
@@ -131,6 +133,14 @@ public class Experiment : MonoBehaviour
         // config.Initialize(config);
         // Check the config for issues 
         config.CheckConfig();
+
+        // Control randomness to replicate experience for each subject
+        if (idAsRandomSeed)
+        {
+            random = new System.Random(1234);
+            UnityEngine.Random.InitState(12345);
+        }
+        else random = new System.Random();
 
         // Are we using Microsoft Azure
         azureStorage = FindObjectOfType<LM_AzureStorage>();
@@ -627,7 +637,7 @@ public class Experiment : MonoBehaviour
 
     public static void Shuffle<T>(T[] array)
     {
-        var random = new System.Random();
+        // var random = new System.Random();
         for (int i = array.Length; i > 1; i--)
         {
             // Pick random element to swap.

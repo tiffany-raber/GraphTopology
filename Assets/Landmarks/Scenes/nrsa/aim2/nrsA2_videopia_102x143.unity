@@ -21070,6 +21070,11 @@ PrefabInstance:
       propertyPath: virtualDesert
       value: 
       objectReference: {fileID: 864404387}
+    - target: {fileID: 7924974381554878584, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
+        type: 3}
+      propertyPath: idAsRandomSeed
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7924974381659779576, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
         type: 3}
       propertyPath: m_RootOrder
