@@ -101,7 +101,7 @@ public class Experiment : MonoBehaviour
 
     public TextMeshProUGUI trialCounter;
 
-    public static System.Random random;
+    public System.Random random;
     public bool idAsRandomSeed;
 
     // -------------------------------------------------------------------------
@@ -137,8 +137,18 @@ public class Experiment : MonoBehaviour
         // Control randomness to replicate experience for each subject
         if (idAsRandomSeed)
         {
-            random = new System.Random(1234);
-            UnityEngine.Random.InitState(12345);
+            int seed;
+            try
+            {
+                seed = int.Parse(config.id);
+            }
+            catch (System.Exception)
+            {
+                seed = 1234;
+                throw;
+            }
+            random = new System.Random(seed);
+            UnityEngine.Random.InitState(seed);
         }
         else random = new System.Random();
 
@@ -641,7 +651,7 @@ public class Experiment : MonoBehaviour
         for (int i = array.Length; i > 1; i--)
         {
             // Pick random element to swap.
-            int j = random.Next(i); // 0 <= j <= i-1
+            int j = FindObjectOfType<Experiment>().random.Next(i); // 0 <= j <= i-1
                                     // Swap.
             T tmp = array[j];
             array[j] = array[i - 1];

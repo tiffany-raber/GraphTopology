@@ -4320,6 +4320,8 @@ MonoBehaviour:
   parentName: 
   parentObject: {fileID: 0}
   current: 0
+  configControlCurrent: 1
+  taskListControlCurrent: {fileID: 505964726}
   objects: []
   EndListBehavior: 0
   shuffle: 0
@@ -5813,7 +5815,6 @@ MonoBehaviour:
   triggerOnStart: 0
   triggerOnEnd: 0
   topDown: 0
-  perspective: 1
   listOfOrigins: {fileID: 0}
   listOfHeadings: {fileID: 1371847994}
   listOfTargets: {fileID: 391846734}
@@ -5830,6 +5831,7 @@ MonoBehaviour:
   right: 275
   rotSpeed: 60
   staySwitch: 0
+  getTopDownListFrom: {fileID: 1193856762}
   topDownTrialList: 
   dummyTrial: 1
 --- !u!1001 &497411692
@@ -6107,7 +6109,7 @@ Transform:
   - {fileID: 491721120}
   - {fileID: 1506374750}
   m_Father: {fileID: 1918633727}
-  m_RootOrder: 2
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &505964726
 MonoBehaviour:
@@ -6147,6 +6149,7 @@ MonoBehaviour:
   tasks: []
   objectsList: []
   repeat: 29
+  configControlRepeat: 0
   overideRepeat: {fileID: 0}
   repeatCount: 1
   currentTask: {fileID: 0}
@@ -8747,6 +8750,8 @@ MonoBehaviour:
   parentName: 
   parentObject: {fileID: 1042421037}
   current: 0
+  configControlCurrent: 0
+  taskListControlCurrent: {fileID: 0}
   objects: []
   EndListBehavior: 0
   shuffle: 1
@@ -14777,7 +14782,7 @@ PrefabInstance:
     - target: {fileID: 6282820247450583383, guid: 4e09813be04144d928219cb9abe866cf,
         type: 3}
       propertyPath: m_Name
-      value: encoding
+      value: Navigation
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4e09813be04144d928219cb9abe866cf, type: 3}
@@ -15647,6 +15652,74 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1193436474}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1193856760
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1193856761}
+  - component: {fileID: 1193856762}
+  m_Layer: 0
+  m_Name: StaySwitchList
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1193856761
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1193856760}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1918633727}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1193856762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1193856760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee2e3ed692ae6404c89b0fc7092d837d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skip: 0
+  canIncrementLists: 1
+  interval: 0
+  interruptTasks: {fileID: 0}
+  interruptInterval: 0
+  repeatInterrupts: 9999
+  currentInterrupt: 0
+  pausedTasks: {fileID: 0}
+  parentTask: {fileID: 0}
+  firstPersonCamera: {fileID: 0}
+  overheadCamera: {fileID: 0}
+  debugButton: {fileID: 0}
+  actionButton: {fileID: 0}
+  vrEnabled: 0
+  taskLog: {fileID: 0}
+  triggerLabel: 
+  triggerOnStart: 0
+  triggerOnEnd: 0
+  trialsPerRun: 1
+  overrideTrialsPerRun: {fileID: 505964726}
+  totalRuns: 1
+  overrideTotalRuns: {fileID: 1918633728}
+  maxRepeat: 3
+  outTrials: 
+  includeMirroredRuns: 1
 --- !u!1001 &1194739538
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21144,7 +21217,7 @@ PrefabInstance:
     - target: {fileID: 7924974381978167566, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
         type: 3}
       propertyPath: skip
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7924974381978167566, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
         type: 3}
@@ -21636,6 +21709,84 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1304556446}
   m_CullTransparentMesh: 0
+--- !u!1 &1305874876
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1305874877}
+  - component: {fileID: 1305874878}
+  m_Layer: 0
+  m_Name: AwaitTriggerStartScanner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1305874877
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305874876}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1918633727}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1305874878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305874876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f2b24b10a1d6446ea483dff9d3e43da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skip: 0
+  canIncrementLists: 0
+  interval: 0
+  interruptTasks: {fileID: 0}
+  interruptInterval: 0
+  repeatInterrupts: 9999
+  currentInterrupt: 0
+  pausedTasks: {fileID: 0}
+  parentTask: {fileID: 0}
+  firstPersonCamera: {fileID: 0}
+  overheadCamera: {fileID: 0}
+  debugButton: {fileID: 0}
+  actionButton: {fileID: 0}
+  vrEnabled: 0
+  taskLog: {fileID: 0}
+  triggerLabel: 
+  triggerOnStart: 0
+  triggerOnEnd: 0
+  instruction: {fileID: 0}
+  message: {fileID: 4900000, guid: 5bef12bc9987e49099ad5c139241cee3, type: 3}
+  masterText: "Imagine yourself at the center of the \nenvironment, facing \"North\".
+    When you are ready, \npress the \"5\" key to begin the task."
+  objects: {fileID: 0}
+  multiObjects: []
+  texts: {fileID: 0}
+  blackout: 1
+  text_color: {r: 1, g: 1, b: 1, a: 1}
+  instructionFont: {fileID: 12800000, guid: b51a3e520f9164da198dc59c8acfccd6, type: 3}
+  instructionSize: 24
+  actionButtonOn: 0
+  customButtonText: 
+  restrictMovement: 0
+  selfPaced: 1
+  continueKey: 53
+  logging: 0
 --- !u!1001 &1310374074
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22478,6 +22629,8 @@ MonoBehaviour:
   parentName: 
   parentObject: {fileID: 0}
   current: 0
+  configControlCurrent: 1
+  taskListControlCurrent: {fileID: 505964726}
   objects: []
   EndListBehavior: 0
   shuffle: 0
@@ -26148,6 +26301,8 @@ MonoBehaviour:
   shuffleMethod: 1
   link: 0
   endListBehavior: 0
+  configControlCurrent: 1
+  taskListControlCurrent: {fileID: 505964726}
 --- !u!1001 &1609695375
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27474,6 +27629,90 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1801187900}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1804229782
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1190775046860764567, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190775046860764567, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 42.98171
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190775046860764567, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -107.79884
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190775046860764567, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.8842125
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190775046860764567, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190775046860764567, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190775046860764567, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190775046860764567, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190775046860764567, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190775046860764567, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1190775046860764567, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5167441126197028154, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: m_Name
+      value: nrsa2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8018723310392941755, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: id
+      value: 1234
+      objectReference: {fileID: 0}
+    - target: {fileID: 8018723310392941755, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: run
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8018723310392941755, guid: 0ba24328df469442c9e26f5064caaa35,
+        type: 3}
+      propertyPath: levelNames.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0ba24328df469442c9e26f5064caaa35, type: 3}
 --- !u!1001 &1807684834
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -28955,6 +29194,8 @@ Transform:
   m_Children:
   - {fileID: 721172987}
   - {fileID: 1601392053}
+  - {fileID: 1193856761}
+  - {fileID: 1305874877}
   - {fileID: 505964725}
   m_Father: {fileID: 1502745653}
   m_RootOrder: 1
@@ -28993,7 +29234,8 @@ MonoBehaviour:
   skipConditions: []
   tasks: []
   objectsList: []
-  repeat: 1
+  repeat: 8
+  configControlRepeat: 0
   overideRepeat: {fileID: 0}
   repeatCount: 1
   currentTask: {fileID: 0}

@@ -224,7 +224,7 @@ public class LM_ExpStartup : MonoBehaviour
                 else
                 {
                     id = int.Parse(guiElements.subID.text);
-                    run = int.Parse(guiElements.subID.text);
+                    run = int.Parse(guiElements.runNum.text);
                     subidError = false;
                     _errorMessage.gameObject.SetActive(false); // then and only then, will we release the flag
                 }

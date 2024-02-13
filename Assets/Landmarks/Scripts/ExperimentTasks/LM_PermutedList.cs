@@ -44,6 +44,9 @@ public class LM_PermutedList : ExperimentTask
     private static bool linked = false;
     public EndListMode endListBehavior;
     readonly public List<GameObject> currentItem;
+    [Tooltip("Use experiment run to index where to start in this list")]
+	public bool configControlCurrent;
+	public TaskList taskListControlCurrent;
     private int currentIndex;
 
     //[HideInInspector]
@@ -148,6 +151,14 @@ public class LM_PermutedList : ExperimentTask
             }
             // Populate output list with items from the permuted list (if any items already exist, these will be appended)
             foreach (var entry in permutedList) outputLists[i].objects.Add(entry[i]);
+
+            // Other things to initialize our objectlists
+            if (configControlCurrent && taskListControlCurrent != null && manager.config.run > 1)
+            {
+                outputLists[i].configControlCurrent = configControlCurrent;
+                outputLists[i].taskListControlCurrent = taskListControlCurrent;
+                outputLists[i].current = (manager.config.run - 1) * taskListControlCurrent.repeat;
+            } 
         }
     }
 

@@ -37,6 +37,8 @@ public class TaskList : ExperimentTask
     public GameObject[] tasks; // no longer need to preset, shown for debugging and visualization - MJS
     public GameObject[] objectsList;
     public int repeat = 1;
+    [Tooltip("Use experiment run to index where this task begins")]
+    public bool configControlRepeat;
     public ObjectList overideRepeat;
     public int repeatCount = 1;
 
@@ -76,6 +78,8 @@ public class TaskList : ExperimentTask
 
     public override void TASK_START()
     {
+        if (configControlRepeat) repeat = manager.config.run;
+
         // Handle if this is a special kind of taskList and set it up as such
         switch (taskListType)
         {

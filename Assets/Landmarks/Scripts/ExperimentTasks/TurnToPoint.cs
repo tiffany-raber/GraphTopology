@@ -6,17 +6,12 @@ using static System.Runtime.CompilerServices.RuntimeHelpers;
 using TMPro;
 using System.Linq;
 using UnityEngine.ProBuilder.MeshOperations;
-
-public enum Perspective {
-    firstPerson,
-    topDown
-}
+using UnityEngine.Events;
 
 public class TurnToPoint : ExperimentTask
 {
     [Header("Task-specific Properties")]
     public bool topDown;
-    public Perspective perspective; 
     [Tooltip("Leave blank to use the player/avatar")]
     public ObjectList listOfOrigins;
     public ObjectList listOfHeadings;
@@ -62,6 +57,7 @@ public class TurnToPoint : ExperimentTask
     private GameObject ti; // target icon copy we'll use for the UI and then destroy after the trial
     [Header("Properties for stay-switch")]
     public bool staySwitch;
+    public BalancedBoolList getTopDownListFrom;
     public List<bool> topDownTrialList = new List<bool>();
     private int topDownTrialIndex;
     public bool dummyTrial = true;
@@ -88,13 +84,14 @@ public class TurnToPoint : ExperimentTask
             return;
         }
 
-        // FIXME FIXME
-        // If a formatting list wasn't provided, set them all to whatever was set in inspector
-        // if (staySwitch) topDownTrialList = BalanceBoolList();
-        // else 
-        if (topDownTrialList.Count == 0) for (int i = 0; i < 334; i++) topDownTrialList.Add(topDown);fd
-        //Debug.Log(BalanceBoolList().ToString());
-        // FIXME FIXME
+        if (getTopDownListFrom != null) topDownTrialList = getTopDownListFrom.outTrials;
+        else 
+        {
+            for (int i = 0; i < parentTask.repeat*taskLog.GetComponent<TaskList>().repeat; i++) 
+            {
+                topDownTrialList.Add(topDown);
+            }
+        }
 
         // Initialize variables that change from trial-to-trial
         topDown = topDownTrialList[topDownTrialIndex];
@@ -336,91 +333,5 @@ public class TurnToPoint : ExperimentTask
         
     }
 
-    private List<bool> BalanceBoolList()
-    {
-        int trialsPerRun = 28;
-        int totalRuns = 8;
-        int maxRepeat = 3;
-        List<bool> outTrials = new List<bool>();
 
-        List<List<int>> sequences = new List<List<int>>();
-        List<int> order = Enumerable.Range(0, trialsPerRun).Select(x => x % 2).ToList();
-
-        while (sequences.Count < totalRuns / 2)
-        {
-            order = order.OrderBy(x => Experiment.random.Next()).ToList();
-            if (sequences.Any(seq => seq.SequenceEqual(order)))
-                continue;
-
-            if (order.GroupBy(x => x).All(group => group.Count() <= maxRepeat))
-                sequences.Add(order.ToList());
-        }
-
-        List<List<int>> topDownSequences = sequences.Select(seq => seq.ToList()).ToList();
-
-        int[,] df = new int[trialsPerRun, 2];
-
-        for (int i = 0; i < trialsPerRun; i++)
-        {
-            if (i == 0)
-            {
-                df[i, 0] = 0;
-                df[i, 1] = topDownSequences[i][0];
-            }
-            else
-            {
-                if (topDownSequences[i][0] == topDownSequences[i - 1][0])
-                {
-                    df[i, 0] = df[i - 1, 0] + 1;
-                    df[i, 1] = topDownSequences[i][0];
-                }
-                else
-                {
-                    df[i, 0] = 0;
-                    df[i, 1] = topDownSequences[i][0];
-                }
-            }
-        }
-
-        List<List<int>> mirrorSequences = new List<List<int>>();
-
-        foreach (var s in topDownSequences)
-        {
-            List<int> ms = s.Select(i => Mathf.Abs(i - 1)).ToList();
-            s.Insert(0, Mathf.Abs(s[0] - 1));
-            ms.Insert(0, Mathf.Abs(ms[0] - 1));
-            mirrorSequences.Add(ms);
-        }
-
-        List<List<int>> trials = new List<List<int>>();
-
-        for (int irun = 0; irun < topDownSequences.Count; irun++)
-        {
-            trials.Add(topDownSequences[irun].ToList());
-            trials.Add(mirrorSequences[irun].ToList());
-        }
-
-        SpecificShuffle(trials, Experiment.random);
-
-        List<int> allTrials = trials.SelectMany(run => run).ToList();
-        foreach (var t in allTrials) 
-        {
-            outTrials.Add(bool.Parse(t.ToString()));
-        }
-
-        return outTrials;
-    }
-
-    static void SpecificShuffle<T>(List<T> list, System.Random random)
-    {
-        int n = list.Count;
-        while (n > 1)
-        {
-            n--;
-            int k = random.Next(n + 1);
-            T value = list[k];
-            list[k] = list[n];
-            list[n] = value;
-        }
-    }
 }

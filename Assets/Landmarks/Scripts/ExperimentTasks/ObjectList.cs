@@ -26,11 +26,15 @@ public class ObjectList : ExperimentTask {
     public string parentName = "";
 	public GameObject parentObject;
 	public int current = 0;
+	[Tooltip("Use experiment run to index where to start in this list")]
+	public bool configControlCurrent;
+	public TaskList taskListControlCurrent;
 	
 	public List<GameObject> objects;
 	public EndListMode EndListBehavior; 
 	public bool shuffle;
 	public List<ObjectList> ignoreCurrentFromOtherLists = new List<ObjectList>();
+	private bool first = true;
     // public GameObject order; // DEPRICATED
 
     
@@ -65,6 +69,13 @@ public class ObjectList : ExperimentTask {
 	{
 		base.startTask();		
 		if (!manager) Start();
+
+		if (first && configControlCurrent && taskListControlCurrent != null && manager.config.run > 1)
+		{
+			current = (manager.config.run - 1) * taskListControlCurrent.repeat + 1;
+		} 
+
+		if (first) first = false;
 
         GameObject[] objs;
 
