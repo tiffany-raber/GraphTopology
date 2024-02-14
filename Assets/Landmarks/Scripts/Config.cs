@@ -69,7 +69,7 @@ public class Config : MonoBehaviour
     public string expPath = "default";
     [HideInInspector]
     public string subjectPath = "default";
-    public string id = "default";
+    public int id = 9999;
     [HideInInspector] public string session = "default";
     [Min(1)] public int run = 1;
     //[HideInInspector]
@@ -311,7 +311,7 @@ public class Config : MonoBehaviour
 [System.Serializable]
 class ExpData
 {
-    public string id;
+    public int id;
     public int lastLevelFinished;
     public List<string> levelNames;
 

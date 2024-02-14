@@ -101,7 +101,7 @@ public class Startup : MonoBehaviour
 
         config.appPath = appDir;
         //config.level = levelList[currentLevelSelection].text;
-        config.id = subject;
+        config.id = int.Parse(subject);
         config.filename = configfile;
     }
 

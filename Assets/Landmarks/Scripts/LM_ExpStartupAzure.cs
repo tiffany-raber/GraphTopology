@@ -86,7 +86,7 @@ public class LM_ExpStartupAzure : LM_ExpStartup
 
 
             // Put the subject ID into the config.subject field
-            config.id = thisSubjectID.ToString();
+            config.id = thisSubjectID;
 
 
             // push a temporary hidden file to reserve that id on Azure
@@ -122,8 +122,7 @@ public class LM_ExpStartupAzure : LM_ExpStartup
 
 
                 // Use the subject ID to determine which condition/scene pair
-                int subCode;
-                int.TryParse(config.id, out subCode);
+                int subCode = config.id;
                 subCode -= firstSubjectId - 1; // remove the starting subject id value - 1
                 Debug.Log("subcode = " + subCode.ToString());
 
@@ -147,8 +146,7 @@ public class LM_ExpStartupAzure : LM_ExpStartup
             else // if it's multiple scenes determine the condition and stick with that
             {
                 // Parse the idNumber (string --> int)
-                int subCode;
-                int.TryParse(config.id, out subCode);
+                int subCode = config.id;
                 subCode -= firstSubjectId - 1; // remove the starting subject id value - 1
                 Debug.Log("subcode = " + subCode.ToString());
 

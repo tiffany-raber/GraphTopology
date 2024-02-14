@@ -162,7 +162,7 @@ public class LM_ExpStartup : MonoBehaviour
         config.runMode = ConfigRunMode.NEW;
         config.bootstrapped = true;
         config.appPath = appDir;
-        config.id = id.ToString();
+        config.id = id;
         config.run = run;
         config.ui = guiElements.ui.options[guiElements.ui.value].text;
         if (existingData) config.Load();

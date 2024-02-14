@@ -140,7 +140,7 @@ public class Experiment : MonoBehaviour
             int seed;
             try
             {
-                seed = int.Parse(config.id);
+                seed = config.id;
             }
             catch (System.Exception)
             {

@@ -314,7 +314,7 @@ public class TaskList : ExperimentTask
             //Debug.Log(manager.gameObject.name);
             //Debug.Log(manager.config.name);
             // Really basic, redundant logging
-            taskLog.AddData("id", manager.config.id);
+            taskLog.AddData("id", manager.config.id.ToString());
             taskLog.AddData("condition", manager.config.condition);
             taskLog.AddData("sceneName", manager.config.levelNames[manager.config.levelNumber]);
             taskLog.AddData("sceneNumber", (manager.config.levelNumber + 1).ToString());

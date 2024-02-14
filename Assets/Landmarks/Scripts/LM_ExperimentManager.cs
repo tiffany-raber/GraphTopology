@@ -182,7 +182,7 @@ public class LM_ExperimentManager : MonoBehaviour
         config.bootstrapped = true;
 
         config.appPath = appDir;
-        config.id = subID.text;
+        config.id = int.Parse(subID.text);
         config.ui = ui.options[ui.value].text;
         //config.level = config.levelNames[0];
         config.CheckConfig();
