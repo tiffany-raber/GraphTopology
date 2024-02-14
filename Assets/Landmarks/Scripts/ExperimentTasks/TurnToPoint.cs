@@ -156,6 +156,7 @@ public class TurnToPoint : ExperimentTask
             headingIcon.SetActive(false);
             hud.showOnlyHUD(false);
             topDownObject.transform.localEulerAngles = Vector3.zero;
+            targetprompt.transform.parent.localEulerAngles = Vector3.zero;
             if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse)
             {
                 manager.playerCamera.orthographic = true;
@@ -197,6 +198,8 @@ public class TurnToPoint : ExperimentTask
                 var targetRot = topDownObject.transform.localRotation;
                 targetRot *= Quaternion.Euler(0f, 0f, rot * rotSpeed * Time.deltaTime);
                 topDownObject.transform.localRotation = targetRot;
+                Debug.Log(targetprompt.transform.parent.name);
+                targetprompt.transform.parent.localRotation = Quaternion.Euler(0f, 0f, -1 * topDownObject.transform.localEulerAngles.z);
                 // FIXME FIXME targetprompt.transform.parent.localEulerAngles = new Vector3(0f, 0f, -1 * topDownObject.transform.localRotation.z);
         }
 
