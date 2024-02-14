@@ -156,6 +156,10 @@ public class TurnToPoint : ExperimentTask
             headingIcon.SetActive(false);
             hud.showOnlyHUD(false);
             topDownObject.transform.localEulerAngles = Vector3.zero;
+            if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse)
+            {
+                manager.playerCamera.orthographic = true;
+            }
         }
         else
         {
@@ -193,6 +197,7 @@ public class TurnToPoint : ExperimentTask
                 var targetRot = topDownObject.transform.localRotation;
                 targetRot *= Quaternion.Euler(0f, 0f, rot * rotSpeed * Time.deltaTime);
                 topDownObject.transform.localRotation = targetRot;
+                // FIXME FIXME targetprompt.transform.parent.localEulerAngles = new Vector3(0f, 0f, -1 * topDownObject.transform.localRotation.z);
         }
 
         if (!firstUpdate)
@@ -299,6 +304,10 @@ public class TurnToPoint : ExperimentTask
         {
             GameObject.Destroy(ti);
             topDownInterface.transform.gameObject.SetActive(false);
+            if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse)
+            {
+                manager.playerCamera.orthographic = false;
+            }
         }
 
         if (canIncrementLists && !dummyTrial)
