@@ -39,9 +39,11 @@ public class InstructionsTask : ExperimentTask {
     private string currentText;
 
     public bool blackout = true;
+    public bool virtualDesert = true;
     public Color text_color = Color.white;
     public Font instructionFont;
     public int instructionSize = 12;
+    public bool textBg = true;
 
     public bool actionButtonOn = true;
     public string customButtonText = "";
@@ -86,6 +88,7 @@ public class InstructionsTask : ExperimentTask {
         GameObject avatar = manager.player.GetComponent<HUD>().Canvas as GameObject;
         Text canvas = avatar.GetComponent<Text>();
         hud.SecondsToShow = hud.InstructionDuration;
+        if (!textBg) hud.hudPanel.GetComponent<Image>().enabled = false;
 
         sgo.AddComponent<Text>();
         sgo.hideFlags = HideFlags.HideAndDontSave;
@@ -130,7 +133,7 @@ public class InstructionsTask : ExperimentTask {
         Debug.Log(gui.text);*/
         
 
-        if (blackout) hud.showOnlyHUD();
+        if (blackout) hud.showOnlyHUD(virtualDesert);
         else hud.showEverything();
 
         string msg;
@@ -237,6 +240,7 @@ public class InstructionsTask : ExperimentTask {
 
         hud.setMessage ("");
         hud.SecondsToShow = hud.GeneralDuration;
+        if (!textBg) hud.hudPanel.GetComponent<Image>().enabled = true;
 
         if (canIncrementLists) {
 

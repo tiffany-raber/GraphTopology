@@ -60,7 +60,7 @@ public class TurnToPoint : ExperimentTask
     public BalancedBoolList getTopDownListFrom;
     public List<bool> topDownTrialList = new List<bool>();
     private int topDownTrialIndex;
-    public bool dummyTrial = true;
+   [Min(0)] public int dummyTrials = 0;
     private bool lastTopDown;
     private int formatRepeatCount;
 
@@ -110,11 +110,15 @@ public class TurnToPoint : ExperimentTask
         topDownInterface.SetActive(topDown);
 
         // Do we want an intial dummy trial?
-        if (dummyTrial) 
+        if (parentTask.repeatCount <= dummyTrials) 
         {
             currentOrigin = avatar.GetComponent<LM_PlayerController>().cam.gameObject;
-            currentHeading = GameObject.Instantiate(new GameObject(), currentOrigin.transform.position + Vector3.forward, Quaternion.Euler(Vector3.zero));
-            currentTarget = listOfTargets.objects[UnityEngine.Random.Range(0, listOfTargets.objects.Count)];
+            currentHeading = listOfTargets.objects[UnityEngine.Random.Range(0, listOfTargets.objects.Count)];
+            do 
+            {
+                currentTarget = listOfTargets.objects[UnityEngine.Random.Range(0, listOfTargets.objects.Count)];
+            } while (currentTarget.name == currentHeading.name);
+            
         }
         else
         {
@@ -148,7 +152,6 @@ public class TurnToPoint : ExperimentTask
             targetprompt.text = prompt;
             if (restrictMovement) manager.RestrictMovement(true, true);
             // copy the target and set it's transform to be the same as the targetIcon
-            ti = new GameObject();
             ti = GameObject.Instantiate<GameObject>(currentHeading, headingIcon.transform.position, headingIcon.transform.rotation, headingIcon.transform.parent);
             foreach (var child in ti.GetComponentsInChildren<Transform>()) child.gameObject.layer = headingIcon.layer;
             ti.name = "temporaryTargetIcon";
@@ -271,7 +274,7 @@ public class TurnToPoint : ExperimentTask
         signedError = underEstimated ? -1 * absoluteError : absoluteError;
 
         // LOG CRITITCAL TRIAL DATA
-        taskLog.AddData(transform.name + "_dummyTrial", dummyTrial.ToString());
+        taskLog.AddData(transform.name + "_dummyTrial", (parentTask.repeatCount <= dummyTrials).ToString());
         taskLog.AddData(transform.name + "_trial_type_topDown", topDown.ToString());
         taskLog.AddData(transform.name + "_trial_type_switch", topDown == lastTopDown ? bool.FalseString : bool.TrueString);
         taskLog.AddData(transform.name + "_stayCount", formatRepeatCount.ToString());
@@ -284,6 +287,7 @@ public class TurnToPoint : ExperimentTask
         taskLog.AddData(transform.name + "_overUnder", underEstimated ? "under" : "over");
         taskLog.AddData(transform.name + "_signedError", signedError.ToString());
         taskLog.AddData(transform.name + "_absError", absoluteError.ToString());
+        taskLog.AddData(transform.name + "_responseLatency_s", (timeAtResponse - onset).ToString());
         // Additional POSITION AND ROTATION DATA
         taskLog.AddData(transform.name + "_initialPosX", initialPos.x.ToString());
         taskLog.AddData(transform.name + "_initialPosZ", initialPos.z.ToString());
@@ -293,14 +297,19 @@ public class TurnToPoint : ExperimentTask
         taskLog.AddData(transform.name + "_finalPosX", finalPos.x.ToString());
         taskLog.AddData(transform.name + "_finalPosZ", finalPos.z.ToString());
         // LOG EVENT TIMING (in an fMRI friendly-ish style)
-        taskLog.AddData(transform.name + "_event_onset_s", onset.ToString());
-        taskLog.AddData(transform.name + "_event_duration_s", ((interval != 0) ? (interval / 1000).ToString() : (timeAtResponse - onset).ToString())); // fancy if-else
-        taskLog.AddData(transform.name + "_preMvmt_duration_s", (responseMovementOnset - onset).ToString());
-        taskLog.AddData(transform.name + "_mvmt_onset_s", responseMovementOnset.ToString());
-        taskLog.AddData(transform.name + "_mvmt_duration_s", (timeAtResponse - responseMovementOnset).ToString());
-        taskLog.AddData(transform.name + "_response_onset_s", timeAtResponse.ToString());
-        taskLog.AddData(transform.name + "_response_duration_s", "0");
-        taskLog.AddData(transform.name + "_responseLatency_s", (timeAtResponse - onset).ToString());
+        taskLog.AddData(transform.name + "_event-trial_onset_s", onset.ToString());
+        taskLog.AddData(transform.name + "_event-trial_duration_s", interval != 0 ? (interval / 1000).ToString() : 
+                                                                                    (timeAtResponse - onset).ToString());
+        taskLog.AddData(transform.name + "_event-preMvmt_onset_s", onset.ToString());
+        taskLog.AddData(transform.name + "_event-preMvmt_duration_s", hasMoved ? (responseMovementOnset - onset).ToString() : 
+                                                                                 (timeAtResponse - onset).ToString());
+        taskLog.AddData(transform.name + "_event-mvmt_onset_s", hasMoved ? responseMovementOnset.ToString() : 
+                                                                           timeAtResponse.ToString());
+        taskLog.AddData(transform.name + "_event-mvmt_duration_s", hasMoved ? (timeAtResponse - responseMovementOnset).ToString() : 
+                                                                              "0");
+        taskLog.AddData(transform.name + "_event-response_onset_s", timeAtResponse.ToString());
+        taskLog.AddData(transform.name + "_event-response_duration_s", "0");
+        
 
         // Clean up
         if (topDown)
@@ -313,7 +322,7 @@ public class TurnToPoint : ExperimentTask
             }
         }
 
-        if (canIncrementLists && !dummyTrial)
+        if (canIncrementLists && parentTask.repeatCount > dummyTrials)
         {
             if (listOfOrigins != null) listOfOrigins.incrementCurrent();
             listOfHeadings.incrementCurrent();
@@ -321,8 +330,6 @@ public class TurnToPoint : ExperimentTask
         }
 
         if (restrictMovement) manager.RestrictMovement(false, false);
-
-        if (dummyTrial) dummyTrial = !dummyTrial; // the next one shouldn't be a dummy trial
 
         // update the format
         lastTopDown = topDown;

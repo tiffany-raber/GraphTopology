@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.IO;
+using Microsoft.Unity.VisualStudio.Editor;
 
 
 public class BalancedBoolList : ExperimentTask
@@ -10,7 +11,7 @@ public class BalancedBoolList : ExperimentTask
     [Header("Task-specific Properties")]
     public int trialsPerRun = 28;
     public TaskList overrideTrialsPerRun;
-    private int overrideTrialsPerRunAdjust = -1;
+    public bool controlStaySwitch;
     public int totalRuns = 8;
     public TaskList overrideTotalRuns;
     [Tooltip("Restrict identical consecutive values, excluding the initial appearance")] 
@@ -39,8 +40,10 @@ public class BalancedBoolList : ExperimentTask
             return;
         }
 
-        if (overrideTrialsPerRun != null) trialsPerRun = overrideTrialsPerRun.repeat + overrideTrialsPerRunAdjust;
+        if (overrideTrialsPerRun != null) trialsPerRun = overrideTrialsPerRun.repeat;
         if (overrideTotalRuns != null) totalRuns = overrideTotalRuns.repeat;
+
+        if (trialsPerRun % 2 != 0) Debug.LogError("Trials cannot be balanced if they aren't even");
 
         //order = Enumerable.Range(0, trialsPerRun).Select(x => x % 2).ToList();
         
@@ -76,12 +79,22 @@ public class BalancedBoolList : ExperimentTask
             
         } while (sequences.Count < totalRuns / 2);
 
-        // Now that we have our unique blocks, create a mirror for each one and 
-        // insert an extra trial at the beginning such that [0] and [1] are opposite for all
+        // Now that we have our unique blocks, if necessary, alternate between adding an extra 'switch' at the beginning
+        // then, if necessary, create a mirror for each sequence 
         List<List<bool>> mirrorSequences = new List<List<bool>>();
+        var addswitch = true;
         for (int iSeq = 0; iSeq < sequences.Count; iSeq++)
         {
-            sequences[iSeq].Insert(0, !sequences[iSeq][0]);
+            if (controlStaySwitch) 
+            {
+                // Add a switch at the beginning to validate that the first trial wouldn't really be stay or switch
+                // even though it's counted as a switch
+                sequences[iSeq].Insert(0, !sequences[iSeq][0]);
+                // Then add another value to the start, alternating between stay and switch
+                if (addswitch) sequences[iSeq].Insert(0, !sequences[iSeq][0]);
+                else sequences[iSeq].Insert(0, sequences[iSeq][0]);
+                addswitch = !addswitch;
+            }
             List<bool> mirror = new List<bool>();
             for (int iTrial = 0; iTrial < sequences[iSeq].Count; iTrial++) mirror.Add(!sequences[iSeq][iTrial]);
             mirrorSequences.Add(mirror);
