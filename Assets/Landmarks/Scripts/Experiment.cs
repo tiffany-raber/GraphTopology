@@ -137,18 +137,8 @@ public class Experiment : MonoBehaviour
         // Control randomness to replicate experience for each subject
         if (idAsRandomSeed)
         {
-            int seed;
-            try
-            {
-                seed = config.id;
-            }
-            catch (System.Exception)
-            {
-                seed = 1234;
-                throw;
-            }
-            random = new System.Random(seed);
-            UnityEngine.Random.InitState(seed);
+            random = new System.Random(config.id);
+            UnityEngine.Random.InitState(config.id);
         }
         else random = new System.Random();
 
