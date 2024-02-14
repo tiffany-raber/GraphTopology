@@ -18,7 +18,7 @@ public class LM_TargetColorAssignments : ExperimentTask
 
     // IF USING ALPHABET COLORS (Green-Armytage, 2010) -------------------------
     [Header("Color Alphabet Settings (or other ColorList)")]
-    public ColorList alphabet;
+    public Material[] alphabet;
 
 
     // IF USING LAB COLOR SPACE ------------------------------------------------
@@ -95,13 +95,14 @@ public class LM_TargetColorAssignments : ExperimentTask
         Debug.Log(targetChildren.Length + " target objects detected");
 
         // Shuffle target stores so we don't get the same assignment in each instance
-        for (int i = targetChildren.Length - 1; i > 0; i--)
-        {
-            var r = Random.Range(0, i);
-            var tmp = targetChildren[i];
-            targetChildren[i] = targetChildren[r];
-            targetChildren[r] = tmp;
-        }
+        Experiment.Shuffle(targetChildren);
+        // for (int i = targetChildren.Length - 1; i > 0; i--)
+        // {
+        //     var r = Random.Range(0, i);
+        //     var tmp = targetChildren[i];
+        //     targetChildren[i] = targetChildren[r];
+        //     targetChildren[r] = tmp;
+        // }
         
         switch (colorSpace)
         {
@@ -109,11 +110,11 @@ public class LM_TargetColorAssignments : ExperimentTask
                 // ---------------------------------------------------------------------
                 // Set Up and Apply Alphabet colors (list of 26 distinct colors
                 // ---------------------------------------------------------------------
-                alphabet.ShuffleColors();
+                Experiment.Shuffle(alphabet);
                 for (int i = 0; i < targetChildren.Length; i++)
                 {
                     //Debug.Log("using alhpabet " + i + " - " + alphabet.materials[i]);
-                    targetChildren[i].GetComponent<LM_TargetStore>().ChangeMaterial(alphabet.materials[i]);
+                    targetChildren[i].GetComponent<LM_TargetStore>().ChangeMaterial(alphabet[i]);
                     
                 }
                 break;
