@@ -39,7 +39,7 @@ public class TaskList : ExperimentTask
     public int repeat = 1;
     [Tooltip("Use experiment run to index where this task begins")]
     public bool configControlRepeat;
-    public ObjectList overideRepeat;
+    public ObjectList overrideRepeat;
     public int repeatCount = 1;
 
     [HideInInspector]
@@ -119,9 +119,9 @@ public class TaskList : ExperimentTask
             }
         }
 
-        if (overideRepeat)
+        if (overrideRepeat)
         {
-            repeat = overideRepeat.objects.Count;
+            repeat = overrideRepeat.objects.Count;
         }
 
         //----------------------------------------------------------------------
@@ -191,7 +191,7 @@ public class TaskList : ExperimentTask
 
         // update the trial count on the overlay
         if (overlayRepeatCount != null) overlayRepeatCount.text = string.Format("{0}: {1} / {2}", name, repeatCount, repeat);
-        if (overlayListItem != null & overideRepeat != null) overlayListItem.text = string.Format("{0}", overideRepeat.currentObject().name);
+        if (overlayListItem != null & overrideRepeat != null) overlayListItem.text = string.Format("{0}", overrideRepeat.currentObject().name);
 
         currentTask = tasks[currentTaskIndex].GetComponent<ExperimentTask>();
 
@@ -330,9 +330,9 @@ public class TaskList : ExperimentTask
     {
         base.endTask();
 
-        if (overideRepeat && canIncrementLists)
+        if (overrideRepeat && canIncrementLists)
         {
-            overideRepeat.incrementCurrent();
+            overrideRepeat.incrementCurrent();
         }
 
         

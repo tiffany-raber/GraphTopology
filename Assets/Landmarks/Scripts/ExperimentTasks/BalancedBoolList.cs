@@ -40,8 +40,12 @@ public class BalancedBoolList : ExperimentTask
             return;
         }
 
-        if (overrideTrialsPerRun != null) trialsPerRun = overrideTrialsPerRun.repeat;
-        if (overrideTotalRuns != null) totalRuns = overrideTotalRuns.repeat;
+        var secondOverride = overrideTrialsPerRun.overrideRepeat;
+        if (overrideTrialsPerRun != null)
+            trialsPerRun = secondOverride == null ? overrideTrialsPerRun.repeat : secondOverride.objects.Count;
+        secondOverride = overrideTotalRuns.overrideRepeat;
+        if (overrideTotalRuns != null) 
+            totalRuns = secondOverride == null ? overrideTotalRuns.repeat : secondOverride.objects.Count;
 
         if (trialsPerRun % 2 != 0) Debug.LogError("Trials cannot be balanced if they aren't even");
 

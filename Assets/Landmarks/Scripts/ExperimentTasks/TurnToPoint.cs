@@ -17,6 +17,7 @@ public class TurnToPoint : ExperimentTask
     public ObjectList listOfHeadings;
     public ObjectList listOfTargets;
     public bool restrictMovement;
+    [Tooltip("When can a response be submitted (in seconds)")] public float minResponseLatency;
     private GameObject currentOrigin;
     private GameObject currentHeading;
     private GameObject currentTarget;
@@ -56,7 +57,6 @@ public class TurnToPoint : ExperimentTask
     [Tooltip("degrees per second")] public float rotSpeed = 60f; // 60 deg/s = 10 rev/min
     private GameObject ti; // target icon copy we'll use for the UI and then destroy after the trial
     [Header("Properties for stay-switch")]
-    public bool staySwitch;
     public BalancedBoolList getTopDownListFrom;
     public List<bool> topDownTrialList = new List<bool>();
     private int topDownTrialIndex;
@@ -246,7 +246,7 @@ public class TurnToPoint : ExperimentTask
             lastFrame = !topDown ? PointingSource.eulerAngles : PointingSource.localEulerAngles;
 
             // Handle Recording the response (and ending for a response-dependent duration)
-            if (Input.GetKeyDown(submitButton) && !responded)
+            if (Input.GetKeyDown(submitButton) && !responded && Time.time - onset >= minResponseLatency)
             {
                 RecordResponse(true);
                 manager.RestrictMovement(true, true);
