@@ -111,6 +111,7 @@ public class LM_TargetColorAssignments : ExperimentTask
                 // Set Up and Apply Alphabet colors (list of 26 distinct colors
                 // ---------------------------------------------------------------------
                 Experiment.Shuffle(alphabet);
+                Debug.Log(targetChildren.Length);
                 for (int i = 0; i < targetChildren.Length; i++)
                 {
                     //Debug.Log("using alhpabet " + i + " - " + alphabet.materials[i]);

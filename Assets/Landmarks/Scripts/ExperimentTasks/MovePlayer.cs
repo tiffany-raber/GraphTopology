@@ -56,8 +56,6 @@ public class MovePlayer : ExperimentTask {
             return;
         }
 
-
-
         if (scaledPlayer)
         {
             start = scaledAvatar;

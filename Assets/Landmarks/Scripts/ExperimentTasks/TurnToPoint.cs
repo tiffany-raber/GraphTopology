@@ -63,6 +63,7 @@ public class TurnToPoint : ExperimentTask
    [Min(0)] public int dummyTrials = 0;
     private bool lastTopDown;
     private int formatRepeatCount;
+    public MovePlayer GetLocalOffsetFacingFrom; // HACK: as long as we're being hack-y for now
 
     public override void startTask()
     {
@@ -112,13 +113,28 @@ public class TurnToPoint : ExperimentTask
         // Do we want an intial dummy trial?
         if (parentTask.repeatCount <= dummyTrials) 
         {
+            // TODO: handle if they provide an originlist
             currentOrigin = avatar.GetComponent<LM_PlayerController>().cam.gameObject;
             currentHeading = listOfTargets.objects[UnityEngine.Random.Range(0, listOfTargets.objects.Count)];
             do 
             {
                 currentTarget = listOfTargets.objects[UnityEngine.Random.Range(0, listOfTargets.objects.Count)];
             } while (currentTarget.name == currentHeading.name);
-            
+
+            // HACK: see properties defined in class; we're taking the scenic route for this one (code from MovePlayer.cs)
+            if (!topDown)
+            {
+                var dummyPos = currentHeading.transform.position;
+                var dummyRot = currentHeading.transform.rotation;
+                if (GetLocalOffsetFacingFrom != null) dummyPos += currentHeading.transform.TransformDirection(GetLocalOffsetFacingFrom.localOffsetFacing);
+                dummyPos.y = currentHeading.transform.position.y;
+                avatar.GetComponentInChildren<CharacterController>().enabled = false;
+                avatar.transform.position = dummyPos;
+                avatar.GetComponentInChildren<CharacterController>().enabled = true;
+                avatar.transform.LookAt(currentHeading.transform);
+                avatar.transform.eulerAngles = new Vector3(0f, avatar.transform.eulerAngles.y, 0f);
+            }
+
         }
         else
         {
@@ -152,7 +168,7 @@ public class TurnToPoint : ExperimentTask
             targetprompt.text = prompt;
             if (restrictMovement) manager.RestrictMovement(true, true);
             // copy the target and set it's transform to be the same as the targetIcon
-            ti = GameObject.Instantiate<GameObject>(currentHeading, headingIcon.transform.position, headingIcon.transform.rotation, headingIcon.transform.parent);
+            ti = Instantiate<GameObject>(currentHeading, headingIcon.transform.position, headingIcon.transform.rotation, headingIcon.transform.parent);
             foreach (var child in ti.GetComponentsInChildren<Transform>()) child.gameObject.layer = headingIcon.layer;
             ti.name = "temporaryTargetIcon";
             ti.transform.localScale = headingIcon.transform.localScale;
@@ -195,17 +211,6 @@ public class TurnToPoint : ExperimentTask
 
     public override bool updateTask()
     {
-        if (topDown)
-        {
-                var rot = (float)(Convert.ToDouble(Input.GetKey(left)) - Convert.ToDouble(Input.GetKey(right)));
-                var targetRot = topDownObject.transform.localRotation;
-                targetRot *= Quaternion.Euler(0f, 0f, rot * rotSpeed * Time.deltaTime);
-                topDownObject.transform.localRotation = targetRot;
-                Debug.Log(targetprompt.transform.parent.name);
-                targetprompt.transform.parent.localRotation = Quaternion.Euler(0f, 0f, -1 * topDownObject.transform.localEulerAngles.z);
-                // FIXME FIXME targetprompt.transform.parent.localEulerAngles = new Vector3(0f, 0f, -1 * topDownObject.transform.localRotation.z);
-        }
-
         if (!firstUpdate)
         {
             onset = Time.time;
@@ -215,8 +220,18 @@ public class TurnToPoint : ExperimentTask
         }
         else
         {
-            // Track the player
-            if (lastFrame.y != PointingSource.eulerAngles.y)
+            // Take input for the top-down interface, if active
+            if (topDown && !responded)
+            {
+                var rot = (float)(Convert.ToDouble(Input.GetKey(left)) - Convert.ToDouble(Input.GetKey(right)));
+                var targetRot = topDownObject.transform.localRotation;
+                targetRot *= Quaternion.Euler(0f, 0f, rot * rotSpeed * Time.deltaTime);
+                topDownObject.transform.localRotation = targetRot;
+                targetprompt.transform.parent.localRotation = Quaternion.Euler(0f, 0f, -1 * topDownObject.transform.localEulerAngles.z);
+            }
+            
+            // Regardless of the perspective/format, record changes in the response orientation
+            if (lastFrame.y != PointingSource.eulerAngles.y && !responded)
             {
                 var deltaY = !topDown ? Mathf.DeltaAngle(PointingSource.eulerAngles.y, lastFrame.y) : Mathf.DeltaAngle(PointingSource.localEulerAngles.z, lastFrame.z);
                 var deltaT = Time.time - lastTime;
@@ -233,19 +248,15 @@ public class TurnToPoint : ExperimentTask
             // Handle Recording the response (and ending for a response-dependent duration)
             if (Input.GetKeyDown(submitButton) && !responded)
             {
-                RecordResponse();
-                responded = true;
+                RecordResponse(true);
+                manager.RestrictMovement(true, true);
                 if (interval == 0) return true; // end with response unless duration/interval is specified
             }
 
-            // Handle the ending for a fixed duration
+            // Handle the ending for a fixed duration, whether they responded or not
             if (interval > 0 && Time.time - onset > interval / 1000)
             {
-                if (!responded)
-                {
-                    RecordResponse();
-                    responded = false;
-                }
+                if (!responded) RecordResponse(false);
                 return true;
             }
         }
@@ -269,7 +280,6 @@ public class TurnToPoint : ExperimentTask
 
         // Calculations
         absoluteError = Mathf.Abs(Mathf.DeltaAngle(responseAngle_actual, responseAngle_correct));
-        // FIXME FIXME - calculate signed error
         var underEstimated = Mathf.Abs(responseAngle_actual) < Mathf.Abs(responseAngle_correct);
         signedError = underEstimated ? -1 * absoluteError : absoluteError;
 
@@ -340,7 +350,7 @@ public class TurnToPoint : ExperimentTask
         hud.SecondsToShow = hud.GeneralDuration;
     }
 
-    private void RecordResponse()
+    private void RecordResponse(bool responseProvided)
     {
         timeAtResponse = Time.time;
         finalPos = PointingSource.position;
@@ -350,6 +360,7 @@ public class TurnToPoint : ExperimentTask
                                                                          currentOrigin.transform.position + currentOrigin.transform.forward);
         else responseAngle_actual = PointingSource.localEulerAngles.z;
         
+        responded = responseProvided;
     }
 
 

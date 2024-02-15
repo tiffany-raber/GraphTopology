@@ -5617,6 +5617,8 @@ MonoBehaviour:
   parentName: TargetObjects
   parentObject: {fileID: 5308465572180033508}
   current: 0
+  configControlCurrent: 0
+  taskListControlCurrent: {fileID: 0}
   objects: []
   EndListBehavior: 0
   shuffle: 1
@@ -5653,7 +5655,7 @@ Transform:
   - {fileID: 5308465570121322754}
   - {fileID: 5308465571149786399}
   m_Father: {fileID: 5308465572113532639}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5308465570167263630
 MonoBehaviour:
@@ -5690,6 +5692,7 @@ MonoBehaviour:
   tasks: []
   objectsList: []
   repeat: 1
+  configControlRepeat: 0
   overideRepeat: {fileID: 0}
   repeatCount: 1
   currentTask: {fileID: 0}
@@ -5788,13 +5791,14 @@ MonoBehaviour:
   overheadCamera: {fileID: 0}
   scaledPlayer: {fileID: 0}
   environment: {fileID: 0}
-  virtualDesert: {fileID: 0}
   scaledEnvironment: {fileID: 0}
   usingVR: 0
   playback_time: 0
   logfile: 
   dataPath: 
+  virtualDesert: {fileID: 0}
   trialCounter: {fileID: 0}
+  idAsRandomSeed: 0
 --- !u!1 &5308465570808339388
 GameObject:
   m_ObjectHideFlags: 0
@@ -5859,6 +5863,8 @@ MonoBehaviour:
   parentName: NavigationStartingLocations
   parentObject: {fileID: 5308465571056132539}
   current: 0
+  configControlCurrent: 0
+  taskListControlCurrent: {fileID: 0}
   objects: []
   EndListBehavior: 0
   shuffle: 1
@@ -5988,6 +5994,8 @@ MonoBehaviour:
   parentName: TargetLocations
   parentObject: {fileID: 5308465571347722053}
   current: 0
+  configControlCurrent: 0
+  taskListControlCurrent: {fileID: 0}
   objects: []
   EndListBehavior: 1
   shuffle: 0
@@ -6125,6 +6133,7 @@ MonoBehaviour:
   tasks: []
   objectsList: []
   repeat: 1
+  configControlRepeat: 0
   overideRepeat: {fileID: 0}
   repeatCount: 1
   currentTask: {fileID: 0}
@@ -6287,6 +6296,7 @@ MonoBehaviour:
   tasks: []
   objectsList: []
   repeat: 1
+  configControlRepeat: 0
   overideRepeat: {fileID: 0}
   repeatCount: 1
   currentTask: {fileID: 0}
@@ -6458,14 +6468,17 @@ MonoBehaviour:
   multiObjects: []
   texts: {fileID: 0}
   blackout: 1
+  virtualDesert: 1
   text_color: {r: 1, g: 1, b: 1, a: 1}
   instructionFont: {fileID: 12800000, guid: b51a3e520f9164da198dc59c8acfccd6, type: 3}
   instructionSize: 24
+  textBg: 1
   actionButtonOn: 1
   customButtonText: 
   restrictMovement: 0
   selfPaced: 1
   continueKey: 13
+  logging: 0
 --- !u!1 &5308465572113532638
 GameObject:
   m_ObjectHideFlags: 0
@@ -6495,8 +6508,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 8732423546615130286}
-  - {fileID: 7154346062648222598}
   - {fileID: 5308465570167263629}
+  - {fileID: 7154346062648222598}
   - {fileID: 5308465570808339389}
   m_Father: {fileID: 5308465571750927105}
   m_RootOrder: 0
@@ -6536,6 +6549,7 @@ MonoBehaviour:
   tasks: []
   objectsList: []
   repeat: 1
+  configControlRepeat: 0
   overideRepeat: {fileID: 0}
   repeatCount: 1
   currentTask: {fileID: 0}
@@ -6615,14 +6629,17 @@ MonoBehaviour:
   multiObjects: []
   texts: {fileID: 0}
   blackout: 1
+  virtualDesert: 1
   text_color: {r: 1, g: 1, b: 1, a: 1}
   instructionFont: {fileID: 0}
   instructionSize: 12
+  textBg: 1
   actionButtonOn: 0
   customButtonText: 
   restrictMovement: 0
   selfPaced: 0
   continueKey: 13
+  logging: 0
 --- !u!1 &5308465572180033508
 GameObject:
   m_ObjectHideFlags: 0
@@ -8013,7 +8030,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5308465572113532639}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4049530821156502844
 MonoBehaviour:
@@ -8046,8 +8063,10 @@ MonoBehaviour:
   triggerOnStart: 0
   triggerOnEnd: 0
   colorSpace: 0
-  alphabet: {fileID: 6487356903442857568, guid: d3a14a0bc1b5d44878f066d1f9a4ed39,
-    type: 3}
+  alphabet:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   Lmin: 25
   Lmax: 75
   uniqueLuminances: 3
@@ -9259,7 +9278,7 @@ MonoBehaviour:
   mouseLook: 0
   walkSpeed: 3
   runSpeed: 10
-  yawSensitivity: 6
+  rotSpeed: 60
   pitchSensitivity: 1
   decoupleHead: 0
   clampVerticalRotation: 1
