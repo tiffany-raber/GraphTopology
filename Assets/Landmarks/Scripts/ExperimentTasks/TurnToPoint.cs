@@ -7,6 +7,7 @@ using TMPro;
 using System.Linq;
 using UnityEngine.ProBuilder.MeshOperations;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class TurnToPoint : ExperimentTask
 {
@@ -348,6 +349,7 @@ public class TurnToPoint : ExperimentTask
         Experiment.MoveToLayer(currentHeading.transform, targetLayer);
         hud.setMessage("");
         hud.SecondsToShow = hud.GeneralDuration;
+        hud.hudPanel.GetComponent<Image>().enabled = true;
     }
 
     private void RecordResponse(bool responseProvided)
@@ -361,6 +363,13 @@ public class TurnToPoint : ExperimentTask
         else responseAngle_actual = PointingSource.localEulerAngles.z;
         
         responded = responseProvided;
+
+        if (interval > 0) 
+        {
+            hud.setMessage("+");
+            hud.hudPanel.GetComponent<Image>().enabled = false;
+            hud.showNothing();
+        }
     }
 
 
