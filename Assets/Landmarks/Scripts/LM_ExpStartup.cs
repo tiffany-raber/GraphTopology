@@ -267,7 +267,6 @@ public class GuiElements
     public TMP_InputField runNum;
     public ToggleGroup biosex;
     public TMP_InputField age;
-    public TMP_InputValidator tmp;
     public TMP_Dropdown ui;
     public TMP_Dropdown condition;
     public TMP_Dropdown environment;
