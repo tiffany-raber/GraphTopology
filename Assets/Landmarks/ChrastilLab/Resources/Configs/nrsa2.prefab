@@ -51,7 +51,7 @@ MonoBehaviour:
   showFPS: 0
   filename: config.txt
   experiment: nrsa2
-  ui: default
+  ui: KeyboardSingleAxis
   runMode: 0
   conditions: []
   practiceTrialCount: 0
@@ -68,7 +68,7 @@ MonoBehaviour:
   appPath: default
   expPath: default
   subjectPath: default
-  id: default
+  id: 0
   session: default
   run: 1
   condition: default

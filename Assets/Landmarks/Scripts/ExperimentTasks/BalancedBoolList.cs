@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.IO;
-using Microsoft.Unity.VisualStudio.Editor;
 
 
 public class BalancedBoolList : ExperimentTask
