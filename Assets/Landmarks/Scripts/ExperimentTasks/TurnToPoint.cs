@@ -323,16 +323,6 @@ public class TurnToPoint : ExperimentTask
         
 
         // Clean up
-        if (topDown)
-        {
-            GameObject.Destroy(ti);
-            topDownInterface.transform.gameObject.SetActive(false);
-            if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse)
-            {
-                manager.playerCamera.orthographic = false;
-            }
-        }
-
         if (canIncrementLists && parentTask.repeatCount > dummyTrials)
         {
             if (listOfOrigins != null) listOfOrigins.incrementCurrent();
@@ -346,7 +336,6 @@ public class TurnToPoint : ExperimentTask
         lastTopDown = topDown;
         topDownTrialIndex++;
 
-        Experiment.MoveToLayer(currentHeading.transform, targetLayer);
         hud.setMessage("");
         hud.SecondsToShow = hud.GeneralDuration;
         hud.hudPanel.GetComponent<Image>().enabled = true;
@@ -360,15 +349,26 @@ public class TurnToPoint : ExperimentTask
         if (!topDown) responseAngle_actual = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
                                                                          currentOrigin.transform.position,
                                                                          currentOrigin.transform.position + currentOrigin.transform.forward);
-        else responseAngle_actual = PointingSource.localEulerAngles.z;
+        else 
+        {
+            responseAngle_actual = PointingSource.localEulerAngles.z;
+            Destroy(ti);
+            topDownInterface.transform.gameObject.SetActive(false);
+            if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse)
+            {
+                manager.playerCamera.orthographic = false;
+            }
+        }
         
         responded = responseProvided;
 
+        Experiment.MoveToLayer(currentHeading.transform, targetLayer);
         if (interval > 0) 
         {
             hud.setMessage("+");
             hud.hudPanel.GetComponent<Image>().enabled = false;
-            hud.showNothing();
+            hud.SecondsToShow = interval;
+            hud.showOnlyHUD(false);
         }
     }
 
