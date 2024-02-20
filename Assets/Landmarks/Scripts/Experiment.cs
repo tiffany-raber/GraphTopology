@@ -300,6 +300,17 @@ public class Experiment : MonoBehaviour
         //     dblog = new dbPlaybackLog(dataPath + logfile);
         // }
 
+        string tsvPath = Application.isEditor ? dataPath + "participants.tsv": dataPath + "../participants.tsv";
+        if (Application.isEditor && !File.Exists(tsvPath)) File.Delete(tsvPath); 
+        bool firstParticipant = !File.Exists(tsvPath);
+        var participantsTSV = new StreamWriter(tsvPath, append:!Application.isEditor);
+        if (firstParticipant) participantsTSV.WriteLine("participant_id\tage\tsex\tgroup");
+        participantsTSV.WriteLine(config.id.ToString() + "\t" + 
+                                  config.age.ToString() + "\t" + 
+                                  (config.biosexFemale ? "F" : "M") + "\t" + 
+                                  "control");
+        participantsTSV.Close();
+
         dblog.log("EXPERIMENT:\t" + PlayerPrefs.GetString("expID") + "\tSUBJECT:\t" + config.id +
                   "\tSTART_SCENE\t" + config.levelNames[config.levelNumber] + "\tSTART_CONDITION:\t" + config.conditions[config.levelNumber] + "\tUI:\t" + userInterface.ToString(), 1);
     }

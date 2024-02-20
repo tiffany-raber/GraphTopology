@@ -33,6 +33,8 @@ public class LM_ExpStartup : MonoBehaviour
     private List<int> usedIds = new List<int>();
     private bool subidError = true;
     private bool uiError = true;
+    private bool biosexError = true;
+    private bool ageError = true;
     private bool abortExperiment;
     private string appDir;
     private bool existingData;
@@ -124,7 +126,8 @@ public class LM_ExpStartup : MonoBehaviour
 
         ValidateSubjectID(); 
             
-
+        if (guiElements.biosex != null) ValidateBiosex();
+        if (guiElements.age != null) ValidateAge();
 
         ValidateUI();
 
@@ -163,6 +166,8 @@ public class LM_ExpStartup : MonoBehaviour
         config.bootstrapped = true;
         config.appPath = appDir;
         config.id = id;
+        if (guiElements.biosex != null) config.biosexFemale = guiElements.biosex.captionText.text == "Female";
+        if (guiElements.age != null) config.age = int.Parse(guiElements.age.text);
         config.run = run;
         config.ui = guiElements.ui.options[guiElements.ui.value].text;
         if (existingData) config.Load();
@@ -184,6 +189,38 @@ public class LM_ExpStartup : MonoBehaviour
         {
             uiError = true;
             _errorMessage.text = "Please select a valid UI.";
+            _errorMessage.gameObject.SetActive(true);
+        }
+    }
+
+    void ValidateBiosex()
+    {
+        TextMeshProUGUI _errorMesage = guiElements.biosex.transform.Find("Error").GetComponent<TextMeshProUGUI>();
+        if (guiElements.biosex.value != 0)
+        {
+            biosexError = false;
+            _errorMesage.gameObject.SetActive(false);
+        }
+        else
+        {
+            biosexError = true;
+            // _errorMesage.text = "[Text you'd like here]";
+            _errorMesage.gameObject.SetActive(true);
+        }
+    }
+
+    void ValidateAge()
+    {
+        TextMeshProUGUI _errorMessage = guiElements.age.transform.Find("Error").GetComponent<TextMeshProUGUI>();
+        if (guiElements.age.text != "")
+        {
+            ageError = false;
+            _errorMessage.gameObject.SetActive(false);
+        }
+        else
+        {
+            ageError = true;
+            // _errorMesage.text = "[Text you'd like here]";
             _errorMessage.gameObject.SetActive(true);
         }
     }
@@ -265,7 +302,7 @@ public class GuiElements
     public TMP_Dropdown studyCodes;
     public TMP_InputField subID;
     public TMP_InputField runNum;
-    public ToggleGroup biosex;
+    public TMP_Dropdown biosex;
     public TMP_InputField age;
     public TMP_Dropdown ui;
     public TMP_Dropdown condition;

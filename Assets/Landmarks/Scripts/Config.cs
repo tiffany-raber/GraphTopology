@@ -69,7 +69,9 @@ public class Config : MonoBehaviour
     public string expPath = "default";
     [HideInInspector]
     public string subjectPath = "default";
-    public int id = 9999;
+    public int id = 999;
+    public int age = 999;
+    public bool biosexFemale;
     [HideInInspector] public string session = "default";
     [Min(1)] public int run = 1;
     //[HideInInspector]
