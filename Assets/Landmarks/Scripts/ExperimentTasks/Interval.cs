@@ -9,7 +9,7 @@ public class Interval : ExperimentTask
     public bool shuffle = true;
 
     private float startTime = -1f;
-    private float[] intervalList = new float[0];
+    public float[] intervalList = new float[0];
     private int currentIntervalIndex;
 
     public override void startTask()
@@ -100,6 +100,7 @@ public class Interval : ExperimentTask
         // Housekeeping
         startTime = -1f;
         currentIntervalIndex++;
+        if (currentIntervalIndex >= intervalList.Length) intervalList = new float[0];
         hud.setMessage("");
         hud.hudPanel.GetComponent<UnityEngine.UI.Image>().enabled = true;
         hud.SecondsToShow = hud.GeneralDuration;

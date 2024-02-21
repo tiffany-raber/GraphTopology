@@ -26,6 +26,7 @@ public class TurnToPoint : ExperimentTask
     private float responseMovementOnset;
     private bool hasMoved;
     private float timeAtResponse;
+    public bool terminateOnResponse;
     public KeyCode submitButton = KeyCode.UpArrow;
     public bool useBodyNotCameraForRotation;
     private Transform PointingSource;
@@ -251,7 +252,7 @@ public class TurnToPoint : ExperimentTask
             {
                 RecordResponse(true);
                 manager.RestrictMovement(true, true);
-                if (interval == 0) return true; // end with response unless duration/interval is specified
+                if (interval == 0 || terminateOnResponse) return true; // end with response unless duration/interval is specified
             }
 
             // Handle the ending for a fixed duration, whether they responded or not

@@ -41,6 +41,7 @@ public class ViewTargets : ExperimentTask {
 	private int saveLayer;
 	private int viewLayer = 11;
 	public bool blackout = true;
+	public bool virtualDesert = false;
 	public bool rotate = true;
 	public long rotation_start;
     public float rotation_start_float;
@@ -76,7 +77,7 @@ public class ViewTargets : ExperimentTask {
 		}
 		
 
-	    if (blackout) hud.showOnlyTargets();
+	    if (blackout) hud.showOnlyTargets(virtualDesert);
 	    else hud.showEverything();
 
         if (restrictMovement)
