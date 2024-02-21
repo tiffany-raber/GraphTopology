@@ -68,12 +68,12 @@ public class LM_MovementController : MonoBehaviour
         desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
 
         Vector3 moveDir = Vector3.zero;
-        moveDir.x = desiredMove.x * speed;
-        moveDir.z = desiredMove.z * speed;
+        moveDir.x = desiredMove.x;
+        moveDir.z = desiredMove.z;
 
         if (motor.enabled)
         {
-            m_CollisionFlags = motor.Move(moveDir * Time.fixedDeltaTime);
+            m_CollisionFlags = motor.Move(moveDir * speed * Time.fixedDeltaTime);
         }
 
 
