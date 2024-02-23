@@ -319,6 +319,8 @@ public class TaskList : ExperimentTask
             taskLog.AddData("sceneName", manager.config.levelNames[manager.config.levelNumber]);
             taskLog.AddData("sceneNumber", (manager.config.levelNumber + 1).ToString());
             taskLog.AddData("task", taskLog.gameObject.name);
+            if (taskLog.gameObject.GetComponent<TaskList>().taskListType == Role.task) taskLog.AddData("run", 
+                    taskLog.gameObject.GetComponent<TaskList>().parentTask.repeatCount.ToString()); 
             taskLog.AddData("block", taskLog.gameObject.GetComponent<TaskList>().repeatCount.ToString());
             taskLog.AddData("trial", repeatCount.ToString());
             //trialLog.AddData("catchTrial", catchFlag.ToString());

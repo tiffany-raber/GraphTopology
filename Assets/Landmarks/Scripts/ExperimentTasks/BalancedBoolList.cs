@@ -10,6 +10,7 @@ public class BalancedBoolList : ExperimentTask
     public int trialsPerRun = 28;
     public TaskList overrideTrialsPerRun;
     public bool controlStaySwitch;
+    public int staySwitchDummyTrials = 2;
     public int totalRuns = 8;
     public TaskList overrideTotalRuns;
     [Tooltip("Restrict identical consecutive values, excluding the initial appearance")] 
@@ -38,20 +39,25 @@ public class BalancedBoolList : ExperimentTask
             return;
         }
 
-        var secondOverride = overrideTrialsPerRun.overrideRepeat;
         if (overrideTrialsPerRun != null)
-            trialsPerRun = secondOverride == null ? overrideTrialsPerRun.repeat : secondOverride.objects.Count;
-        secondOverride = overrideTotalRuns.overrideRepeat;
-        if (overrideTotalRuns != null) 
-            totalRuns = secondOverride == null ? overrideTotalRuns.repeat : secondOverride.objects.Count;
-
+            trialsPerRun =  overrideTrialsPerRun.overrideRepeat == null ? 
+                            overrideTrialsPerRun.repeat : 
+                            overrideTrialsPerRun.overrideRepeat.objects.Count;
+        trialsPerRun -= staySwitchDummyTrials;
         if (trialsPerRun % 2 != 0) Debug.LogError("Trials cannot be balanced if they aren't even");
+
+        if (overrideTotalRuns != null ) 
+            totalRuns = overrideTotalRuns.overrideRepeat == null ? 
+                        overrideTotalRuns.repeat : 
+                        overrideTotalRuns.overrideRepeat.objects.Count;
 
         //order = Enumerable.Range(0, trialsPerRun).Select(x => x % 2).ToList();
         
         List<List<bool>> sequences = new List<List<bool>>();
         var order = Enumerable.Repeat<bool>(true, trialsPerRun / 2).ToList();
         order.AddRange(Enumerable.Repeat<bool>(false, trialsPerRun / 2).ToList());
+
+        var sequences2generate = includeMirroredRuns ? totalRuns / 2 : totalRuns;
         do
         {
             // Randomize, then make sure a trial type doesn't appear consecutively more than the max allowed
@@ -79,7 +85,7 @@ public class BalancedBoolList : ExperimentTask
                 //     "\tSwitch Trials: " + switchCount);
             }
             
-        } while (sequences.Count < totalRuns / 2);
+        } while (sequences.Count < sequences2generate);
 
         // Now that we have our unique blocks, if necessary, alternate between adding an extra 'switch' at the beginning
         // then, if necessary, create a mirror for each sequence 
@@ -97,10 +103,17 @@ public class BalancedBoolList : ExperimentTask
                 else sequences[iSeq].Insert(0, sequences[iSeq][0]);
                 addswitch = !addswitch;
             }
-            List<bool> mirror = new List<bool>();
-            for (int iTrial = 0; iTrial < sequences[iSeq].Count; iTrial++) mirror.Add(!sequences[iSeq][iTrial]);
-            mirrorSequences.Add(mirror);
+
+            if (includeMirroredRuns)
+            {
+                List<bool> mirror = new List<bool>();
+                for (int iTrial = 0; iTrial < sequences[iSeq].Count; iTrial++) mirror.Add(!sequences[iSeq][iTrial]);
+                mirrorSequences.Add(mirror);
+            }
+
         }
+        Debug.Log(sequences.SelectMany(list => list).Count());
+        Debug.Log(mirrorSequences.SelectMany(list => list).Count());
         if (includeMirroredRuns) sequences.AddRange(mirrorSequences);
        
 

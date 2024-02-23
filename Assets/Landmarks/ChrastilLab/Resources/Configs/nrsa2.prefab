@@ -54,11 +54,9 @@ MonoBehaviour:
   ui: KeyboardSingleAxis
   runMode: 0
   conditions: []
-  practiceTrialCount: 0
+  practiceTrialCount: 1
   levelNames:
-  - nrsA2_videopia_102x143
   - nrsA2_videosville_102x143
-  - nrsA2_videopolis_102x143
   randomSceneOrder: 0
   singleSceneBuild: 1
   levelNumber: 0
@@ -69,6 +67,8 @@ MonoBehaviour:
   expPath: default
   subjectPath: default
   id: 0
+  age: 999
+  biosexFemale: 0
   session: default
   run: 1
   condition: default

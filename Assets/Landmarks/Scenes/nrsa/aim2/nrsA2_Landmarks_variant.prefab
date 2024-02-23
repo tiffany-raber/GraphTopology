@@ -5350,6 +5350,11 @@ PrefabInstance:
       propertyPath: alphabet.Array.data[7]
       value: 
       objectReference: {fileID: 2100000, guid: fb910e1d2b59f494aadb575db95b41a9, type: 2}
+    - target: {fileID: 4936814082498709507, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
+      propertyPath: walkSpeed
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 5308465570229703753, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
         type: 3}
       propertyPath: m_Name

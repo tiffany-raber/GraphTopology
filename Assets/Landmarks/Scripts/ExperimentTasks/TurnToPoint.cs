@@ -347,9 +347,13 @@ public class TurnToPoint : ExperimentTask
         timeAtResponse = Time.time;
         finalPos = PointingSource.position;
 
-        if (!topDown) responseAngle_actual = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
+        if (!topDown) 
+        {
+            responseAngle_actual = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
                                                                          currentOrigin.transform.position,
                                                                          currentOrigin.transform.position + currentOrigin.transform.forward);
+            currentHeading.layer = targetLayer;
+        }
         else 
         {
             responseAngle_actual = PointingSource.localEulerAngles.z;

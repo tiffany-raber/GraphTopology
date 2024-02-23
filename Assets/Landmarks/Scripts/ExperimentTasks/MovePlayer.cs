@@ -32,6 +32,7 @@ public class MovePlayer : ExperimentTask {
     public bool randomRotation;
 	public bool scaledPlayer = false;
     public bool ignoreY = false;
+    public bool useSnapPoint;
     public Vector3 localOffsetFacing;
 
     //variables used for block repetition
@@ -79,8 +80,10 @@ public class MovePlayer : ExperimentTask {
         // Temporary transforms that can be easily modified
         var originPos = start.transform.position;
         var originRot = start.transform.eulerAngles;
-        var terminusPos = destination.transform.position;
-        var terminusRot = destination.transform.eulerAngles;
+        var terminusPos = useSnapPoint ?    destination.transform.GetComponentInChildren<LM_SnapPoint>().transform.position : 
+                                            destination.transform.position;
+        var terminusRot = useSnapPoint ?    destination.transform.GetComponentInChildren<LM_SnapPoint>().transform.localEulerAngles :
+                                            destination.transform.eulerAngles;
 
         // -----------------
         // Move the player
