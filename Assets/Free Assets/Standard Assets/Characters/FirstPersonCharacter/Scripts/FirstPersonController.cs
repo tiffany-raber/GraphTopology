@@ -17,6 +17,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private float m_JumpSpeed;
         [SerializeField] private float m_StickToGroundForce;
         [SerializeField] private float m_GravityMultiplier;
+        [SerializeField] public bool mouseLookOn = true; // allow turning off mouselook
+        [SerializeField] public KeyCode noMouseLookLeft = KeyCode.LeftArrow;
+        [SerializeField] public KeyCode noMouseLookRight = KeyCode.RightArrow;
+        [SerializeField] public float noMouseTurnSpeed = 60; // degrees per second
         [SerializeField] private MouseLook m_MouseLook;
         [SerializeField] private bool m_UseFovKick;
         [SerializeField] private FOVKick m_FovKick = new FOVKick();
@@ -61,7 +65,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Update is called once per frame
         private void Update()
         {
-            RotateView();
             // the jump state needs to read here to make sure it is not missed
             if (!m_Jump)
             {
@@ -130,13 +133,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
             if (m_CharacterController.enabled)
             {
                 m_CollisionFlags = m_CharacterController.Move(m_MoveDir * Time.fixedDeltaTime);
+                RotateView();
             }
 
 
             ProgressStepCycle(speed);
             UpdateCameraPosition(speed);
 
-            m_MouseLook.UpdateCursorLock();
+            if (mouseLookOn) m_MouseLook.UpdateCursorLock();
         }
 
 
@@ -210,7 +214,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private void GetInput(out float speed)
         {
             // Read input
-            float horizontal = CrossPlatformInputManager.GetAxis("Horizontal");
+            float horizontal = mouseLookOn ? CrossPlatformInputManager.GetAxis("Horizontal") : 0f; // mjsa to handle single-axis control
             float vertical = CrossPlatformInputManager.GetAxis("Vertical");
 
             bool waswalking = m_IsWalking;
@@ -242,7 +246,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void RotateView()
         {
-            m_MouseLook.LookRotation(transform, m_Camera.transform);
+            // MJSA if loop to circumvent mouselook.cs
+            if (mouseLookOn) m_MouseLook.LookRotation(transform, m_Camera.transform);
+            else
+            {
+                // Handle rotations
+                var yaw = (float)(Convert.ToDouble(Input.GetKey(noMouseLookRight)) - Convert.ToDouble(Input.GetKey(noMouseLookLeft)));
+                var m_CharacterTargetRot = transform.localRotation;
+                var m_CameraTargetRot = m_Camera.transform.localRotation;
+                m_CharacterTargetRot *= Quaternion.Euler(0f, yaw * noMouseTurnSpeed * Time.fixedDeltaTime, 0f);
+                transform.localRotation = m_CharacterTargetRot;
+                m_Camera.transform.localRotation = m_CameraTargetRot;
+            }
         }
 
 
