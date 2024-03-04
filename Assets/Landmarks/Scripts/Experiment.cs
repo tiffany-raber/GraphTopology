@@ -705,12 +705,12 @@ public class Experiment : MonoBehaviour
         return measurement;
 	}
 
-    public void RestrictMovement(bool move, bool look)
+    public void RestrictMovement(bool canMove, bool canLook)
     {
-        avatar.GetComponentInChildren<CharacterController>().enabled = !move;
+        avatar.GetComponentInChildren<CharacterController>().enabled = !canMove;
 
-        if (GetComponentInChildren<FirstPersonController>()) GetComponentInChildren<FirstPersonController>().enabled = !look;
-        if (GetComponentInChildren<LM_MovementController>()) GetComponentInChildren<LM_MovementController>().enabled = !look;
+        if (GetComponentInChildren<FirstPersonController>()) GetComponentInChildren<FirstPersonController>().LockRotation(canLook);
+        if (GetComponentInChildren<LM_MovementController>()) GetComponentInChildren<LM_MovementController>().enabled = !canLook;
     }
     
     // Turn off all Renderers and Canvases on a gameobject and all of its children
