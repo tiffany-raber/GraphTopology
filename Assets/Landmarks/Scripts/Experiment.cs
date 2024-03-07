@@ -674,7 +674,7 @@ public class Experiment : MonoBehaviour
 
 
     /// <summary>
-    /// Calculate the planar angle between two points measured at a third vertex point.
+    /// Calculate the planar angle between two points measured at a third vertex point. Returns [-180:180]
     /// </summary>
     /// <param name="a">The transform of the point at the end of the arm/vector to measure from.</param>
     /// <param name="b">The transform of the point where the two arms/vectors meet.</param>
@@ -699,8 +699,8 @@ public class Experiment : MonoBehaviour
         // var measurement = Mathf.Rad2Deg * Mathf.Acos((Mathf.Pow(ab, 2) + Mathf.Pow(ac, 2) - Mathf.Pow(bc, 2)) / (2 * ab * bc));
         var measurement = Mathf.Rad2Deg * (Mathf.Atan2(bc.y, bc.x) - Mathf.Atan2(ba.y, ba.x));
 
-        while (measurement > 180) measurement -= 360;
-        while (measurement < -180) measurement += 360;
+        while (measurement > 180) measurement -= 180;
+        while (measurement < -180) measurement += 180;
 
         return measurement;
 	}

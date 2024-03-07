@@ -37,10 +37,10 @@ public class TurnToPoint : ExperimentTask
     private float totalRotation;
     private float netClockwiseRotation;
     private Vector3 finalPos;
-    private float responseAngle_actual;
-    private float responseAngle_correct;
+    private float estimatedAngleCW;
+    private float correctAngleCW;
     private bool responded;
-    private float signedError;
+    private float signedErrorCW;
     private float absoluteError;
     private bool firstUpdate;
     [Tooltip("Use {0} in place of the target name")]// Use {0} for origin, {1} for heading, {2} for target")]
@@ -62,10 +62,17 @@ public class TurnToPoint : ExperimentTask
     public BalancedBoolList getTopDownListFrom;
     public List<bool> topDownTrialList = new List<bool>();
     private int topDownTrialIndex;
-   [Min(0)] public int dummyTrials = 0;
+    [Min(0)] public int dummyTrials = 0;
     private bool lastTopDown;
     private int formatRepeatCount;
     public MovePlayer GetLocalOffsetFacingFrom; // HACK: as long as we're being hack-y for now
+
+    // Trig Check
+    public float startRotGlobal;
+    public float endRotGlobal;
+    public float targetRotGlobal;
+    public float sError;
+    public float aError;
 
     public override void startTask()
     {
@@ -124,19 +131,15 @@ public class TurnToPoint : ExperimentTask
             } while (currentTarget.name == currentHeading.name);
 
             // HACK: see properties defined in class; we're taking the scenic route for this one (code from MovePlayer.cs)
-            if (!topDown)
-            {
-                var dummyPos = currentHeading.transform.position;
-                var dummyRot = currentHeading.transform.rotation;
-                if (GetLocalOffsetFacingFrom != null) dummyPos += currentHeading.transform.TransformDirection(GetLocalOffsetFacingFrom.localOffsetFacing);
-                dummyPos.y = currentHeading.transform.position.y;
-                avatar.GetComponentInChildren<CharacterController>().enabled = false;
-                avatar.transform.position = dummyPos;
-                avatar.GetComponentInChildren<CharacterController>().enabled = true;
-                avatar.transform.LookAt(currentHeading.transform);
-                avatar.transform.eulerAngles = new Vector3(0f, avatar.transform.eulerAngles.y, 0f);
-            }
-
+            var dummyPos = currentHeading.transform.position;
+            var dummyRot = currentHeading.transform.rotation;
+            if (GetLocalOffsetFacingFrom != null) dummyPos += currentHeading.transform.TransformDirection(GetLocalOffsetFacingFrom.localOffsetFacing);
+            dummyPos.y = currentHeading.transform.position.y;
+            avatar.GetComponentInChildren<CharacterController>().enabled = false;
+            avatar.transform.position = dummyPos;
+            avatar.GetComponentInChildren<CharacterController>().enabled = true;
+            avatar.transform.LookAt(currentHeading.transform);
+            avatar.transform.eulerAngles = new Vector3(0f, avatar.transform.eulerAngles.y, 0f);
         }
         else
         {
@@ -202,11 +205,28 @@ public class TurnToPoint : ExperimentTask
         initialLocalY = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
                                                              currentOrigin.transform.position,
                                                              currentOrigin.transform.position + currentOrigin.transform.forward);
-        responseAngle_correct = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
-                                                             currentOrigin.transform.position,
-                                                             currentTarget.transform.position);
+        correctAngleCW = -1 * Experiment.CalculateAngleThreePoints(
+            currentHeading.transform.position, 
+            currentOrigin.transform.position, 
+            currentTarget.transform.position
+        );
 
-        
+        // Trig Check
+        // startRotGlobal = Experiment.CalculateAngleThreePoints(
+        //     currentOrigin.transform.position + currentOrigin.transform.forward,
+        //     currentOrigin.transform.position + Vector3.forward,
+        //     currentOrigin.transform.position);
+        // if (startRotGlobal < 0) startRotGlobal += 360; //wrap
+        startRotGlobal = topDown ? PointingSource.transform.localEulerAngles.z : PointingSource.transform.eulerAngles.y;
+        targetRotGlobal = Experiment.CalculateAngleThreePoints( currentTarget.transform.position,
+                                                                currentOrigin.transform.position + Vector3.forward, 
+                                                                currentOrigin.transform.position); 
+        if (targetRotGlobal < 0) targetRotGlobal += 360;
+        Debug.Log(currentOrigin.transform.position + Vector3.forward);
+        Debug.Log(currentTarget.transform.position);
+        Debug.Log(currentOrigin.transform.position);
+        Debug.LogWarning(   "Staring out facing " + startRotGlobal + " degrees\n" + 
+                            "Should end facing " + targetRotGlobal + " degrees");
         
     }
 
@@ -216,7 +236,7 @@ public class TurnToPoint : ExperimentTask
         if (!firstUpdate)
         {
             onset = Time.time;
-            lastFrame = PointingSource.eulerAngles;
+            lastFrame = !topDown ? PointingSource.eulerAngles : PointingSource.localEulerAngles;
             lastTime = Time.time;
             firstUpdate = true;
         }
@@ -281,10 +301,48 @@ public class TurnToPoint : ExperimentTask
         base.endTask();
 
         // Calculations
-        absoluteError = Mathf.Abs(Mathf.DeltaAngle(responseAngle_actual, responseAngle_correct));
-        var underEstimated = Mathf.Abs(responseAngle_actual) < Mathf.Abs(responseAngle_correct);
-        signedError = underEstimated ? -1 * absoluteError : absoluteError;
+        var wrongDir = estimatedAngleCW * correctAngleCW < 0; // product of the two values w/ same sign is positive
+        bool underEstimated;
+        float signedErrorOverUnder;
 
+        // fixme
+        if (wrongDir) {
+            absoluteError = Mathf.Abs(estimatedAngleCW) + Mathf.Abs(correctAngleCW);
+            // our result could be >180 (rotated 150cw when correcet was 45ccw), which we don't want
+            if (absoluteError > 180) 
+            {
+                signedErrorCW =
+                absoluteError -= 180;
+            }
+            else if (estimatedAngleCW < 0) signedErrorCW = -1 * absoluteError;
+        }
+        else
+        {
+            var a = estimatedAngleCW;
+            var b = correctAngleCW;
+            underEstimated = Mathf.Abs(a) < Mathf.Abs(b);
+            signedErrorCW = underEstimated ? -1 * Mathf.DeltaAngle(b, a) : -1 * Mathf.DeltaAngle(a, b);
+
+            // 45 - 35
+            // 35 - 45
+            // 
+
+            signedErrorOverUnder = estimatedAngleCW >= 0 ? estimatedAngleCW - correctAngleCW : estimatedAngleCW - correctAngleCW;
+            // else if (underEstimated && estimatedAngleCW < 0) signedErrorOverUnder = Mathf.Abs(correctAngleCW) - Mathf.Abs(estimatedAngleCW);
+            // else if (!underEstimated && estimatedAngleCW >= 0) signedErrorOverUnder = estimatedAngleCW - correctAngleCW;
+            // else if (!underEstimated && estimatedAngleCW < 0) signedErrorOverUnder = ;
+
+            Debug.Log("Underestimated: " + underEstimated + "\tSigned Error: " + signedErrorCW);
+        }
+        absoluteError = Mathf.Abs(signedErrorCW);
+
+
+        // Trig Check
+        sError = Mathf.DeltaAngle(endRotGlobal, targetRotGlobal);
+        Debug.LogWarning(   "Ended at " + endRotGlobal + "degrees\n" + 
+                            "Angular error calculated to be " + sError + "degrees");
+        aError = Mathf.Abs(sError);
+        
         // LOG CRITITCAL TRIAL DATA
         taskLog.AddData(transform.name + "_dummyTrial", (parentTask.repeatCount <= dummyTrials).ToString());
         taskLog.AddData(transform.name + "_trial_type_topDown", topDown.ToString());
@@ -294,10 +352,10 @@ public class TurnToPoint : ExperimentTask
         taskLog.AddData(transform.name + "_heading",currentHeading.name);
         taskLog.AddData(transform.name + "_target", currentTarget.name);
         taskLog.AddData(transform.name + "_responded", responded.ToString());
-        taskLog.AddData(transform.name + "_responseAngle_correct", responseAngle_correct.ToString());
-        taskLog.AddData(transform.name + "_responseAngle_actual", responseAngle_actual.ToString());
-        taskLog.AddData(transform.name + "_overUnder", underEstimated ? "under" : "over");
-        taskLog.AddData(transform.name + "_signedError", signedError.ToString());
+        taskLog.AddData(transform.name + "_responseAngle_correct", correctAngleCW.ToString());
+        taskLog.AddData(transform.name + "_responseAngle_actual", estimatedAngleCW.ToString());
+        //taskLog.AddData(transform.name + "_overUnder", underEstimated ? "under" : "over");
+        taskLog.AddData(transform.name + "_signedError", signedErrorCW.ToString());
         taskLog.AddData(transform.name + "_absError", absoluteError.ToString());
         taskLog.AddData(transform.name + "_responseLatency_s", (timeAtResponse - onset).ToString());
         // Additional POSITION AND ROTATION DATA
@@ -346,17 +404,24 @@ public class TurnToPoint : ExperimentTask
     {
         timeAtResponse = Time.time;
         finalPos = PointingSource.position;
+        estimatedAngleCW = netClockwiseRotation;
+        while (estimatedAngleCW < -360) estimatedAngleCW += 360;
+        while (estimatedAngleCW > 360) estimatedAngleCW -= 360;
+
+        endRotGlobal = topDown ? PointingSource.transform.localEulerAngles.z : PointingSource.transform.eulerAngles.y;
 
         if (!topDown) 
         {
-            responseAngle_actual = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
-                                                                         currentOrigin.transform.position,
-                                                                         currentOrigin.transform.position + currentOrigin.transform.forward);
+            // responseAngle_actual = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
+            //                                                              currentOrigin.transform.position,
+            //                                                              currentOrigin.transform.position + currentOrigin.transform.forward);
             currentHeading.layer = targetLayer;
         }
         else 
         {
-            responseAngle_actual = PointingSource.localEulerAngles.z;
+            //responseAngle_actual = PointingSource.localEulerAngles.z;
+            // while (responseAngle_actual > 180) responseAngle_actual -= 180;
+            // while (responseAngle_actual < -180) responseAngle_actual +=180;
             Destroy(ti);
             topDownInterface.transform.gameObject.SetActive(false);
             if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse)
