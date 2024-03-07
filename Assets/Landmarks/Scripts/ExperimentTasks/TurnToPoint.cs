@@ -30,15 +30,13 @@ public class TurnToPoint : ExperimentTask
     public KeyCode submitButton = KeyCode.UpArrow;
     public bool useBodyNotCameraForRotation;
     private Transform PointingSource;
+    private Vector3 initialPos;
     private Vector3 lastFrame;
     private float lastTime;
-    private Vector3 initialPos;
-    private float initialLocalY;
     private float totalRotation;
     private float netClockwiseRotation;
     private Vector3 finalPos;
-    private float estimatedAngleCW;
-    private float correctAngleCW;
+
     private bool responded;
     private float signedErrorCW;
     private float absoluteError;
@@ -65,14 +63,13 @@ public class TurnToPoint : ExperimentTask
     [Min(0)] public int dummyTrials = 0;
     private bool lastTopDown;
     private int formatRepeatCount;
-    public MovePlayer GetLocalOffsetFacingFrom; // HACK: as long as we're being hack-y for now
+    public MovePlayer GetLocalOffsetFacingFrom; // HACK: to move the player on dummy trials
 
     // Trig Check
-    public float startRotGlobal;
-    public float endRotGlobal;
-    public float targetRotGlobal;
-    public float sError;
-    public float aError;
+    public float startRotNorthCW;
+    public float endRotNorthCW;
+    public float targetRotNorthCW;
+
 
     public override void startTask()
     {
@@ -198,36 +195,26 @@ public class TurnToPoint : ExperimentTask
             hud.showOnlyHUD();
         }
 
-
-
         // Calculate geometry
-        initialPos = PointingSource.position;
-        initialLocalY = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
-                                                             currentOrigin.transform.position,
-                                                             currentOrigin.transform.position + currentOrigin.transform.forward);
-        correctAngleCW = -1 * Experiment.CalculateAngleThreePoints(
-            currentHeading.transform.position, 
-            currentOrigin.transform.position, 
-            currentTarget.transform.position
-        );
+        // Temporarily face the player at the target and record this as the correct answer
+        var tmp = currentOrigin.transform.rotation;
+        currentOrigin.transform.LookAt(currentTarget.transform);
+        targetRotNorthCW = currentOrigin.transform.eulerAngles.y;
+        currentOrigin.transform.rotation = tmp;
+        // Record the start rotation 
+        startRotNorthCW = currentOrigin.transform.eulerAngles.y;
+        // Adjust to top-down if necessary (ironically requiring us to make it egocentric)
+        if (topDown)
+        {
+            // top-downAnswer   = targetRotNorthCW  - startRotNorthCW  (if < 0, add 360);   // Allo to ego conversion for top-down
+            targetRotNorthCW -= startRotNorthCW;
+            if (targetRotNorthCW < 0) targetRotNorthCW += 360; // wrap 0-360
+            startRotNorthCW = PointingSource.transform.localEulerAngles.z; // should be ego-zero; set after using allo startRot to calculate target
+        }
+        Debug.Log("Standing in front of and facing the " + currentHeading.name + ", turn to face the " + currentTarget.name);
+        Debug.Log(   "Facing vector: " + startRotNorthCW + "°\t" + "Target vector: " + targetRotNorthCW + "°");
 
-        // Trig Check
-        // startRotGlobal = Experiment.CalculateAngleThreePoints(
-        //     currentOrigin.transform.position + currentOrigin.transform.forward,
-        //     currentOrigin.transform.position + Vector3.forward,
-        //     currentOrigin.transform.position);
-        // if (startRotGlobal < 0) startRotGlobal += 360; //wrap
-        startRotGlobal = topDown ? PointingSource.transform.localEulerAngles.z : PointingSource.transform.eulerAngles.y;
-        targetRotGlobal = Experiment.CalculateAngleThreePoints( currentTarget.transform.position,
-                                                                currentOrigin.transform.position + Vector3.forward, 
-                                                                currentOrigin.transform.position); 
-        if (targetRotGlobal < 0) targetRotGlobal += 360;
-        Debug.Log(currentOrigin.transform.position + Vector3.forward);
-        Debug.Log(currentTarget.transform.position);
-        Debug.Log(currentOrigin.transform.position);
-        Debug.LogWarning(   "Staring out facing " + startRotGlobal + " degrees\n" + 
-                            "Should end facing " + targetRotGlobal + " degrees");
-        
+        initialPos = currentOrigin.transform.position;
     }
 
 
@@ -301,47 +288,10 @@ public class TurnToPoint : ExperimentTask
         base.endTask();
 
         // Calculations
-        var wrongDir = estimatedAngleCW * correctAngleCW < 0; // product of the two values w/ same sign is positive
-        bool underEstimated;
-        float signedErrorOverUnder;
-
-        // fixme
-        if (wrongDir) {
-            absoluteError = Mathf.Abs(estimatedAngleCW) + Mathf.Abs(correctAngleCW);
-            // our result could be >180 (rotated 150cw when correcet was 45ccw), which we don't want
-            if (absoluteError > 180) 
-            {
-                signedErrorCW =
-                absoluteError -= 180;
-            }
-            else if (estimatedAngleCW < 0) signedErrorCW = -1 * absoluteError;
-        }
-        else
-        {
-            var a = estimatedAngleCW;
-            var b = correctAngleCW;
-            underEstimated = Mathf.Abs(a) < Mathf.Abs(b);
-            signedErrorCW = underEstimated ? -1 * Mathf.DeltaAngle(b, a) : -1 * Mathf.DeltaAngle(a, b);
-
-            // 45 - 35
-            // 35 - 45
-            // 
-
-            signedErrorOverUnder = estimatedAngleCW >= 0 ? estimatedAngleCW - correctAngleCW : estimatedAngleCW - correctAngleCW;
-            // else if (underEstimated && estimatedAngleCW < 0) signedErrorOverUnder = Mathf.Abs(correctAngleCW) - Mathf.Abs(estimatedAngleCW);
-            // else if (!underEstimated && estimatedAngleCW >= 0) signedErrorOverUnder = estimatedAngleCW - correctAngleCW;
-            // else if (!underEstimated && estimatedAngleCW < 0) signedErrorOverUnder = ;
-
-            Debug.Log("Underestimated: " + underEstimated + "\tSigned Error: " + signedErrorCW);
-        }
+        signedErrorCW = -1 * Mathf.DeltaAngle(endRotNorthCW, targetRotNorthCW); // idk why they do this ccw as positive, but whatever
+        Debug.LogWarning(   "Ended at " + endRotNorthCW + "°\n" + 
+                            "Angular error calculated to be " + signedErrorCW + "°");
         absoluteError = Mathf.Abs(signedErrorCW);
-
-
-        // Trig Check
-        sError = Mathf.DeltaAngle(endRotGlobal, targetRotGlobal);
-        Debug.LogWarning(   "Ended at " + endRotGlobal + "degrees\n" + 
-                            "Angular error calculated to be " + sError + "degrees");
-        aError = Mathf.Abs(sError);
         
         // LOG CRITITCAL TRIAL DATA
         taskLog.AddData(transform.name + "_dummyTrial", (parentTask.repeatCount <= dummyTrials).ToString());
@@ -352,16 +302,14 @@ public class TurnToPoint : ExperimentTask
         taskLog.AddData(transform.name + "_heading",currentHeading.name);
         taskLog.AddData(transform.name + "_target", currentTarget.name);
         taskLog.AddData(transform.name + "_responded", responded.ToString());
-        taskLog.AddData(transform.name + "_responseAngle_correct", correctAngleCW.ToString());
-        taskLog.AddData(transform.name + "_responseAngle_actual", estimatedAngleCW.ToString());
-        //taskLog.AddData(transform.name + "_overUnder", underEstimated ? "under" : "over");
-        taskLog.AddData(transform.name + "_signedError", signedErrorCW.ToString());
+        taskLog.AddData(transform.name + "_targetResponseAngle", targetRotNorthCW.ToString());
+        taskLog.AddData(transform.name + "_observedResponseAngle", endRotNorthCW.ToString());
+        taskLog.AddData(transform.name + "_signedErrorCW_deg", signedErrorCW.ToString());
         taskLog.AddData(transform.name + "_absError", absoluteError.ToString());
         taskLog.AddData(transform.name + "_responseLatency_s", (timeAtResponse - onset).ToString());
-        // Additional POSITION AND ROTATION DATA
+        // ADDITIONAL POSITION AND ROTATION DATA
         taskLog.AddData(transform.name + "_initialPosX", initialPos.x.ToString());
         taskLog.AddData(transform.name + "_initialPosZ", initialPos.z.ToString());
-        taskLog.AddData(transform.name + "_initialY_ego", initialLocalY.ToString());
         taskLog.AddData(transform.name + "_totalRotation", totalRotation.ToString());
         taskLog.AddData(transform.name + "_netCWrotation", netClockwiseRotation.ToString());
         taskLog.AddData(transform.name + "_finalPosX", finalPos.x.ToString());
@@ -375,11 +323,9 @@ public class TurnToPoint : ExperimentTask
                                                                                  (timeAtResponse - onset).ToString());
         taskLog.AddData(transform.name + "_event-mvmt_onset_s", hasMoved ? responseMovementOnset.ToString() : 
                                                                            timeAtResponse.ToString());
-        taskLog.AddData(transform.name + "_event-mvmt_duration_s", hasMoved ? (timeAtResponse - responseMovementOnset).ToString() : 
-                                                                              "0");
+        taskLog.AddData(transform.name + "_event-mvmt_duration_s", hasMoved ? (timeAtResponse - responseMovementOnset).ToString() : "0");
         taskLog.AddData(transform.name + "_event-response_onset_s", timeAtResponse.ToString());
         taskLog.AddData(transform.name + "_event-response_duration_s", "0");
-        
 
         // Clean up
         if (canIncrementLists && parentTask.repeatCount > dummyTrials)
@@ -404,19 +350,12 @@ public class TurnToPoint : ExperimentTask
     {
         timeAtResponse = Time.time;
         finalPos = PointingSource.position;
-        estimatedAngleCW = netClockwiseRotation;
-        while (estimatedAngleCW < -360) estimatedAngleCW += 360;
-        while (estimatedAngleCW > 360) estimatedAngleCW -= 360;
 
-        endRotGlobal = topDown ? PointingSource.transform.localEulerAngles.z : PointingSource.transform.eulerAngles.y;
+        endRotNorthCW = topDown ?   -1 * PointingSource.transform.localEulerAngles.z : // It seems rectTransforms (i.e. gui objects) rotate differently?
+                                    PointingSource.transform.eulerAngles.y; // just the y rotation of the player
+        if (endRotNorthCW < 0) endRotNorthCW += 360; // wrap 0-360
 
-        if (!topDown) 
-        {
-            // responseAngle_actual = Experiment.CalculateAngleThreePoints(currentHeading.transform.position,
-            //                                                              currentOrigin.transform.position,
-            //                                                              currentOrigin.transform.position + currentOrigin.transform.forward);
-            currentHeading.layer = targetLayer;
-        }
+        if (!topDown) currentHeading.layer = targetLayer;
         else 
         {
             //responseAngle_actual = PointingSource.localEulerAngles.z;
@@ -441,6 +380,4 @@ public class TurnToPoint : ExperimentTask
             hud.showOnlyHUD(false);
         }
     }
-
-
 }
