@@ -9939,15 +9939,15 @@ PrefabInstance:
     - target: {fileID: 3382642056112659399, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
         type: 3}
       propertyPath: skip
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3424433371418128219, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
-        type: 3}
-      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3424433371418128219, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
         type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3424433371418128219, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
+        type: 3}
       propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
@@ -10109,6 +10109,11 @@ PrefabInstance:
     - target: {fileID: 3459009763891961992, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
         type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3698899747811053192, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
+        type: 3}
+      propertyPath: skip
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3714536671915286556, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
@@ -12175,6 +12180,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: nrsA2_Landmarks_variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 7924974382790016458, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
+        type: 3}
+      propertyPath: skip
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8137681329897588386, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
         type: 3}
