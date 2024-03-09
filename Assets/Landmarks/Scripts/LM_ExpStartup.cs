@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -38,6 +39,8 @@ public class LM_ExpStartup : MonoBehaviour
     private bool abortExperiment;
     private string appDir;
     private bool existingData;
+    public  List<Selectable> fields;
+    int _fieldIndexer;
 
     private void Awake()
     {
@@ -99,10 +102,28 @@ public class LM_ExpStartup : MonoBehaviour
             option.text = opt.name;
             guiElements.studyCodes.options.Add(option);
         }
+
+        fields = new List<Selectable>()
+        {  
+            guiElements.subID,
+            guiElements.biosex,
+            guiElements.age
+        };
+
     }
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (fields.Count <= _fieldIndexer)
+            {
+                _fieldIndexer = 0;
+            }
+            fields[_fieldIndexer].Select();
+            _fieldIndexer++;
+        }
+
         if (!abortExperiment & Input.GetKeyDown(KeyCode.Return))
         {
             try

@@ -772,99 +772,100 @@ public class Experiment : MonoBehaviour
         dblog.close();
 
         
+        // TODO CANDIDATE FOR DEPRECATION
+        // // ---------------------------------------------------------------------
+        // // Generate a clean .csv file for each task in the experiment
+        // // ---------------------------------------------------------------------
+        // Debug.Log("Generating secondary log files");
+        // try
+        // {
+        //     // Read in the log file and prepare to parse it with RegEx
+        //     var sr = new StreamReader(dataPath + logfile);
+        //     var loggedData = await sr.ReadToEndAsync();
+        //     sr.Close();
 
-        // ---------------------------------------------------------------------
-        // Generate a clean .csv file for each task in the experiment
-        // ---------------------------------------------------------------------
-        Debug.Log("Generating secondary log files");
-        try
-        {
-            // Read in the log file and prepare to parse it with RegEx
-            var sr = new StreamReader(dataPath + logfile);
-            var loggedData = await sr.ReadToEndAsync();
-            sr.Close();
+        //     // Find LM logging headers and identify unique tasks in this experiment
+        //     Regex pattern = new Regex("LandmarksTrialData:\n.*\n(.*\t)\n");
+        //     MatchCollection matches = pattern.Matches(loggedData);
+        //     List<string> tasks = new List<string>();
+        //     foreach (Match match in matches)
+        //     {
+        //         GroupCollection groups = match.Groups;
+        //         var header = groups[1].Value;
+        //         if (!tasks.Contains(header))
+        //         {
+        //             tasks.Add(header);
+        //         }
+        //     }
 
-            // Find LM logging headers and identify unique tasks in this experiment
-            Regex pattern = new Regex("LandmarksTrialData:\n.*\n(.*\t)\n");
-            MatchCollection matches = pattern.Matches(loggedData);
-            List<string> tasks = new List<string>();
-            foreach (Match match in matches)
-            {
-                GroupCollection groups = match.Groups;
-                var header = groups[1].Value;
-                if (!tasks.Contains(header))
-                {
-                    tasks.Add(header);
-                }
-            }
+        //     // Extract the data for each unique task and append in a .csv
+        //     var taskCount = 0;
+        //     foreach (var taskHeader in tasks)
+        //     {
+        //         // Create the file and add the header line
+        //         string filename = "task";
+        //         taskCount++;
 
-            // Extract the data for each unique task and append in a .csv
-            var taskCount = 0;
-            foreach (var taskHeader in tasks)
-            {
-                // Create the file and add the header line
-                string filename = "task";
-                taskCount++;
+        //         Regex namePattern = new Regex(taskHeader + "\n([A-z0-9._]*)");
+        //         MatchCollection nameMatches = namePattern.Matches(loggedData);
+        //         foreach (Match nameMatch in nameMatches)
+        //         {
+        //             GroupCollection nameGroups = nameMatch.Groups;
+        //             Debug.Log(nameGroups[1].Value);
+        //             filename = nameGroups[1].Value;
+        //         }
+        //         //filename = "task_" + taskCount;
 
-                Regex namePattern = new Regex(taskHeader + "\n([A-z0-9._]*)");
-                MatchCollection nameMatches = namePattern.Matches(loggedData);
-                foreach (Match nameMatch in nameMatches)
-                {
-                    GroupCollection nameGroups = nameMatch.Groups;
-                    Debug.Log(nameGroups[1].Value);
-                    filename = nameGroups[1].Value;
-                }
-                //filename = "task_" + taskCount;
+        //         // Don't overwrite data unless in Editor or if we are appending multiple log files (set on the config)
+        //         if (File.Exists(dataPath + filename + ".csv") & !Application.isEditor)
+        //         {
+        //             int duplicate = 1;
+        //             while (File.Exists(dataPath + filename + "_" + duplicate + ".csv"))
+        //             {
+        //                 duplicate++;
+        //             }
+        //             filename += "_" + duplicate;
+        //         }
+        //         filename += ".csv";
 
-                // Don't overwrite data unless in Editor or if we are appending multiple log files (set on the config)
-                if (File.Exists(dataPath + filename + ".csv") & !Application.isEditor)
-                {
-                    int duplicate = 1;
-                    while (File.Exists(dataPath + filename + "_" + duplicate + ".csv"))
-                    {
-                        duplicate++;
-                    }
-                    filename += "_" + duplicate;
-                }
-                filename += ".csv";
+        //         // Create the formatted csv file, if there's more than 1 level, append to existing
+        //         StreamWriter sw = new StreamWriter(dataPath + filename, false, System.Text.Encoding.UTF8);
 
-                // Create the formatted csv file, if there's more than 1 level, append to existing
-                StreamWriter sw = new StreamWriter(dataPath + filename, false, System.Text.Encoding.UTF8);
+        //         sw.WriteLine(taskHeader.Replace("\t", ",")); // commas for excel
 
-                sw.WriteLine(taskHeader.Replace("\t", ",")); // commas for excel
+        //         // If using Azure, add these files to the list of files to upload
+        //         if (azureStorage != null)
+        //         {
+        //             azureStorage.additionalSaveFiles.Add(filename);
+        //         }
 
-                // If using Azure, add these files to the list of files to upload
-                if (azureStorage != null)
-                {
-                    azureStorage.additionalSaveFiles.Add(filename);
-                }
+        //         // Extract data and write
+        //         Regex DataPattern = new Regex(taskHeader + "\n(.*)\n"); // where is the data?
+        //         MatchCollection dataMatches = DataPattern.Matches(loggedData);
+        //         foreach (Match dataMatch in dataMatches)
+        //         {
+        //             GroupCollection dataGroups = dataMatch.Groups;
 
-                // Extract data and write
-                Regex DataPattern = new Regex(taskHeader + "\n(.*)\n"); // where is the data?
-                MatchCollection dataMatches = DataPattern.Matches(loggedData);
-                foreach (Match dataMatch in dataMatches)
-                {
-                    GroupCollection dataGroups = dataMatch.Groups;
+        //             sw.WriteLine(dataGroups[1].Value.ToString().Replace("\t", ",")); // when writing, use commas for excel
+        //         }
 
-                    sw.WriteLine(dataGroups[1].Value.ToString().Replace("\t", ",")); // when writing, use commas for excel
-                }
+        //         // clean up (close this file and get ready for next one)
+        //         sw.Close();
+        //     }
+        // }
+        // catch (Exception ex)
+        // {
+        //     Debug.LogException(ex);
+        //     Debug.Log("something went wrong generating CSV data files for individual tasks");
+        // }
+        // Debug.Log("Clean log files have been generated for each task");
 
-                // clean up (close this file and get ready for next one)
-                sw.Close();
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            Debug.Log("something went wrong generating CSV data files for individual tasks");
-        }
-        Debug.Log("Clean log files have been generated for each task");
-
-        // Shut down any LM_TaskLogs
-        foreach (var log in FindObjectsOfType<LM_TaskLog>())
-        {
-            log.output.Close();
-        }
+        // // Shut down any LM_TaskLogs
+        // foreach (var log in FindObjectsOfType<LM_TaskLog>())
+        // {
+        //     log.output.Close();
+        // }
+        // TODO (end)
 
 
         // ---------------------------------------------------------------------
@@ -917,6 +918,7 @@ public class Experiment : MonoBehaviour
         {
             config.DeleteTemporaryProgressData();
             // shut it down
+            Debug.Log("Closing the application");
             Application.Quit();
         }
     }
