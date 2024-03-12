@@ -58,7 +58,7 @@ MonoBehaviour:
   levelNames:
   - nrsA2_videosville_102x143
   randomSceneOrder: 0
-  singleSceneBuild: 1
+  singleSceneBuild: 0
   levelNumber: 0
   appendLogFiles: 0
   bootstrapped: 0

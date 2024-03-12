@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Landmarks/Scenes/LM_Startup.unity
     guid: c04c809e574054910923b01d66e4e790
   - enabled: 1
+    path: Assets/Landmarks/Scenes/nrsa/aim2/nrsA2_practice_50x50.unity
+    guid: 9b374d44015db4b9ab0184b48998bc61
+  - enabled: 1
     path: Assets/Landmarks/Scenes/nrsa/aim2/nrsA2_videosville_102x143.unity
     guid: 0fc69f7fd0e8c49bb9a8bfaa7c8a12de
   m_configObjects:
