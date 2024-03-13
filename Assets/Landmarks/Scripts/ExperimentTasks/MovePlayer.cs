@@ -82,6 +82,7 @@ public class MovePlayer : ExperimentTask {
         var originRot = start.transform.eulerAngles;
         var terminusPos = useSnapPoint ?    destination.transform.GetComponentInChildren<LM_SnapPoint>().transform.position : 
                                             destination.transform.position;
+        Debug.Log(terminusPos.y);
         var terminusRot = useSnapPoint ?    destination.transform.GetComponentInChildren<LM_SnapPoint>().transform.localEulerAngles :
                                             destination.transform.eulerAngles;
 
@@ -148,6 +149,8 @@ public class MovePlayer : ExperimentTask {
             destination.transform.position = originPos;
             destination.transform.eulerAngles = originRot;
         }
+
+        Debug.Log("Player at (" + manager.player.transform.position.x + ", " + manager.player.transform.position.y + ", " + manager.player.transform.position.z + ") and facing " + manager.player.transform.eulerAngles.y + "°");
 	}
 
 	public override bool updateTask () {

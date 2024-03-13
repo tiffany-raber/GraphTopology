@@ -8,6 +8,7 @@ using System.Linq;
 using UnityEngine.ProBuilder.MeshOperations;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using UnityStandardAssets.Characters.FirstPerson;
 
 public class TurnToPoint : ExperimentTask
 {
@@ -63,7 +64,7 @@ public class TurnToPoint : ExperimentTask
     [Min(0)] public int dummyTrials = 0;
     private bool lastTopDown;
     private int formatRepeatCount;
-    public MovePlayer GetLocalOffsetFacingFrom; // HACK: to move the player on dummy trials
+    public Vector3 localOffsetFacing;
 
     // Trig Check
     public float startRotNorthCW;
@@ -127,16 +128,6 @@ public class TurnToPoint : ExperimentTask
                 currentTarget = listOfTargets.objects[UnityEngine.Random.Range(0, listOfTargets.objects.Count)];
             } while (currentTarget.name == currentHeading.name);
 
-            // HACK: see properties defined in class; we're taking the scenic route for this one (code from MovePlayer.cs)
-            var dummyPos = currentHeading.transform.position;
-            var dummyRot = currentHeading.transform.rotation;
-            if (GetLocalOffsetFacingFrom != null) dummyPos += currentHeading.transform.TransformDirection(GetLocalOffsetFacingFrom.localOffsetFacing);
-            dummyPos.y = currentHeading.transform.position.y;
-            avatar.GetComponentInChildren<CharacterController>().enabled = false;
-            avatar.transform.position = dummyPos;
-            avatar.GetComponentInChildren<CharacterController>().enabled = true;
-            avatar.transform.LookAt(currentHeading.transform);
-            avatar.transform.eulerAngles = new Vector3(0f, avatar.transform.eulerAngles.y, 0f);
         }
         else
         {
@@ -146,6 +137,16 @@ public class TurnToPoint : ExperimentTask
             currentTarget = listOfTargets.currentObject();
         }
        
+        // Put the player in front of the store
+        if (restrictMovement) manager.RestrictMovement(true, topDown);
+        avatar.GetComponentInChildren<CharacterController>().enabled = false;
+        if (avatar.GetComponentInChildren<FirstPersonController>()) avatar.GetComponentInChildren<FirstPersonController>().enabled = false;
+        avatar.transform.position = listOfOrigins != null ? currentOrigin.transform.position + currentOrigin.transform.TransformDirection(localOffsetFacing) : 
+                                                            currentHeading.transform.position+ currentHeading.transform.TransformDirection(localOffsetFacing);
+        avatar.transform.LookAt(currentHeading.transform);
+        avatar.transform.eulerAngles = Vector3.Scale(avatar.transform.eulerAngles, Vector3.up);
+        avatar.GetComponentInChildren<CharacterController>().enabled = true;
+        if (avatar.GetComponentInChildren<FirstPersonController>()) avatar.GetComponentInChildren<FirstPersonController>().enabled = true;
 
         // Set the prompt requested
         if (promptTarget)
