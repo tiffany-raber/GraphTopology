@@ -14,7 +14,7 @@ public class BrainAmpManager : MonoBehaviour {
     public int port = 3; // COM port number
     public int nTriggers = 255; // how many unique combinations (e.g., 8 bits = 0-255, 256 permutations)
 
-    private float delay = 5f; // how long to wait before turning off squarewave
+    // private float delay = 5f; // how long to wait before turning off squarewave
     private Byte[] bit = { 0 }; // container for our trigger configuration info in 8-bit format
     public Dictionary<string, int> triggers = new Dictionary<string, int>(); // Store trigger name/number pairs
     private int nextTriggerValue;

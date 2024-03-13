@@ -27,7 +27,7 @@ public class dbPlaybackLog : dbLog {
         private List<string[]> actions;
     //private List<List<string>> actions = new List<List<string>>();
     public long start_time = 0;
-    private long playback_time = 0;
+    // private long playback_time = 0;
     private string[] next_action;
     private int index = 0;
     

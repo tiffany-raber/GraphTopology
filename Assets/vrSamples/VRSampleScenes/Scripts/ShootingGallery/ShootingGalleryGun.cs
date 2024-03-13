@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.XR;
 using VRStandardAssets.Utils;
+using System.Collections.Generic;
 
 namespace VRStandardAssets.ShootingGallery
 {
@@ -50,7 +51,12 @@ namespace VRStandardAssets.ShootingGallery
         private void Update()
         {
             // Smoothly interpolate this gameobject's rotation towards that of the user/camera.
-            transform.rotation = Quaternion.Slerp(transform.rotation, UnityEngine.XR.InputTracking.GetLocalRotation(UnityEngine.XR.XRNode.Head),
+            var headDevices = new List<InputDevice>();
+            InputDevices.GetDevicesAtXRNode(XRNode.Head, headDevices);
+            var headDevice = headDevices[0];
+            Quaternion headRot; 
+            headDevice.TryGetFeatureValue(CommonUsages.deviceRotation, out headRot);
+            transform.rotation = Quaternion.Slerp(transform.rotation,  headRot,
                 m_Damping * (1 - Mathf.Exp(k_DampingCoef * Time.deltaTime)));
             
             // Move this gameobject to the camera.

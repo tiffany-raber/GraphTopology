@@ -20,7 +20,7 @@ public class BoundaryDetection : MonoBehaviour
     //material array for the warning object;
     private Material[] signMats, textMats;
     //visibility boolean for toggling the fade in and fade out
-    private bool visible;
+    // private bool visible;
     
 
     // Start is called before the first frame update
@@ -39,7 +39,7 @@ public class BoundaryDetection : MonoBehaviour
         signMats = popupSign.GetComponent<MeshRenderer>().materials;
         textMats = popupText.GetComponent<MeshRenderer>().materials;
         //sets visibility to false
-        visible = false;
+        // visible = false;
         //sets the renderer to false at start
         
 
@@ -76,7 +76,7 @@ public class BoundaryDetection : MonoBehaviour
         }
         else
         {
-            visible = false;
+            // visible = false;
         }
 
     }
@@ -95,7 +95,7 @@ public class BoundaryDetection : MonoBehaviour
         }
         else
         {
-            visible = true;
+            // visible = true;
         }
     }
 }

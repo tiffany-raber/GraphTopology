@@ -9,6 +9,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System.Threading.Tasks;
 using TMPro;
 using System.IO;
+using System;
 
 #if WINDOWS_UWP && ENABLE_DOTNET
 using Windows.Storage;
@@ -152,7 +153,7 @@ public class LM_ExpStartup : MonoBehaviour
 
         ValidateUI();
 
-        if (!subidError & !uiError)
+        if (!subidError && !uiError && !biosexError && !ageError)
         {
             // Create the directories if they don't exist
             if (!Directory.Exists(appDir + "/" + config.experiment))
@@ -313,7 +314,7 @@ public class LM_ExpStartup : MonoBehaviour
             config = Instantiate(configProvided);
         }
         try {config = Instantiate(configs[guiElements.studyCodes.value - 1]);}
-        catch (System.Exception ex) { } 
+        catch (SystemException) { } 
     }
 }
 

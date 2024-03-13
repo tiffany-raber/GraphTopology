@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.XR;
+using System.Collections.Generic;
 
 namespace VRStandardAssets.Examples
 {
@@ -25,7 +26,13 @@ namespace VRStandardAssets.Examples
             // Set the rotation to be the same as the user's in the y axis.
             eulerRotation.x = 0;
             eulerRotation.z = 0;
-            eulerRotation.y = UnityEngine.XR.InputTracking.GetLocalRotation(UnityEngine.XR.XRNode.Head).eulerAngles.y;
+
+            var headDevices = new List<InputDevice>();
+            InputDevices.GetDevicesAtXRNode(XRNode.Head, headDevices);
+            var headDevice = headDevices[0];
+            Quaternion headRotation;
+            headDevice.TryGetFeatureValue(CommonUsages.deviceRotation, out headRotation);
+            eulerRotation.y = headRotation.eulerAngles.y;
 
             // Add 360 to the rotation so that it can effectively be clamped.
             if (eulerRotation.y < 270)

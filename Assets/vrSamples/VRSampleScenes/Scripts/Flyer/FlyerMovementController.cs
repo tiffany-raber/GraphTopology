@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.XR;
 using VRStandardAssets.Common;
+using System.Collections.Generic;
 
 namespace VRStandardAssets.Flyer
 {
@@ -70,12 +71,17 @@ namespace VRStandardAssets.Flyer
         {
             while (m_IsGameRunning)
             {
+                var headDevices = new List<InputDevice>();
+                InputDevices.GetDevicesAtXRNode(XRNode.Head, headDevices);
+                var headDevice = headDevices[0];
+                Quaternion headRotation;
+                headDevice.TryGetFeatureValue(CommonUsages.deviceRotation, out headRotation);
                 // Set the target marker position to a point forward of the camera multiplied by the distance from the camera.
-                Quaternion headRotation = UnityEngine.XR.InputTracking.GetLocalRotation (UnityEngine.XR.XRNode.Head);
+                // Quaternion headRotation = UnityEngine.XR.InputTracking.GetLocalRotation(UnityEngine.XR.XRNode.Head);
                 m_TargetMarker.position = m_Camera.position + (headRotation * Vector3.forward) * m_DistanceFromCamera;
 
                 // Move the camera container forward.
-                m_CameraContainer.Translate (Vector3.forward * Time.deltaTime * m_Speed);
+                m_CameraContainer.Translate(Vector3.forward * Time.deltaTime * m_Speed);
 
                 // Move the flyer towards the target marker.
                 m_Flyer.position = Vector3.Lerp(m_Flyer.position, m_TargetMarker.position,

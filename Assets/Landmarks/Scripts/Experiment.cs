@@ -83,14 +83,14 @@ public class Experiment : MonoBehaviour
     public string dataPath;
     public GameObject virtualDesert;
 
-    private bool playback = false;
+    // private bool playback = false;
     private bool pause = true;
     private bool done = false;
     private long now;
-    private Event evt;
+    // private Event evt;
     private long playback_start;
     private long playback_offset;
-    private long next_time;
+    // private long next_time;
     private string[] next_action;
     private string configfile = "";
     private LM_AzureStorage azureStorage;
@@ -333,7 +333,7 @@ public class Experiment : MonoBehaviour
         {
             hud.flashStatus("Playback Paused");
             next_action = dblog.NextAction();
-            next_time = Int64.Parse(next_action[0]);
+            // next_time = Int64.Parse(next_action[0]);
             long tick = DateTime.Now.Ticks;
             playback_start = tick / TimeSpan.TicksPerMillisecond;
             playback_offset = 0;

@@ -31,9 +31,9 @@ public class Startup : MonoBehaviour
     private Config config;
 
     private Resolution[] resolutions;
-    private GUIContent currentSelection;
-    private int toolbarInt = 0;
-    private string[] toolbarStrings = new string[] { "New Experiment", "Current Experiments" };
+    // private GUIContent currentSelection;
+    // private int toolbarInt = 0;
+    // private string[] toolbarStrings = new string[] { "New Experiment", "Current Experiments" };
 
     private bool showList = false;
     private int listEntry = 0;
@@ -46,7 +46,7 @@ public class Startup : MonoBehaviour
 
 
     private string[] subjects;
-    private int subjectEntry = 0;
+    //  private int subjectEntry = 0;
     private GUIContent[] subjectslist;
 
     private GUIStyle errorStyle;
@@ -71,20 +71,20 @@ public class Startup : MonoBehaviour
     private bool fsToggleState = false;
     private bool noEEGToggleState = true;
     private bool showFPSToggleState = false;
-    private bool enableSkipStateToggleState = false;
+    // private bool enableSkipStateToggleState = false;
 
-    private bool blnToggleState = false;
+    // private bool blnToggleState = false;
 
-    private float fltSliderValue = 0.5f;
-    private float fltScrollerValue = 0.5f;
-    private Vector2 scrollPosition = Vector2.zero;
+    // private float fltSliderValue = 0.5f;
+    // private float fltScrollerValue = 0.5f;
+    // private Vector2 scrollPosition = Vector2.zero;
 
     private string subject = "";
     private string configfile = "";
     private string appDir = "";
     private string home = "";
     private string home2 = "";
-    private string workingDir = "";
+    // private string workingDir = "";
 
     private string errorText = "";
 
@@ -176,7 +176,7 @@ public class Startup : MonoBehaviour
         home = Application.dataPath;
         appDir = Directory.GetCurrentDirectory();
         home = "";
-        workingDir = home;
+        // workingDir = home;
         home2 = home;
         bool topCreated = false;
 
@@ -248,7 +248,7 @@ public class Startup : MonoBehaviour
 
 
 
-        currentSelection = new GUIContent("Select a Resolution");
+        //currentSelection = new GUIContent("Select a Resolution");
         // Make a GUIStyle that has a solid white hover/onHover background to indicate highlighted items
         listStyle = new GUIStyle();
         listStyle.normal.textColor = Color.white;

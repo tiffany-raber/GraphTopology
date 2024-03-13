@@ -34,7 +34,7 @@ public class SteamVR_LaserPointer_mjs : MonoBehaviour
     public event PointerEventHandler PointerOut;
     public event PointerEventHandler PointerClick;
 
-    Transform previousContact = null;
+    // Transform previousContact = null;
 
 
     private void Start()

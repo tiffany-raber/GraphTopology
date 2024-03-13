@@ -73,12 +73,12 @@ public class LM_TargetStore : LM_Target
 
     public void OpenDoor()
     {
-        if (!doorInMotion) StartCoroutine(Open());
+        if (!doorInMotion || doorOpen) StartCoroutine(Open());
     }
 
     public void CloseDoor()
     {
-        if (!doorInMotion) StartCoroutine(Close());
+        if (!doorInMotion || !doorOpen) StartCoroutine(Close());
     }
 
     IEnumerator Open()
