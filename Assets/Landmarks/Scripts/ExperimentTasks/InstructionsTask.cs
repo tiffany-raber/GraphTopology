@@ -28,7 +28,7 @@ public class InstructionsTask : ExperimentTask {
 
     public TextAsset instruction;
     public TextAsset message;
-    [TextArea] public string masterText;
+    [TextArea(5,20)] public string masterText;
 
     public ObjectList objects;
     public ObjectList[] multiObjects; // if you want the same subset from several lists
