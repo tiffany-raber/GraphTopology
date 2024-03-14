@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
+using Unity.Collections.LowLevel.Unsafe;
 
 public enum HideTargetOnStart
 {
@@ -75,6 +76,11 @@ public class NavigationTask : ExperimentTask
     public bool logStartEnd;
     private Vector3 startXYZ;
     private Vector3 endXYZ;
+
+    // 3/13/2024 Feature to display target object name for a period of time
+    [Tooltip("In seconds")] 
+    public int displayTargetNameFor = 0;
+    private Vector3 initialHUDposition;
 
     public override void startTask ()
 	{
@@ -252,6 +258,30 @@ public class NavigationTask : ExperimentTask
         if (logStartEnd) startXYZ = avatar.GetComponent<LM_PlayerController>().collisionObject.transform.position;
             
         if (vrEnabled & haptics) SteamVR_Actions.default_Haptic.Execute(0f, 2.0f, 65f, 1f, SteamVR_Input_Sources.Any);
+
+        if (displayTargetNameFor > 0)
+        {
+            hud.setMessage(currentTarget.name);
+
+            // handle changes to the hud
+            if (vrEnabled)
+            {
+                initialHUDposition = hud.hudPanel.transform.position;
+
+                var temp = currentTarget.transform.position;
+                temp.y += 2.5f;
+                hud.hudPanel.transform.position = temp;
+            }
+            else
+            {
+                // Change the anchor points to put the message at the bottom
+                RectTransform hudposition = hud.hudPanel.GetComponent<RectTransform>() as RectTransform;
+                hudposition.pivot = new Vector2(0.5f, 1f);
+            }
+
+            hud.SecondsToShow = displayTargetNameFor;
+            hud.ForceShowMessage();
+        }
     }
 
     public override bool updateTask ()
@@ -275,6 +305,13 @@ public class NavigationTask : ExperimentTask
 				hud.setScore(score);
 			}
 		}
+
+        // Hide the hud displaying the target after specified time
+        if (Time.time - startTime > displayTargetNameFor) 
+        {
+            hud.SecondsToShow = 0;
+            if (hud.GetMessage() != "") hud.setMessage("");
+        }
 
         //show target after set time
         if (hideTargetOnStart != HideTargetOnStart.Off && Time.time - startTime > showTargetAfterSeconds && !exploration)
@@ -517,6 +554,17 @@ public class NavigationTask : ExperimentTask
 
         if (canIncrementLists) destinations.incrementCurrent();
         if (!exploration) currentTarget = destinations.currentObject();
+
+        if (vrEnabled)
+        {
+            hud.hudPanel.transform.position = initialHUDposition;
+        }
+        else
+        {
+            // Change the anchor points to put the message back in center
+            RectTransform hudposition = hud.hudPanel.GetComponent<RectTransform>() as RectTransform;
+            hudposition.pivot = new Vector2(0.5f, 0.5f);
+        }
     }
 
 	public override bool OnControllerColliderHit(GameObject hit)
