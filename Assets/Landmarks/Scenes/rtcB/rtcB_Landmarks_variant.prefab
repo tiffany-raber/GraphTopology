@@ -84,7 +84,7 @@ GameObject:
   - component: {fileID: 6268303676218455917}
   - component: {fileID: 1793856582321315577}
   m_Layer: 13
-  m_Name: headingCanvas
+  m_Name: OriginCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2111,7 +2111,7 @@ GameObject:
   - component: {fileID: 3922550693763908715}
   - component: {fileID: 9095535714880847284}
   m_Layer: 13
-  m_Name: heading
+  m_Name: Origin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2559,22 +2559,23 @@ MonoBehaviour:
   listOfTargets: {fileID: 2356349828308495368}
   restrictMovement: 1
   minResponseLatency: 0.5
-  terminateOnResponse: 1
-  submitButton: 273
-  useBodyNotCameraForRotation: 0
   promptTarget: 1
+  submitButton: 273
+  terminateOnResponse: 1
+  useBodyNotCameraForRotation: 0
   topDownInterface: {fileID: 7690408661155728050}
   originObject: {fileID: 6958054561728317781}
   topDownObject: {fileID: 3037398503301786628}
-  headingIcon: {fileID: 0}
+  headingIcon: {fileID: 4023278617638803711}
+  referenceIcon: {fileID: 7211907823068732539}
   targetprompt: {fileID: 5951484721811838171}
   left: 276
   right: 275
   rotSpeed: 60
   getTopDownListFrom: {fileID: 1250547543065459335}
   topDownTrialList: 
-  dummyTrials: 2
   localOffsetFacing: {x: 0, y: 0, z: 0}
+  dummyTrials: 2
   startRotNorthCW: 0
   endRotNorthCW: 0
   targetRotNorthCW: 0

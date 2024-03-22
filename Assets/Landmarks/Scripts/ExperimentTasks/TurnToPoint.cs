@@ -19,16 +19,26 @@ public class TurnToPoint : ExperimentTask
     public ObjectList listOfHeadings;
     public ObjectList listOfTargets;
     public bool restrictMovement;
-    [Tooltip("When can a response be submitted (in seconds)")] public float minResponseLatency;
+    [Tooltip("When can a response be submitted (in seconds)")] 
+    public float minResponseLatency;
+    public bool promptTarget;
+    public KeyCode submitButton = KeyCode.UpArrow;
+
+    // Store targetObjects used to define this trial
     private GameObject currentOrigin;
     private GameObject currentHeading;
     private GameObject currentTarget;
+    private GameObject currentReference;
+
+    // Track trial data
+    private bool firstUpdate;
     private float onset;
     private float responseMovementOnset;
     private bool hasMoved;
+    private int targetLayer;
     private float timeAtResponse;
     public bool terminateOnResponse;
-    public KeyCode submitButton = KeyCode.UpArrow;
+    
     public bool useBodyNotCameraForRotation;
     private Transform PointingSource;
     private Vector3 initialPos;
@@ -38,38 +48,40 @@ public class TurnToPoint : ExperimentTask
     private float netClockwiseRotation;
     private Vector3 finalPos;
 
+    // Measured variables
     private bool responded;
     private float signedErrorCW;
     private float absoluteError;
-    private bool firstUpdate;
     [Tooltip("Use {0} in place of the target name")]// Use {0} for origin, {1} for heading, {2} for target")]
     [TextArea] private string prompt = "{0}";
-    public bool promptTarget;
-    private int targetLayer;
     
     [Header("Properties Specific To Top-Down")]
     public GameObject topDownInterface;
     public GameObject originObject;
     public GameObject topDownObject;
     public GameObject headingIcon;
+    public GameObject referenceIcon;
     public TextMeshProUGUI targetprompt;
     public KeyCode left = KeyCode.LeftArrow;
     public KeyCode right = KeyCode.RightArrow;
     [Tooltip("degrees per second")] public float rotSpeed = 60f; // 60 deg/s = 10 rev/min
     private GameObject ti; // target icon copy we'll use for the UI and then destroy after the trial
+    private GameObject ri; // reference icon copy we'll use for hte UI and then destroy
+
     [Header("Properties for stay-switch")]
     public BalancedBoolList getTopDownListFrom;
     public List<bool> topDownTrialList = new List<bool>();
+    public Vector3 localOffsetFacing;
     private int topDownTrialIndex;
     [Min(0)] public int dummyTrials = 0;
     private bool lastTopDown;
     private int formatRepeatCount;
-    public Vector3 localOffsetFacing;
 
     // Trig Check
+    [HideInInspector]
     public float startRotNorthCW;
-    public float endRotNorthCW;
-    public float targetRotNorthCW;
+    [HideInInspector] public float endRotNorthCW;
+    [HideInInspector] public float targetRotNorthCW;
 
 
     public override void startTask()
@@ -170,12 +182,14 @@ public class TurnToPoint : ExperimentTask
             topDownInterface.transform.gameObject.SetActive(true);
             targetprompt.text = prompt;
             if (restrictMovement) manager.RestrictMovement(true, true);
+
             // copy the target and set it's transform to be the same as the targetIcon
-            ti = Instantiate<GameObject>(currentHeading, headingIcon.transform.position, headingIcon.transform.rotation, headingIcon.transform.parent);
+            ti = Instantiate(currentHeading, headingIcon.transform.position, headingIcon.transform.rotation, headingIcon.transform.parent);
             foreach (var child in ti.GetComponentsInChildren<Transform>()) child.gameObject.layer = headingIcon.layer;
             ti.name = "temporaryTargetIcon";
             ti.transform.localScale = headingIcon.transform.localScale;
             headingIcon.SetActive(false);
+
             hud.showOnlyHUD(false);
             topDownObject.transform.localEulerAngles = Vector3.zero;
             targetprompt.transform.parent.localEulerAngles = Vector3.zero;
@@ -212,6 +226,31 @@ public class TurnToPoint : ExperimentTask
             if (targetRotNorthCW < 0) targetRotNorthCW += 360; // wrap 0-360
             startRotNorthCW = PointingSource.transform.localEulerAngles.z; // should be ego-zero; set after using allo startRot to calculate target
         }
+
+        if (topDown)
+        {
+            // Select and position a reference icon to constrain the correct repsonse (mostly for top-down)
+            do
+            {
+                currentReference = listOfTargets.objects[UnityEngine.Random.Range(0, listOfTargets.objects.Count)];
+            }
+            while (currentReference.name == currentOrigin.name ||
+                    currentReference.name == currentHeading.name ||
+                    currentReference.name == currentTarget.name
+                    // || the reference is overlapping with the heading
+                    );
+
+            // TODO - this may need to move or change
+            // Copy the reference and set it's transform to be the same as the referenceIcon
+            Debug.Log("Instantiating " + currentReference.name);
+            ri = Instantiate(currentReference, referenceIcon.transform.position, referenceIcon.transform.rotation, referenceIcon.transform.parent);
+            foreach (var child in ri.GetComponentsInChildren<Transform>()) child.gameObject.layer = referenceIcon.layer;
+            ri.name = "temporaryReferenceIcon";
+            ri.transform.localScale = referenceIcon.transform.localScale;
+            referenceIcon.SetActive(false);
+        }
+
+
         Debug.Log("Standing in front of and facing the " + currentHeading.name + ", turn to face the " + currentTarget.name);
         Debug.Log(   "Facing vector: " + startRotNorthCW + "°\t" + "Target vector: " + targetRotNorthCW + "°");
 
@@ -363,6 +402,7 @@ public class TurnToPoint : ExperimentTask
             // while (responseAngle_actual > 180) responseAngle_actual -= 180;
             // while (responseAngle_actual < -180) responseAngle_actual +=180;
             Destroy(ti);
+            Destroy(ri);
             topDownInterface.transform.gameObject.SetActive(false);
             if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse)
             {
