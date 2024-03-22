@@ -705,6 +705,22 @@ public class Experiment : MonoBehaviour
         return measurement;
 	}
 
+    /// <summary>
+    /// Calculate the clockwise angle between vectors extending toward "Unity North" and toward a target from a given origin
+    /// </summary>
+    /// <param name="origin">The point to measure from</param>
+    /// <param name="target">The point to measure to</param>
+    /// <returns>(float) The world-space polar angle of a line extending from the origin to the target.</returns>
+    public static float MeasureClockwiseGlobalAngle(GameObject origin, GameObject target)
+    {
+        // Temporarily face the origin at the target and record this as the correct answer, then put it back
+        var tmp = origin.transform.rotation;
+        origin.transform.LookAt(target.transform);
+        var northCwDirection = origin.transform.eulerAngles.y;
+        origin.transform.rotation = tmp;
+        return northCwDirection;
+    }
+
     public void RestrictMovement(bool canMove, bool canLook)
     {
         avatar.GetComponentInChildren<CharacterController>().enabled = !canMove;
