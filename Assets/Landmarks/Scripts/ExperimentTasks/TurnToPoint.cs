@@ -55,18 +55,14 @@ public class TurnToPoint : ExperimentTask
     [TextArea] private string prompt = "{0}";
     
     [Header("Properties Specific To Top-Down")]
-    public GameObject topDownInterface;
-    public GameObject originObject;
-    public GameObject topDownObject;
-    public GameObject headingIcon;
-    public GameObject referenceIcon;
+    public TopDownPointingInterface topDownInterfacePrefab;
+    private TopDownPointingInterface topDownInterface;
     [Range(0f,180f)] public float minReferenceAngle;
-    public TextMeshProUGUI targetprompt;
+    private GameObject hi; // heading icon copy we'll use for the UI and then destroy after the trial
+    private GameObject ri; // reference icon copy we'll use for hte UI and then destroy
     public KeyCode left = KeyCode.LeftArrow;
     public KeyCode right = KeyCode.RightArrow;
     [Tooltip("degrees per second")] public float rotSpeed = 60f; // 60 deg/s = 10 rev/min
-    private GameObject hi; // heading icon copy we'll use for the UI and then destroy after the trial
-    private GameObject ri; // reference icon copy we'll use for hte UI and then destroy
 
     [Header("Properties for stay-switch")]
     public BalancedBoolList getTopDownListFrom;
@@ -121,7 +117,9 @@ public class TurnToPoint : ExperimentTask
             if (topDown != lastTopDown) formatRepeatCount = 0;
             else formatRepeatCount++;
         }
-        topDownInterface.SetActive(topDown);
+
+        // Spawn a top-down interface
+        topDownInterface = topDown ? Instantiate(topDownInterfacePrefab, transform) : null;
 
         // Set up the trial properties and configure
         if (parentTask.repeatCount <= dummyTrials) 
@@ -177,7 +175,7 @@ public class TurnToPoint : ExperimentTask
         // Set up the trial format
         if (topDown)
         {
-            PointingSource = topDownObject.transform;
+            PointingSource = topDownInterface.topDownObject.transform;
             // Hide the HUD and put the prompt on the Top-Down UI
             hud.setMessage(""); hud.SecondsToShow = 0;
             topDownInterface.transform.position = new Vector3(
@@ -186,7 +184,7 @@ public class TurnToPoint : ExperimentTask
                 avatar.GetComponentInChildren<LM_SnapPoint>().transform.position.z);
             topDownInterface.transform.rotation = avatar.GetComponentInChildren<LM_SnapPoint>().transform.rotation;
             topDownInterface.transform.gameObject.SetActive(true);
-            targetprompt.text = prompt;
+            topDownInterface.targetprompt.text = prompt;
             if (restrictMovement) manager.RestrictMovement(true, true);
 
             // Adjust to top-down if necessary (ironically requiring us to make it egocentric)
@@ -200,25 +198,40 @@ public class TurnToPoint : ExperimentTask
             startRotNorthCW = PointingSource.transform.localEulerAngles.z; // should be ego-zero; set after using allo startRot to calculate target
 
             // copy the target and set it's transform to be the same as the targetIcon
-            hi = Instantiate(currentHeading, headingIcon.transform.position, headingIcon.transform.rotation, headingIcon.transform.parent);
-            foreach (var child in hi.GetComponentsInChildren<Transform>()) child.gameObject.layer = headingIcon.layer;
+            hi = Instantiate(
+                currentHeading, 
+                topDownInterface.headingIcon.transform.position, 
+                topDownInterface.headingIcon.transform.rotation, 
+                topDownInterface.headingIcon.transform.parent
+                );
+            foreach (var child in hi.GetComponentsInChildren<Transform>()) Experiment.MoveToLayer(child, hud.hudLayer);
             hi.name = "temporaryTargetIcon";
-            hi.transform.localScale = headingIcon.transform.localScale;
+            hi.transform.localScale = topDownInterface.headingIcon.transform.localScale;
             hi.transform.parent.localRotation = Quaternion.Euler(0f, 0f, -1f * startRotNorthCW);
-            headingIcon.SetActive(false);
+            topDownInterface.headingIcon.SetActive(false);
 
             // TODO - this may need to move or change
             // Copy the reference and set it's transform to be the same as the referenceIcon
-            ri = Instantiate(currentReference, referenceIcon.transform.position, referenceIcon.transform.rotation, referenceIcon.transform.parent);
-            foreach (var child in ri.GetComponentsInChildren<Transform>()) child.gameObject.layer = referenceIcon.layer;
+            ri = Instantiate(
+                currentReference, 
+                topDownInterface.referenceIcon.transform.position, 
+                topDownInterface.referenceIcon.transform.rotation, 
+                topDownInterface.referenceIcon.transform.parent
+                );
+            foreach (var child in ri.GetComponentsInChildren<Transform>()) Experiment.MoveToLayer(child, hud.hudLayer);
             ri.name = "temporaryReferenceIcon";
-            ri.transform.localScale = referenceIcon.transform.localScale;
+            ri.transform.localScale = topDownInterface.referenceIcon.transform.localScale;
             ri.transform.parent.localRotation = Quaternion.Euler(0f, 0f, -1 * referenceRotNorthCW);
-            referenceIcon.SetActive(false);
+            topDownInterface.referenceIcon.SetActive(false);
+            var xnow = ri.transform.eulerAngles.x;
+            var ynow = 
+            ri.transform.localRotation = Quaternion.Euler(currentReference.transform.eulerAngles.y, 
+                                                            ri.transform.localEulerAngles.y,
+                                                            ri.transform.localEulerAngles.z);
 
             hud.showOnlyHUD(false);
-            topDownObject.transform.localEulerAngles = Vector3.zero;
-            targetprompt.transform.parent.localEulerAngles = Vector3.zero;
+            // FIXME - consider deleting // topDownObject.transform.localEulerAngles = Vector3.zero;
+            // FIXME - consider deleting // targetprompt.transform.parent.localEulerAngles = Vector3.zero;
             if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse)
             {
                 manager.playerCamera.orthographic = true;
@@ -233,6 +246,7 @@ public class TurnToPoint : ExperimentTask
             currentTarget.SetActive(true);
             targetLayer = currentHeading.layer;
             Experiment.MoveToLayer(currentHeading.transform, hud.hudLayer);
+            Experiment.MoveToLayer(currentReference.transform, hud.hudLayer);
             hud.showOnlyHUD();
         }
 
@@ -258,10 +272,11 @@ public class TurnToPoint : ExperimentTask
             if (topDown && !responded)
             {
                 var rot = (float)(Convert.ToDouble(Input.GetKey(left)) - Convert.ToDouble(Input.GetKey(right)));
-                var targetRot = topDownObject.transform.localRotation;
+                var targetRot = topDownInterface.topDownObject.transform.localRotation;
                 targetRot *= Quaternion.Euler(0f, 0f, rot * rotSpeed * Time.deltaTime);
-                topDownObject.transform.localRotation = targetRot;
-                targetprompt.transform.parent.localRotation = Quaternion.Euler(0f, 0f, -1 * topDownObject.transform.localEulerAngles.z);
+                topDownInterface.topDownObject.transform.localRotation = targetRot;
+                topDownInterface.targetprompt.transform.parent.localRotation = 
+                    Quaternion.Euler(0f, 0f, -1 * topDownInterface.topDownObject.transform.localEulerAngles.z);
             }
             
             // Regardless of the perspective/format, record changes in the response orientation
@@ -383,8 +398,8 @@ public class TurnToPoint : ExperimentTask
 
         if (!topDown) 
         {
-            currentHeading.layer = targetLayer;
-            currentReference.layer = targetLayer;
+            Experiment.MoveToLayer(currentHeading.transform, targetLayer);
+            Experiment.MoveToLayer(currentReference.transform, targetLayer);
         }
         else 
         {
@@ -393,14 +408,12 @@ public class TurnToPoint : ExperimentTask
             // while (responseAngle_actual < -180) responseAngle_actual +=180;
             Destroy(hi);
             Destroy(ri);
-            topDownInterface.transform.gameObject.SetActive(false);
+            Destroy(topDownInterface.gameObject);
             if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse)
             {
                 manager.playerCamera.orthographic = false;
             }
         }
-
-        Destroy(ri);
 
         responded = responseProvided;
 
