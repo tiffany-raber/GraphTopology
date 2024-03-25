@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4396226998460692561}
   - component: {fileID: 4396226998460692566}
   m_Layer: 0
-  m_Name: MODULE_MoveToStart
+  m_Name: MODULE_GoTo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -190,7 +190,7 @@ PrefabInstance:
     - target: {fileID: 8963637187331830073, guid: fcf9c00bd4ed44a3db1b4eea0446bee2,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8963637187402709062, guid: fcf9c00bd4ed44a3db1b4eea0446bee2,
         type: 3}
