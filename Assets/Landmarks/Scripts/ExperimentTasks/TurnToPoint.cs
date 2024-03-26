@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
 using TMPro;
-using System.Linq;
-using UnityEngine.ProBuilder.MeshOperations;
-using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityStandardAssets.Characters.FirstPerson;
 
@@ -57,7 +51,8 @@ public class TurnToPoint : ExperimentTask
     [Header("Properties Specific To Top-Down")]
     public TopDownPointingInterface topDownInterfacePrefab;
     private TopDownPointingInterface topDownInterface;
-    [Range(0f,180f)] public float minReferenceAngle;
+    // Options
+    public bool keepPromptStable = true;
     private GameObject hi; // heading icon copy we'll use for the UI and then destroy after the trial
     private GameObject ri; // reference icon copy we'll use for hte UI and then destroy
     public KeyCode left = KeyCode.LeftArrow;
@@ -79,6 +74,7 @@ public class TurnToPoint : ExperimentTask
     [HideInInspector] public float endRotNorthCW;
     [HideInInspector] public float targetRotNorthCW;
     [HideInInspector] public float referenceRotNorthCW;
+    [HideInInspector] public float headingRotNorthCW;
 
 
     public override void startTask()
@@ -118,9 +114,6 @@ public class TurnToPoint : ExperimentTask
             else formatRepeatCount++;
         }
 
-        // Spawn a top-down interface
-        topDownInterface = topDown ? Instantiate(topDownInterfacePrefab, transform) : null;
-
         // Set up the trial properties and configure
         if (parentTask.repeatCount <= dummyTrials) 
         {
@@ -154,6 +147,7 @@ public class TurnToPoint : ExperimentTask
 
         // Calculate geometry now that the player is positioned
         targetRotNorthCW = Experiment.MeasureClockwiseGlobalAngle(currentOrigin, currentTarget);
+        headingRotNorthCW = Experiment.MeasureClockwiseGlobalAngle(currentOrigin, currentHeading);
         startRotNorthCW = avatar.transform.eulerAngles.y;
 
         // Select and position a reference object to constrain the correct repsonse (mostly for top-down)
@@ -164,8 +158,7 @@ public class TurnToPoint : ExperimentTask
         }
         while (currentReference.name == currentOrigin.name ||
                 currentReference.name == currentHeading.name ||
-                currentReference.name == currentTarget.name ||
-                Mathf.Abs(Mathf.DeltaAngle(referenceRotNorthCW, startRotNorthCW)) < minReferenceAngle
+                currentReference.name == currentTarget.name
                 );
 
         // Set the prompt requested
@@ -175,16 +168,20 @@ public class TurnToPoint : ExperimentTask
         // Set up the trial format
         if (topDown)
         {
-            PointingSource = topDownInterface.topDownObject.transform;
-            // Hide the HUD and put the prompt on the Top-Down UI
-            hud.setMessage(""); hud.SecondsToShow = 0;
+            // Spawn a top-down interface in front of the player
+            topDownInterface = Instantiate(topDownInterfacePrefab, avatar.GetComponentInChildren<LM_SnapPoint>().transform);
             topDownInterface.transform.position = new Vector3(
                 avatar.GetComponentInChildren<LM_SnapPoint>().transform.position.x,
                 manager.playerCamera.transform.position.y,
-                avatar.GetComponentInChildren<LM_SnapPoint>().transform.position.z);
-            topDownInterface.transform.rotation = avatar.GetComponentInChildren<LM_SnapPoint>().transform.rotation;
-            topDownInterface.transform.gameObject.SetActive(true);
-            topDownInterface.targetprompt.text = prompt;
+                avatar.GetComponentInChildren<LM_SnapPoint>().transform.position.z
+                );
+            // topDownInterface.transform.LookAt(manager.playerCamera.transform);
+            topDownInterface.transform.localRotation = Quaternion.identity;
+            
+            PointingSource = topDownInterface.topDownObject.transform;
+            // Hide the HUD and put the prompt on the Top-Down UI
+            hud.setMessage(""); hud.SecondsToShow = 0;
+            topDownInterface.targetIcon.GetComponentInChildren<TextMeshProUGUI>().text = prompt;
             if (restrictMovement) manager.RestrictMovement(true, true);
 
             // Adjust to top-down if necessary (ironically requiring us to make it egocentric)
@@ -195,49 +192,57 @@ public class TurnToPoint : ExperimentTask
             referenceRotNorthCW -= startRotNorthCW;
             if (referenceRotNorthCW < 0) referenceRotNorthCW += 360;
 
-            startRotNorthCW = PointingSource.transform.localEulerAngles.z; // should be ego-zero; set after using allo startRot to calculate target
+            var fppRotNorthCW = startRotNorthCW;
+            startRotNorthCW = PointingSource.transform.localEulerAngles.y; // should be ego-zero; set after using allo startRot to calculate target
+
+            // Arrange the top-down interface objects
+            // Heading
+            topDownInterface.headingIcon.transform.parent.localEulerAngles = new Vector3(
+                topDownInterface.headingIcon.transform.parent.localEulerAngles.x, 
+                startRotNorthCW, 
+                topDownInterface.headingIcon.transform.parent.localEulerAngles.z
+                );
+            // Reference
+            topDownInterface.referenceIcon.transform.parent.localEulerAngles = new Vector3(
+                topDownInterface.referenceIcon.transform.parent.localEulerAngles.x, 
+                referenceRotNorthCW, 
+                topDownInterface.referenceIcon.transform.parent.localEulerAngles.z);
+
+            Debug.Log("Standing in front of and facing the " + currentHeading.name + ", turn to face the " + currentTarget.name);
+            Debug.Log(startRotNorthCW + "\t" + referenceRotNorthCW + "\t" + targetRotNorthCW);
 
             // copy the target and set it's transform to be the same as the targetIcon
-            hi = Instantiate(
-                currentHeading, 
-                topDownInterface.headingIcon.transform.position, 
-                topDownInterface.headingIcon.transform.rotation, 
-                topDownInterface.headingIcon.transform.parent
-                );
+            hi = Instantiate(currentHeading, topDownInterface.headingIcon.transform.parent);
+            hi.transform.localPosition = topDownInterface.headingIcon.transform.localPosition;
+            hi.transform.parent = hi.transform.parent.parent;
+            hi.transform.localEulerAngles = currentHeading.transform.eulerAngles - Vector3.up * fppRotNorthCW;
+            hi.transform.parent = topDownInterface.headingIcon.transform.parent;
+            hi.transform.localScale = topDownInterface.headingIcon.transform.localScale;
             foreach (var child in hi.GetComponentsInChildren<Transform>()) Experiment.MoveToLayer(child, hud.hudLayer);
             hi.name = "temporaryTargetIcon";
-            hi.transform.localScale = topDownInterface.headingIcon.transform.localScale;
-            hi.transform.parent.localRotation = Quaternion.Euler(0f, 0f, -1f * startRotNorthCW);
             topDownInterface.headingIcon.SetActive(false);
 
-            // TODO - this may need to move or change
             // Copy the reference and set it's transform to be the same as the referenceIcon
-            ri = Instantiate(
-                currentReference, 
-                topDownInterface.referenceIcon.transform.position, 
-                topDownInterface.referenceIcon.transform.rotation, 
-                topDownInterface.referenceIcon.transform.parent
-                );
+            ri = Instantiate(currentReference, topDownInterface.referenceIcon.transform.parent);
+            ri.transform.localPosition = topDownInterface.referenceIcon.transform.localPosition;
+            ri.transform.parent = ri.transform.parent.parent;
+            Debug.Log(currentReference.transform.eulerAngles);
+            ri.transform.localEulerAngles = currentReference.transform.eulerAngles - Vector3.up * fppRotNorthCW;
+            ri.transform.parent = topDownInterface.referenceIcon.transform.parent;
+            ri.transform.localScale = topDownInterface.referenceIcon.transform.localScale;
             foreach (var child in ri.GetComponentsInChildren<Transform>()) Experiment.MoveToLayer(child, hud.hudLayer);
             ri.name = "temporaryReferenceIcon";
-            ri.transform.localScale = topDownInterface.referenceIcon.transform.localScale;
-            ri.transform.parent.localRotation = Quaternion.Euler(0f, 0f, -1 * referenceRotNorthCW);
             topDownInterface.referenceIcon.SetActive(false);
-            var xnow = ri.transform.eulerAngles.x;
-            var ynow = 
-            ri.transform.localRotation = Quaternion.Euler(currentReference.transform.eulerAngles.y, 
-                                                            ri.transform.localEulerAngles.y,
-                                                            ri.transform.localEulerAngles.z);
+            
 
+            // Set up the rendering
             hud.showOnlyHUD(false);
-            // FIXME - consider deleting // topDownObject.transform.localEulerAngles = Vector3.zero;
-            // FIXME - consider deleting // targetprompt.transform.parent.localEulerAngles = Vector3.zero;
             if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse)
             {
                 manager.playerCamera.orthographic = true;
             }
         }
-        else
+        else // i.e., if first-person trials
         {
             if (useBodyNotCameraForRotation) PointingSource = avatar.GetComponent<LM_PlayerController>().collisionObject.transform;
             else PointingSource = avatar.GetComponent<LM_PlayerController>().cam.transform;
@@ -250,8 +255,7 @@ public class TurnToPoint : ExperimentTask
             hud.showOnlyHUD();
         }
 
-        Debug.Log("Standing in front of and facing the " + currentHeading.name + ", turn to face the " + currentTarget.name);
-        Debug.Log(   "Facing vector: " + startRotNorthCW + "°\t" + "Target vector: " + targetRotNorthCW + "°");
+        // Debug.Log(   "Facing vector: " + startRotNorthCW + "°\t" + "Target vector: " + targetRotNorthCW + "°");
 
         initialPos = currentOrigin.transform.position;
     }
@@ -271,14 +275,12 @@ public class TurnToPoint : ExperimentTask
             // Take input for the top-down interface, if active
             if (topDown && !responded)
             {
-                var rot = (float)(Convert.ToDouble(Input.GetKey(left)) - Convert.ToDouble(Input.GetKey(right)));
-                var targetRot = topDownInterface.topDownObject.transform.localRotation;
-                targetRot *= Quaternion.Euler(0f, 0f, rot * rotSpeed * Time.deltaTime);
-                topDownInterface.topDownObject.transform.localRotation = targetRot;
-                topDownInterface.targetprompt.transform.parent.localRotation = 
-                    Quaternion.Euler(0f, 0f, -1 * topDownInterface.topDownObject.transform.localEulerAngles.z);
+                var netInput = (float)(System.Convert.ToDouble(Input.GetKey(right)) - System.Convert.ToDouble(Input.GetKey(left)));
+                topDownInterface.topDownObject.transform.Rotate(0f, netInput * rotSpeed * Time.deltaTime, 0f);
+                if (keepPromptStable) topDownInterface.targetIcon.transform.localEulerAngles =
+                                        new Vector3 (0f, -1 * topDownInterface.topDownObject.transform.localEulerAngles.y, 0f);
             }
-            
+
             // Regardless of the perspective/format, record changes in the response orientation
             if (lastFrame.y != PointingSource.eulerAngles.y && !responded)
             {
