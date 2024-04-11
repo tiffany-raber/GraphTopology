@@ -689,18 +689,19 @@ public class Experiment : MonoBehaviour
         var c = new Vector2(pointC.x, pointC.z);
         
         // // Calculate the length of each side of the triangle formed by ABC using the Euclidean distance formula
-        // var ab = Mathf.Sqrt(Mathf.Pow(a.x - b.x, 2) + Mathf.Pow(a.y - b.y, 2));
-        // var bc = Mathf.Sqrt(Mathf.Pow(b.x - c.x, 2) + Mathf.Pow(b.y - c.y, 2));
-        // var ac = Mathf.Sqrt(Mathf.Pow(a.x - c.x, 2) + Mathf.Pow(a.y - c.y, 2));
-        var ba = a - b;
-        var bc = c - b;
+        // // var ab = Mathf.Sqrt(Mathf.Pow(a.x - b.x, 2) + Mathf.Pow(a.y - b.y, 2));
+        // // var bc = Mathf.Sqrt(Mathf.Pow(b.x - c.x, 2) + Mathf.Pow(b.y - c.y, 2));
+        // // var ac = Mathf.Sqrt(Mathf.Pow(a.x - c.x, 2) + Mathf.Pow(a.y - c.y, 2));
+        // var ba = a - b;
+        // var bc = c - b;
+        // // // Use the law of cosines
+        // // var measurement = Mathf.Rad2Deg * Mathf.Acos((Mathf.Pow(ab, 2) + Mathf.Pow(ac, 2) - Mathf.Pow(bc, 2)) / (2 * ab * bc));
+        // var measurement = Mathf.Rad2Deg * (Mathf.Atan2(bc.y, bc.x) - Mathf.Atan2(ba.y, ba.x));
 
-        // // Use the law of cosines
-        // var measurement = Mathf.Rad2Deg * Mathf.Acos((Mathf.Pow(ab, 2) + Mathf.Pow(ac, 2) - Mathf.Pow(bc, 2)) / (2 * ab * bc));
-        var measurement = Mathf.Rad2Deg * (Mathf.Atan2(bc.y, bc.x) - Mathf.Atan2(ba.y, ba.x));
+        var measurement = Mathf.Rad2Deg * (Mathf.Atan2(c.y - a.y, c.x - a.x) - Mathf.Atan2(b.y - a.y, b.x - a.x));
 
-        while (measurement > 180) measurement -= 180;
-        while (measurement < -180) measurement += 180;
+        // while (measurement > 180) measurement -= 180;
+        // while (measurement < -180) measurement += 180;
 
         return measurement;
 	}

@@ -329,34 +329,53 @@ public class TurnToPoint : ExperimentTask
     {
         base.endTask();
 
-        // Calculations
+        // FIXME BEGIN
+        // Calculations 
         signedErrorCW = -1 * Mathf.DeltaAngle(endRotNorthCW, targetRotNorthCW); // idk why they do this ccw as positive, but whatever
         Debug.LogWarning(   "Ended at " + endRotNorthCW + "°\n" + 
                             "Angular error calculated to be " + signedErrorCW + "°");
         absoluteError = Mathf.Abs(signedErrorCW);
+        //FIXME END
         
-        // LOG CRITITCAL TRIAL DATA
+        // TRIAL TYPE INFORMATION
         taskLog.AddData(transform.name + "_dummyTrial", (parentTask.repeatCount <= dummyTrials).ToString());
         taskLog.AddData(transform.name + "_trial_type_topDown", topDown.ToString());
         taskLog.AddData(transform.name + "_trial_type_switch", topDown == lastTopDown ? bool.FalseString : bool.TrueString);
         taskLog.AddData(transform.name + "_stayCount", formatRepeatCount.ToString());
+
+        // CRITICAL TRIAL PARAMETERS AND MEASUREMENTS
         taskLog.AddData(transform.name + "_origin", currentOrigin.name);
+        taskLog.AddData(transform.name + "_originPosX", currentOrigin.transform.position.x.ToString());
+        taskLog.AddData(transform.name + "_originPosZ", currentOrigin.transform.position.z.ToString());
+        taskLog.AddData(transform.name + "_originRotY", currentOrigin.transform.eulerAngles.y.ToString());
         taskLog.AddData(transform.name + "_heading",currentHeading.name);
+        taskLog.AddData(transform.name + "_headingPosX", currentHeading.transform.position.x.ToString());
+        taskLog.AddData(transform.name + "_headingPosZ", currentHeading.transform.position.z.ToString());
+        taskLog.AddData(transform.name + "_headingRotY", currentHeading.transform.eulerAngles.y.ToString());
         taskLog.AddData(transform.name + "_target", currentTarget.name);
-        taskLog.AddData(transform.name + "_responded", responded.ToString());
-        taskLog.AddData(transform.name + "_targetResponseAngle", targetRotNorthCW.ToString());
-        taskLog.AddData(transform.name + "_observedResponseAngle", endRotNorthCW.ToString());
-        taskLog.AddData(transform.name + "_signedErrorCW_deg", signedErrorCW.ToString());
-        taskLog.AddData(transform.name + "_absError", absoluteError.ToString());
-        taskLog.AddData(transform.name + "_responseLatency_s", (timeAtResponse - onset).ToString());
-        // ADDITIONAL POSITION AND ROTATION DATA
+        taskLog.AddData(transform.name + "_targetPosX", currentTarget.transform.position.x.ToString());
+        taskLog.AddData(transform.name + "_targetPosZ", currentTarget.transform.position.z.ToString());
+        taskLog.AddData(transform.name + "_targetRotY", currentTarget.transform.eulerAngles.y.ToString());
         taskLog.AddData(transform.name + "_initialPosX", initialPos.x.ToString());
         taskLog.AddData(transform.name + "_initialPosZ", initialPos.z.ToString());
-        taskLog.AddData(transform.name + "_totalRotation", totalRotation.ToString());
-        taskLog.AddData(transform.name + "_netCWrotation", netClockwiseRotation.ToString());
+        // taskLog.AddData(transform.name + "_initialRotY", .ToString()); // FIXME get rotation
         taskLog.AddData(transform.name + "_finalPosX", finalPos.x.ToString());
         taskLog.AddData(transform.name + "_finalPosZ", finalPos.z.ToString());
-        // LOG EVENT TIMING (in an fMRI friendly-ish style)
+        // taskLog.AddData(transform.name + "_finalRotY", .ToString()); // FIXME get rotation
+
+        // BEHAVIORAL MEASUREMENTS AND METRICS
+        taskLog.AddData(transform.name + "_responded", responded.ToString());
+        taskLog.AddData(transform.name + "_targetResponseAngle", targetRotNorthCW.ToString()); //fixme
+        taskLog.AddData(transform.name + "_observedResponseAngle", endRotNorthCW.ToString()); //fixme
+        taskLog.AddData(transform.name + "_signedErrorCW_deg", signedErrorCW.ToString()); //fixme
+        taskLog.AddData(transform.name + "_absError", absoluteError.ToString()); //fixme
+        taskLog.AddData(transform.name + "_responseLatency_s", (timeAtResponse - onset).ToString());
+
+        // ADDITIONAL POSITION AND ROTATION DATA
+        taskLog.AddData(transform.name + "_totalRotation", totalRotation.ToString());
+        taskLog.AddData(transform.name + "_netCWrotation", netClockwiseRotation.ToString());
+
+        // EVENT TIMING (in an fMRI friendly-ish style)
         taskLog.AddData(transform.name + "_event-trial_onset_s", onset.ToString());
         taskLog.AddData(transform.name + "_event-trial_duration_s", interval != 0 ? (interval / 1000).ToString() : 
                                                                                     (timeAtResponse - onset).ToString());
