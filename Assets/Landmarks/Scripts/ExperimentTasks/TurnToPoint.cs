@@ -76,6 +76,10 @@ public class TurnToPoint : ExperimentTask
     [HideInInspector] public float referenceRotNorthCW;
     [HideInInspector] public float headingRotNorthCW;
 
+    [HideInInspector] public float correctTurn;
+    [HideInInspector] public float observedTurn;
+    [HideInInspector] public float errorTurn;
+
 
     public override void startTask()
     {
@@ -114,7 +118,7 @@ public class TurnToPoint : ExperimentTask
             else formatRepeatCount++;
         }
 
-        // Set up the trial properties and configure
+        // Specify and select the landmarks used for geometry (origin, heading, target)
         if (parentTask.repeatCount <= dummyTrials) 
         {
             // TODO: handle if they provide an originlist
@@ -257,7 +261,12 @@ public class TurnToPoint : ExperimentTask
 
         // Debug.Log(   "Facing vector: " + startRotNorthCW + "°\t" + "Target vector: " + targetRotNorthCW + "°");
 
-        initialPos = currentOrigin.transform.position;
+        correctTurn = Experiment.CalculateAngleThreePoints(
+            currentOrigin.transform.position, 
+            currentHeading.transform.position, 
+            currentTarget.transform.position);
+
+        initialPos = PointingSource.position;
     }
 
 
