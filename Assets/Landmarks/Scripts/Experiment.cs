@@ -674,19 +674,26 @@ public class Experiment : MonoBehaviour
 
 
     /// <summary>
-    /// Calculate the planar angle between two points measured at a third vertex point. Returns [-180:180]
+    /// Calculate the planar clockwise angle, in degrees, between three cartesian points.
     /// </summary>
-    /// <param name="a">The transform of the point at the end of the arm/vector to measure from.</param>
-    /// <param name="b">The transform of the point where the two arms/vectors meet.</param>
-    /// <param name="to">The transform of the point at the end of the arm/vector to measure to.</param>
-    /// <param name="signed">Whether or not to use a signed angle (default is unsigned)</param>
-    /// <returns>The measured (signed) angle as a float.</returns>
-	public static float CalculateAngleThreePoints(Vector3 pointA, Vector3 pointB, Vector3 pointC, bool signed = false) 
+    /// <param name="a">The vertex or origin of the angle.</param>
+    /// <param name="b">The reference point for the angle (i.e., 0°).</param>
+    /// <param name="to">The measurement point for the angle.</param>
+    /// <returns>The signed (clockwise) angle as a float [-179.9°, 180°].</returns>
+	public static float CalculateCwAngleThreePoints(Vector3 pointA, Vector3 pointB, Vector3 pointC) 
 	{
         // convert each Vector3 to a Vector2 by stripping the y-value from the Vector3
         var a  = new Vector2(pointA.x, pointA.z);
         var b = new Vector2(pointB.x, pointB.z);
         var c = new Vector2(pointC.x, pointC.z);
+
+        // Use law of cosines and atan2 to calculate the angle without any weird quadrant issues 
+        // The method returns values wrt the unit-circle (i.e., counterclockwise is positive) so we multiply by -1 and convert to degrees
+        var measurement = -1 * Mathf.Rad2Deg * (Mathf.Atan2(c.y - a.y, c.x - a.x) - Mathf.Atan2(b.y - a.y, b.x - a.x));
+        if (measurement <= -180) measurement += 360;
+        if (measurement > 180) measurement -= 360;
+
+        return measurement;
         
         // // Calculate the length of each side of the triangle formed by ABC using the Euclidean distance formula
         // // var ab = Mathf.Sqrt(Mathf.Pow(a.x - b.x, 2) + Mathf.Pow(a.y - b.y, 2));
@@ -698,12 +705,12 @@ public class Experiment : MonoBehaviour
         // // var measurement = Mathf.Rad2Deg * Mathf.Acos((Mathf.Pow(ab, 2) + Mathf.Pow(ac, 2) - Mathf.Pow(bc, 2)) / (2 * ab * bc));
         // var measurement = Mathf.Rad2Deg * (Mathf.Atan2(bc.y, bc.x) - Mathf.Atan2(ba.y, ba.x));
 
-        var measurement = Mathf.Rad2Deg * (Mathf.Atan2(c.y - a.y, c.x - a.x) - Mathf.Atan2(b.y - a.y, b.x - a.x));
+        
 
         // while (measurement > 180) measurement -= 180;
         // while (measurement < -180) measurement += 180;
 
-        return measurement;
+        
 	}
 
     /// <summary>

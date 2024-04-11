@@ -35,7 +35,7 @@ public class TurnToPoint : ExperimentTask
     public bool useBodyNotCameraForRotation;
     private Transform PointingSource;
     private Vector3 initialPos;
-    private Vector3 lastFrame;
+    private float lastRot;
     private float lastTime;
     private float totalRotation;
     private float netClockwiseRotation;
@@ -76,9 +76,9 @@ public class TurnToPoint : ExperimentTask
     [HideInInspector] public float referenceRotNorthCW;
     [HideInInspector] public float headingRotNorthCW;
 
-    [HideInInspector] public float correctTurn;
-    [HideInInspector] public float observedTurn;
-    [HideInInspector] public float errorTurn;
+    [HideInInspector] public float correctTurnCw;
+    [HideInInspector] public float observedTurnCw;
+    [HideInInspector] public float errorTurnCw;
 
 
     public override void startTask()
@@ -241,10 +241,7 @@ public class TurnToPoint : ExperimentTask
 
             // Set up the rendering
             hud.showOnlyHUD(false);
-            if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse)
-            {
-                manager.playerCamera.orthographic = true;
-            }
+            if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse) manager.playerCamera.orthographic = true;
         }
         else // i.e., if first-person trials
         {
@@ -261,7 +258,7 @@ public class TurnToPoint : ExperimentTask
 
         // Debug.Log(   "Facing vector: " + startRotNorthCW + "°\t" + "Target vector: " + targetRotNorthCW + "°");
 
-        correctTurn = Experiment.CalculateAngleThreePoints(
+        correctTurnCw = Experiment.CalculateCwAngleThreePoints(
             currentOrigin.transform.position, 
             currentHeading.transform.position, 
             currentTarget.transform.position);
@@ -275,7 +272,7 @@ public class TurnToPoint : ExperimentTask
         if (!firstUpdate)
         {
             onset = Time.time;
-            lastFrame = !topDown ? PointingSource.eulerAngles : PointingSource.localEulerAngles;
+            lastRot = topDown ? PointingSource.localEulerAngles.y : PointingSource.eulerAngles.y;
             lastTime = Time.time;
             firstUpdate = true;
         }
@@ -291,19 +288,17 @@ public class TurnToPoint : ExperimentTask
             }
 
             // Regardless of the perspective/format, record changes in the response orientation
-            if (lastFrame.y != PointingSource.eulerAngles.y && !responded)
+            var thisRot = topDown ? PointingSource.localEulerAngles.y : PointingSource.eulerAngles.y;
+            var deltaY = Mathf.DeltaAngle(thisRot, lastRot);
+            var deltaT = Time.time - lastTime;
+            netClockwiseRotation -= deltaY;
+            totalRotation += Mathf.Abs(deltaY);
+            if (totalRotation > 0 && !hasMoved)
             {
-                var deltaY = !topDown ? Mathf.DeltaAngle(PointingSource.eulerAngles.y, lastFrame.y) : Mathf.DeltaAngle(PointingSource.localEulerAngles.z, lastFrame.z);
-                var deltaT = Time.time - lastTime;
-                netClockwiseRotation += deltaY;
-                totalRotation += Mathf.Abs(deltaY);
-                if (totalRotation > 0 && !hasMoved)
-                {
-                    hasMoved = true;
-                    responseMovementOnset = Time.time;
-                }
+                hasMoved = true;
+                responseMovementOnset = Time.time;
             }
-            lastFrame = !topDown ? PointingSource.eulerAngles : PointingSource.localEulerAngles;
+            lastRot = thisRot;
 
             // Handle Recording the response (and ending for a response-dependent duration)
             if (Input.GetKeyDown(submitButton) && !responded && Time.time - onset >= minResponseLatency)
@@ -374,10 +369,13 @@ public class TurnToPoint : ExperimentTask
 
         // BEHAVIORAL MEASUREMENTS AND METRICS
         taskLog.AddData(transform.name + "_responded", responded.ToString());
-        taskLog.AddData(transform.name + "_targetResponseAngle", targetRotNorthCW.ToString()); //fixme
-        taskLog.AddData(transform.name + "_observedResponseAngle", endRotNorthCW.ToString()); //fixme
-        taskLog.AddData(transform.name + "_signedErrorCW_deg", signedErrorCW.ToString()); //fixme
-        taskLog.AddData(transform.name + "_absError", absoluteError.ToString()); //fixme
+        taskLog.AddData(transform.name + "_correctTurn_cwDeg", correctTurnCw.ToString());
+        taskLog.AddData(transform.name + "_observedTurn_cwDeg", observedTurnCw.ToString());
+        taskLog.AddData(transform.name + "_errorTurn_cwDeg", errorTurnCw.ToString());
+        // taskLog.AddData(transform.name + "_targetResponseAngle", targetRotNorthCW.ToString()); //fixme
+        // taskLog.AddData(transform.name + "_observedResponseAngle", endRotNorthCW.ToString()); //fixme
+        // taskLog.AddData(transform.name + "_signedErrorCW_deg", signedErrorCW.ToString()); //fixme
+        // taskLog.AddData(transform.name + "_absError", absoluteError.ToString()); //fixme
         taskLog.AddData(transform.name + "_responseLatency_s", (timeAtResponse - onset).ToString());
 
         // ADDITIONAL POSITION AND ROTATION DATA
@@ -419,13 +417,7 @@ public class TurnToPoint : ExperimentTask
 
     private void RecordResponse(bool responseProvided)
     {
-        timeAtResponse = Time.time;
-        finalPos = PointingSource.position;
-
-        endRotNorthCW = topDown ?   -1 * PointingSource.transform.localEulerAngles.z : // It seems rectTransforms (i.e. gui objects) rotate differently?
-                                    PointingSource.transform.eulerAngles.y; // just the y rotation of the player
-        if (endRotNorthCW < 0) endRotNorthCW += 360; // wrap 0-360
-
+        // HIDE VISUAL INFO SO WE CAN DO SOME CALCULATIONS IN PRIVATE
         if (!topDown) 
         {
             Experiment.MoveToLayer(currentHeading.transform, targetLayer);
@@ -439,14 +431,8 @@ public class TurnToPoint : ExperimentTask
             Destroy(hi);
             Destroy(ri);
             Destroy(topDownInterface.gameObject);
-            if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse)
-            {
-                manager.playerCamera.orthographic = false;
-            }
+            if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse) manager.playerCamera.orthographic = false;
         }
-
-        responded = responseProvided;
-
         Experiment.MoveToLayer(currentHeading.transform, targetLayer);
         if (interval > 0) 
         {
@@ -455,5 +441,23 @@ public class TurnToPoint : ExperimentTask
             hud.SecondsToShow = interval;
             hud.showOnlyHUD(false);
         }
+
+        // RECORD DATA
+        timeAtResponse = Time.time;
+        responded = responseProvided;
+        // observedTurnCw = topDown ? 
+        //     netClockwiseRotation :
+        //     Experiment.CalculateCwAngleThreePoints( currentOrigin.transform.position, currentHeading.transform.position, avatar.GetComponentInChildren<LM_SnapPoint>().transform.position);
+        observedTurnCw = netClockwiseRotation;
+        if (topDown) avatar.transform.localEulerAngles += new Vector3(0f, netClockwiseRotation, 0f);
+        errorTurnCw = Experiment.CalculateCwAngleThreePoints(currentOrigin.transform.position, currentTarget.transform.position, avatar.GetComponentInChildren<LM_SnapPoint>().transform.position);
+
+        finalPos = PointingSource.position;
+
+        endRotNorthCW = topDown ?   -1 * PointingSource.transform.localEulerAngles.z : // It seems rectTransforms (i.e. gui objects) rotate differently?
+                                    PointingSource.transform.eulerAngles.y; // just the y rotation of the player
+        if (endRotNorthCW < 0) endRotNorthCW += 360; // wrap 0-360
+
+        
     }
 }
