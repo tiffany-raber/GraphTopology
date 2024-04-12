@@ -241,7 +241,7 @@ public class TurnToPoint : ExperimentTask
 
             // Set up the rendering
             hud.showOnlyHUD(false);
-            if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse) manager.playerCamera.orthographic = true;
+            // if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse) manager.playerCamera.orthographic = true;
         }
         else // i.e., if first-person trials
         {
@@ -431,7 +431,7 @@ public class TurnToPoint : ExperimentTask
             Destroy(hi);
             Destroy(ri);
             Destroy(topDownInterface.gameObject);
-            if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse) manager.playerCamera.orthographic = false;
+            // if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse) manager.playerCamera.orthographic = false;
         }
         Experiment.MoveToLayer(currentHeading.transform, targetLayer);
         if (interval > 0) 
