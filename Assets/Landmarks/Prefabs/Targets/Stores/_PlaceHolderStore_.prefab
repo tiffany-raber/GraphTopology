@@ -853,7 +853,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1785131489993381753}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.5, y: 0, z: 1.5}
+  m_LocalPosition: {x: -10, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6754479628067843933}
@@ -1881,6 +1881,8 @@ MonoBehaviour:
   door: {fileID: 6166990647727925571}
   doorMaxOpenAngle: -115
   doorSpeedMulitplier: 1
+  collisionIndicator: {fileID: 3680469859221534333, guid: 65bd4c09ea91f4fa1a305b0ab262afe6,
+    type: 3}
 --- !u!65 &1785131490668919501
 BoxCollider:
   m_ObjectHideFlags: 0

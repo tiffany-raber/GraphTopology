@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.ProBuilder.MeshOperations;
 using UnityEngine.UI;
 
 public class LM_TargetStore : LM_Target
@@ -17,6 +18,8 @@ public class LM_TargetStore : LM_Target
     public float doorSpeedMulitplier = 1;
     private bool doorOpen;
     private bool doorInMotion;
+    public GameObject collisionIndicator;
+    private GameObject m_collisionIndicator;
 
     //private Color storeColor;
 
@@ -68,6 +71,39 @@ public class LM_TargetStore : LM_Target
         {
             elem.GetComponent<Renderer>().material.color = col;
             Debug.Log("Element " + elem.name.ToString() + " changed to color " + col);
+        }
+    }
+
+    public void SetActiveTarget(bool yes)
+    {
+        if (yes)
+        {
+            OpenDoor();
+            InstantiateIndicator(true);
+            
+        }
+        else 
+        {
+            CloseDoor();
+            InstantiateIndicator(false);    
+        }
+
+    }
+
+    private void InstantiateIndicator(bool yes)
+    {
+        if (collisionIndicator != null)
+        {
+            if (yes) 
+            {
+                m_collisionIndicator = Instantiate(collisionIndicator, GetComponentInChildren<LM_SnapPoint>().transform);
+                // Color match the target store's identifying color
+                foreach (var mr in m_collisionIndicator.GetComponentsInChildren<Renderer>()) 
+                {
+                    mr.material.color = exteriorElements[0].GetComponent<Renderer>().material.color;
+                }
+            }
+            else Destroy(m_collisionIndicator);
         }
     }
 

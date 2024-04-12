@@ -130,7 +130,7 @@ public class NavigationTask : ExperimentTask
         // if it's a target, open the door to show it's active
         if (currentTarget.GetComponentInChildren<LM_TargetStore>() != null)
         {
-            currentTarget.GetComponentInChildren<LM_TargetStore>().OpenDoor();
+            currentTarget.GetComponentInChildren<LM_TargetStore>().SetActiveTarget(true);
         }
 
 		if (NavigationInstruction)
@@ -463,7 +463,7 @@ public class NavigationTask : ExperimentTask
         // if it's a target, open the door to show it's active
         if (currentTarget.GetComponentInChildren<LM_TargetStore>() != null)
         {
-            currentTarget.GetComponentInChildren<LM_TargetStore>().CloseDoor();
+            currentTarget.GetComponentInChildren<LM_TargetStore>().SetActiveTarget(false);
         }
 
         // re-enable everything on the gameobject we just finished finding

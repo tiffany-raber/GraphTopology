@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class LM_Target : MonoBehaviour
 {
     //public bool useExisting = true;
-    public Image thumbnail;
 
     [HideInInspector]
     public Color color;
