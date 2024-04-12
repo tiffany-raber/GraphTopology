@@ -21,7 +21,7 @@ public class TurnToPoint : ExperimentTask
     private GameObject currentOrigin;
     private GameObject currentHeading;
     private GameObject currentTarget;
-    private GameObject currentReference;
+    // private GameObject currentReference;
 
     // Track trial data
     private bool firstUpdate;
@@ -43,8 +43,8 @@ public class TurnToPoint : ExperimentTask
 
     // Measured variables
     private bool responded;
-    private float signedErrorCW;
-    private float absoluteError;
+    // private float signedErrorCW; // TODO - remove when possible
+    // private float absoluteError; // TODO - remove when possible
     [Tooltip("Use {0} in place of the target name")]// Use {0} for origin, {1} for heading, {2} for target")]
     [TextArea] private string prompt = "{0}";
     
@@ -73,12 +73,13 @@ public class TurnToPoint : ExperimentTask
     public float startRotNorthCW;
     [HideInInspector] public float endRotNorthCW;
     [HideInInspector] public float targetRotNorthCW;
-    [HideInInspector] public float referenceRotNorthCW;
+    //[HideInInspector] public float referenceRotNorthCW;
     [HideInInspector] public float headingRotNorthCW;
 
     [HideInInspector] public float correctTurnCw;
     [HideInInspector] public float observedTurnCw;
     [HideInInspector] public float errorTurnCw;
+    [HideInInspector] public float errorTurnAbs;
 
 
     public override void startTask()
@@ -155,15 +156,15 @@ public class TurnToPoint : ExperimentTask
         startRotNorthCW = avatar.transform.eulerAngles.y;
 
         // Select and position a reference object to constrain the correct repsonse (mostly for top-down)
-        do
-        {
-            currentReference = listOfTargets.objects[UnityEngine.Random.Range(0, listOfTargets.objects.Count)];
-            referenceRotNorthCW = Experiment.MeasureClockwiseGlobalAngle(currentOrigin, currentReference);    
-        }
-        while (currentReference.name == currentOrigin.name ||
-                currentReference.name == currentHeading.name ||
-                currentReference.name == currentTarget.name
-                );
+        // do
+        // {
+        //     currentReference = listOfTargets.objects[UnityEngine.Random.Range(0, listOfTargets.objects.Count)];
+        //     referenceRotNorthCW = Experiment.MeasureClockwiseGlobalAngle(currentOrigin, currentReference);    
+        // }
+        // while (currentReference.name == currentOrigin.name ||
+        //         currentReference.name == currentHeading.name ||
+        //         currentReference.name == currentTarget.name
+        //         );
 
         // Set the prompt requested
         hud.SecondsToShow = 99999;
@@ -193,8 +194,8 @@ public class TurnToPoint : ExperimentTask
             targetRotNorthCW -= startRotNorthCW;
             if (targetRotNorthCW < 0) targetRotNorthCW += 360; // wrap 0-360
 
-            referenceRotNorthCW -= startRotNorthCW;
-            if (referenceRotNorthCW < 0) referenceRotNorthCW += 360;
+            // referenceRotNorthCW -= startRotNorthCW;
+            // if (referenceRotNorthCW < 0) referenceRotNorthCW += 360;
 
             var fppRotNorthCW = startRotNorthCW;
             startRotNorthCW = PointingSource.transform.localEulerAngles.y; // should be ego-zero; set after using allo startRot to calculate target
@@ -206,14 +207,14 @@ public class TurnToPoint : ExperimentTask
                 startRotNorthCW, 
                 topDownInterface.headingIcon.transform.parent.localEulerAngles.z
                 );
-            // Reference
-            topDownInterface.referenceIcon.transform.parent.localEulerAngles = new Vector3(
-                topDownInterface.referenceIcon.transform.parent.localEulerAngles.x, 
-                referenceRotNorthCW, 
-                topDownInterface.referenceIcon.transform.parent.localEulerAngles.z);
+            // // Reference
+            // topDownInterface.referenceIcon.transform.parent.localEulerAngles = new Vector3(
+            //     topDownInterface.referenceIcon.transform.parent.localEulerAngles.x, 
+            //     referenceRotNorthCW, 
+            //     topDownInterface.referenceIcon.transform.parent.localEulerAngles.z);
 
-            Debug.Log("Standing in front of and facing the " + currentHeading.name + ", turn to face the " + currentTarget.name);
-            Debug.Log(startRotNorthCW + "\t" + referenceRotNorthCW + "\t" + targetRotNorthCW);
+            // Debug.Log("Standing in front of and facing the " + currentHeading.name + ", turn to face the " + currentTarget.name);
+            // Debug.Log(startRotNorthCW + "\t" + referenceRotNorthCW + "\t" + targetRotNorthCW);
 
             // copy the target and set it's transform to be the same as the targetIcon
             hi = Instantiate(currentHeading, topDownInterface.headingIcon.transform.parent);
@@ -227,16 +228,16 @@ public class TurnToPoint : ExperimentTask
             topDownInterface.headingIcon.SetActive(false);
 
             // Copy the reference and set it's transform to be the same as the referenceIcon
-            ri = Instantiate(currentReference, topDownInterface.referenceIcon.transform.parent);
-            ri.transform.localPosition = topDownInterface.referenceIcon.transform.localPosition;
-            ri.transform.parent = ri.transform.parent.parent;
-            Debug.Log(currentReference.transform.eulerAngles);
-            ri.transform.localEulerAngles = currentReference.transform.eulerAngles - Vector3.up * fppRotNorthCW;
-            ri.transform.parent = topDownInterface.referenceIcon.transform.parent;
-            ri.transform.localScale = topDownInterface.referenceIcon.transform.localScale;
-            foreach (var child in ri.GetComponentsInChildren<Transform>()) Experiment.MoveToLayer(child, hud.hudLayer);
-            ri.name = "temporaryReferenceIcon";
-            topDownInterface.referenceIcon.SetActive(false);
+            // ri = Instantiate(currentReference, topDownInterface.referenceIcon.transform.parent);
+            // ri.transform.localPosition = topDownInterface.referenceIcon.transform.localPosition;
+            // ri.transform.parent = ri.transform.parent.parent;
+            // Debug.Log(currentReference.transform.eulerAngles);
+            // ri.transform.localEulerAngles = currentReference.transform.eulerAngles - Vector3.up * fppRotNorthCW;
+            // ri.transform.parent = topDownInterface.referenceIcon.transform.parent;
+            // ri.transform.localScale = topDownInterface.referenceIcon.transform.localScale;
+            // foreach (var child in ri.GetComponentsInChildren<Transform>()) Experiment.MoveToLayer(child, hud.hudLayer);
+            // ri.name = "temporaryReferenceIcon";
+            // topDownInterface.referenceIcon.SetActive(false);
             
 
             // Set up the rendering
@@ -252,7 +253,7 @@ public class TurnToPoint : ExperimentTask
             currentTarget.SetActive(true);
             targetLayer = currentHeading.layer;
             Experiment.MoveToLayer(currentHeading.transform, hud.hudLayer);
-            Experiment.MoveToLayer(currentReference.transform, hud.hudLayer);
+            // Experiment.MoveToLayer(currentReference.transform, hud.hudLayer);
             hud.showOnlyHUD();
         }
 
@@ -333,13 +334,14 @@ public class TurnToPoint : ExperimentTask
     {
         base.endTask();
 
-        // FIXME BEGIN
-        // Calculations 
-        signedErrorCW = -1 * Mathf.DeltaAngle(endRotNorthCW, targetRotNorthCW); // idk why they do this ccw as positive, but whatever
-        Debug.LogWarning(   "Ended at " + endRotNorthCW + "°\n" + 
-                            "Angular error calculated to be " + signedErrorCW + "°");
-        absoluteError = Mathf.Abs(signedErrorCW);
-        //FIXME END
+        // TODO Remove once confirmed obsolete
+        // // FIXME BEGIN
+        // // Calculations 
+        // signedErrorCW = -1 * Mathf.DeltaAngle(endRotNorthCW, targetRotNorthCW); // idk why they do this ccw as positive, but whatever
+        // Debug.LogWarning(   "Ended at " + endRotNorthCW + "°\n" + 
+        //                     "Angular error calculated to be " + signedErrorCW + "°");
+        // absoluteError = Mathf.Abs(signedErrorCW);
+        // //FIXME END
         
         // TRIAL TYPE INFORMATION
         taskLog.AddData(transform.name + "_dummyTrial", (parentTask.repeatCount <= dummyTrials).ToString());
@@ -371,11 +373,12 @@ public class TurnToPoint : ExperimentTask
         taskLog.AddData(transform.name + "_responded", responded.ToString());
         taskLog.AddData(transform.name + "_correctTurn_cwDeg", correctTurnCw.ToString());
         taskLog.AddData(transform.name + "_observedTurn_cwDeg", observedTurnCw.ToString());
-        taskLog.AddData(transform.name + "_errorTurn_cwDeg", errorTurnCw.ToString());
-        // taskLog.AddData(transform.name + "_targetResponseAngle", targetRotNorthCW.ToString()); //fixme
-        // taskLog.AddData(transform.name + "_observedResponseAngle", endRotNorthCW.ToString()); //fixme
-        // taskLog.AddData(transform.name + "_signedErrorCW_deg", signedErrorCW.ToString()); //fixme
-        // taskLog.AddData(transform.name + "_absError", absoluteError.ToString()); //fixme
+        taskLog.AddData(transform.name + "_signedError_cwDeg", errorTurnCw.ToString());
+        taskLog.AddData(transform.name + "_absoluteError_Deg", errorTurnAbs.ToString());
+        // taskLog.AddData(transform.name + "_targetResponseAngle", targetRotNorthCW.ToString()); //fixme // TODO - remove when possible
+        // taskLog.AddData(transform.name + "_observedResponseAngle", endRotNorthCW.ToString()); //fixme // TODO - remove when possible
+        // taskLog.AddData(transform.name + "_signedErrorCW_deg", signedErrorCW.ToString()); //fixme // TODO - remove when possible
+        // taskLog.AddData(transform.name + "_absError", absoluteError.ToString()); //fixme // TODO - remove when possible
         taskLog.AddData(transform.name + "_responseLatency_s", (timeAtResponse - onset).ToString());
 
         // ADDITIONAL POSITION AND ROTATION DATA
@@ -421,7 +424,7 @@ public class TurnToPoint : ExperimentTask
         if (!topDown) 
         {
             Experiment.MoveToLayer(currentHeading.transform, targetLayer);
-            Experiment.MoveToLayer(currentReference.transform, targetLayer);
+            // Experiment.MoveToLayer(currentReference.transform, targetLayer);
         }
         else 
         {
@@ -451,7 +454,7 @@ public class TurnToPoint : ExperimentTask
         observedTurnCw = netClockwiseRotation;
         if (topDown) avatar.transform.localEulerAngles += new Vector3(0f, netClockwiseRotation, 0f);
         errorTurnCw = Experiment.CalculateCwAngleThreePoints(currentOrigin.transform.position, currentTarget.transform.position, avatar.GetComponentInChildren<LM_SnapPoint>().transform.position);
-
+        errorTurnAbs = Mathf.Abs(errorTurnCw);
         finalPos = PointingSource.position;
 
         endRotNorthCW = topDown ?   -1 * PointingSource.transform.localEulerAngles.z : // It seems rectTransforms (i.e. gui objects) rotate differently?
