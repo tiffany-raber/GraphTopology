@@ -47,6 +47,7 @@ public class TurnToPoint : ExperimentTask
     // private float absoluteError; // TODO - remove when possible
     [Tooltip("Use {0} in place of the target name")]// Use {0} for origin, {1} for heading, {2} for target")]
     [TextArea] private string prompt = "{0}";
+    public Vector3 offsetPrompt;
     
     [Header("Properties Specific To Top-Down")]
     public TopDownPointingInterface topDownInterfacePrefab;
@@ -169,12 +170,26 @@ public class TurnToPoint : ExperimentTask
         // Set the prompt requested
         hud.SecondsToShow = 99999;
         prompt = currentTarget.name;
+        hud.setMessage(prompt);
+        hud.hudPanel.transform.position += offsetPrompt;
 
         // Set up the trial format
         if (topDown)
         {
             // Spawn a top-down interface in front of the player
             topDownInterface = Instantiate(topDownInterfacePrefab, avatar.GetComponentInChildren<LM_SnapPoint>().transform);
+            // Set the color on the origin
+            if (currentHeading.GetComponentInChildren<LM_TargetStore>() != null && currentHeading.GetComponentInChildren<LM_TargetStore>().exteriorElements.Length > 0)
+            {
+                topDownInterface.originObject.GetComponentInChildren<RawImage>().color = 
+                    currentHeading.GetComponentInChildren<LM_TargetStore>().exteriorElements[0].GetComponent<Renderer>().material.color;
+            }
+            if (currentTarget.GetComponentInChildren<LM_TargetStore>() != null && currentTarget.GetComponentInChildren<LM_TargetStore>().exteriorElements.Length > 0)
+            {
+                topDownInterface.targetIcon.GetComponent<Renderer>().material.color = 
+                    currentTarget.GetComponentInChildren<LM_TargetStore>().exteriorElements[0].GetComponent<Renderer>().material.color;
+            }
+
             topDownInterface.transform.position = new Vector3(
                 avatar.GetComponentInChildren<LM_SnapPoint>().transform.position.x,
                 manager.playerCamera.transform.position.y,
@@ -184,9 +199,8 @@ public class TurnToPoint : ExperimentTask
             topDownInterface.transform.localRotation = Quaternion.identity;
             
             PointingSource = topDownInterface.topDownObject.transform;
-            // Hide the HUD and put the prompt on the Top-Down UI
-            hud.setMessage(""); hud.SecondsToShow = 0;
-            topDownInterface.targetIcon.GetComponentInChildren<TextMeshProUGUI>().text = prompt;
+
+            // topDownInterface.targetIcon.GetComponentInChildren<TextMeshProUGUI>().text = prompt;
             if (restrictMovement) manager.RestrictMovement(true, true);
 
             // Adjust to top-down if necessary (ironically requiring us to make it egocentric)
@@ -248,7 +262,6 @@ public class TurnToPoint : ExperimentTask
         {
             if (useBodyNotCameraForRotation) PointingSource = avatar.GetComponent<LM_PlayerController>().collisionObject.transform;
             else PointingSource = avatar.GetComponent<LM_PlayerController>().cam.transform;
-            hud.setMessage(prompt);
             if (restrictMovement) manager.RestrictMovement(true, false);
             currentTarget.SetActive(true);
             targetLayer = currentHeading.layer;

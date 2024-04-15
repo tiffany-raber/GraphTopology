@@ -1617,11 +1617,11 @@ MonoBehaviour:
   startRotNorthCW: 0
   endRotNorthCW: 0
   targetRotNorthCW: 0
-  referenceRotNorthCW: 0
   headingRotNorthCW: 0
   correctTurnCw: 0
   observedTurnCw: 0
   errorTurnCw: 0
+  errorTurnAbs: 0
 --- !u!1 &7955141127686597403
 GameObject:
   m_ObjectHideFlags: 0
@@ -1987,6 +1987,11 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 70
       objectReference: {fileID: 0}
+    - target: {fileID: 1105487150790673448, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 1961071617021989367, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
         type: 3}
       propertyPath: m_LocalPosition.z
@@ -2161,7 +2166,7 @@ PrefabInstance:
         type: 3}
       propertyPath: virtualDesert
       value: 
-      objectReference: {fileID: 8274381362166326959}
+      objectReference: {fileID: 7828129578170353450}
     - target: {fileID: 5308465570326146506, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
         type: 3}
       propertyPath: idAsRandomSeed
@@ -2209,6 +2214,11 @@ PrefabInstance:
         type: 3}
       propertyPath: actionButtonOn
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5748537040359903156, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5886711916787819011, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
         type: 3}
@@ -2264,6 +2274,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8097147008788212412, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8551736410258332864, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
         type: 3}
@@ -2355,9 +2370,9 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 2616696360002921906}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &8274381362166326959 stripped
+--- !u!1 &7828129578170353450 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 6234351308212618013, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
+  m_CorrespondingSourceObject: {fileID: 5256621167868551832, guid: 0eaa84beeb5544ef08a8fa759a1176ce,
     type: 3}
   m_PrefabInstance: {fileID: 2616696360002921906}
   m_PrefabAsset: {fileID: 0}
