@@ -14,9 +14,15 @@ public class LM_GoTo : ExperimentTask
 {
     [Header("Task-specific Properties")]
     public GameObject arriveAt;
+    public Vector3 localOffsetFacing;
     public bool hideEnvironment;
     public float orientThreshold = 15.0f;
     [TextArea] public string readyMessage;
+    [TextArea] public string notReadyMessage;
+    [Tooltip("Only use if your player will already be at the destination \n" + 
+                "I.e, you just want them to orient from their current position")]
+    public bool immobilize;
+    private Vector3 m_immobilizedAt;
 
     private ParticleSystem effect;
     private bool atDestination;
@@ -67,6 +73,8 @@ public class LM_GoTo : ExperimentTask
         // Toggle the collider on then off in case they were already inside this collider on load (e.g., standing at start when experiment begins)
         GetComponent<Collider>().enabled = false;
         GetComponent<Collider>().enabled = true;
+
+         if (immobilize) m_immobilizedAt = avatar.transform.position;
     }
 
 
@@ -79,37 +87,52 @@ public class LM_GoTo : ExperimentTask
             return true;
         }
 
+        if (immobilize) avatar.transform.position = m_immobilizedAt;
+
         // Is the player at and aligned with the destination?
-        if (atDestination & Mathf.Abs(Mathf.DeltaAngle(manager.playerCamera.transform.eulerAngles.y, arriveAt.transform.eulerAngles.y)) < orientThreshold)
+        if (atDestination)
         {
-            if (hud.GetMessage() == "")
+            if (Mathf.Abs(Mathf.DeltaAngle(manager.playerCamera.transform.eulerAngles.y, arriveAt.transform.eulerAngles.y)) < orientThreshold)
             {
-                hud.setMessage(readyMessage);
+                if (hud.GetMessage() == "" || hud.GetMessage() == notReadyMessage)
+                {
+                    hud.setMessage(readyMessage);
+                    hud.hudPanel.SetActive(true);
+                    hud.ForceShowMessage();
+                }
+
+                // Know when to fold 'em (or end the task)
+                if (readyMessage == "")
+                {
+                    hud.hudPanel.SetActive(false);
+                    hud.setMessage("");
+                    return true;
+                }
+                else if (vrEnabled)
+                {
+                    if (vrInput.TriggerButton.GetStateDown(SteamVR_Input_Sources.Any))
+                    {
+                        Debug.Log("VR trying to start the task");
+                        log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
+                        hud.hudPanel.SetActive(false);
+                        hud.setMessage("");
+                        return true;
+                    }
+                } else if (Input.GetButtonDown("Return") | Input.GetKeyDown(KeyCode.Return))
+                {
+                    if (Input.GetButtonDown("Return") | Input.GetKeyDown(KeyCode.Return))
+                    {
+                        log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
+                        hud.hudPanel.SetActive(false);
+                        hud.setMessage("");
+                        return true;
+                    }
+                }
+            } else 
+            {
+                hud.setMessage(notReadyMessage);
                 hud.hudPanel.SetActive(true);
                 hud.ForceShowMessage();
-            }
-
-            if (vrEnabled)
-            {
-                if (vrInput.TriggerButton.GetStateDown(SteamVR_Input_Sources.Any))
-                {
-                    Debug.Log("VR trying to start the task");
-                    log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
-                    hud.hudPanel.SetActive(false);
-                    hud.setMessage("");
-                    return true;
-                }
-            }
-
-            if (Input.GetButtonDown("Return") | Input.GetKeyDown(KeyCode.Return))
-            {
-                if (Input.GetButtonDown("Return") | Input.GetKeyDown(KeyCode.Return))
-                {
-                    log.log("INPUT_EVENT    Player Arrived at Destination    1", 1);
-                    hud.hudPanel.SetActive(false);
-                    hud.setMessage("");
-                    return true;
-                }
             }
         }
         else

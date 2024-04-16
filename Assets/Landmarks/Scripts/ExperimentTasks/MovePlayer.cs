@@ -33,7 +33,8 @@ public class MovePlayer : ExperimentTask {
 	public bool scaledPlayer = false;
     public bool ignoreY = false;
     public bool useSnapPoint;
-    public Vector3 localOffsetFacing;
+    public Vector3 localOffset;
+    public bool localOffsetFacing = true;
 
     //variables used for block repetition
     public bool blockRepeat;
@@ -90,7 +91,7 @@ public class MovePlayer : ExperimentTask {
         // Move the player
         // -----------------
         // Character controller component must be disabled to move the player like this
-        if (localOffsetFacing != Vector3.zero) terminusPos += destination.transform.TransformDirection(localOffsetFacing);
+        if (localOffset != Vector3.zero) terminusPos += destination.transform.TransformDirection(localOffset);
         if (ignoreY) terminusPos.y = originPos.y;
         start.GetComponentInChildren<CharacterController>().enabled = false;
         start.transform.position = terminusPos;
@@ -104,11 +105,11 @@ public class MovePlayer : ExperimentTask {
         var fpc = start.GetComponent<FirstPersonController>();
         if (fpc != null) fpc.enabled = false;
         // Modify and/or set
-        if (localOffsetFacing != Vector3.zero)
+        if (localOffset != Vector3.zero)
         {
             Debug.LogWarning("Using the provided 'localOffsetFacing' property to point the player at the original destination.\n" +
                 "\tIf 'randomRotation' was selected, it will be ignored.");
-            start.transform.LookAt(destination.transform);
+            if (localOffsetFacing) start.transform.LookAt(destination.transform);
             // level off the viewpoint
             start.transform.eulerAngles = new Vector3(0f, start.transform.eulerAngles.y, 0f);
         }
