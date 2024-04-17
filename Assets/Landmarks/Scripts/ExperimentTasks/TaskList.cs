@@ -190,14 +190,15 @@ public class TaskList : ExperimentTask
         Debug.Log("Starting " + tasks[currentTaskIndex].name);
 
         // update the trial count on the overlay
-        if (overlayRepeatCount != null) overlayRepeatCount.text = string.Format("{0}: {1} / {2}", name, repeatCount, repeat);
-        if (overlayListItem != null & overrideRepeat != null) overlayListItem.text = string.Format("{0}", overrideRepeat.currentObject().name);
+        // if (overlayRepeatCount != null) overlayRepeatCount.text = string.Format("{0}: {1} / {2}", name, repeatCount, repeat);
+        // if (overlayListItem != null & overrideRepeat != null) overlayListItem.text = string.Format("{0}", overrideRepeat.currentObject().name);
 
         currentTask = tasks[currentTaskIndex].GetComponent<ExperimentTask>();
 
         currentTask.parentTask = this;
 
         currentTask.startTask();
+
     }
 
 

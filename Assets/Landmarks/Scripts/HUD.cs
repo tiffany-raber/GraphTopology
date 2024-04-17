@@ -91,11 +91,12 @@ public class HUD : MonoBehaviour
 
     public void Awake()
 	{
-		SecondsToShow = GeneralDuration;
+		SecondsToShow = 0;//GeneralDuration;
         //Debug.Log ("Starting HUD.cs");
         //canvasName = Canvas.name;
         //Debug.Log ("Canvas Name: " + canvasName);
         this.actionButton.GetComponent<Button>().onClick.AddListener(OnActionClick);
+		actionButton.SetActive(false);
 	}
 
 

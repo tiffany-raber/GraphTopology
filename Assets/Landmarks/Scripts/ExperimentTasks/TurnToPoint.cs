@@ -43,6 +43,7 @@ public class TurnToPoint : ExperimentTask
 
     // Measured variables
     private bool responded;
+    private bool responseRecorded;
     // private float signedErrorCW; // TODO - remove when possible
     // private float absoluteError; // TODO - remove when possible
     [Tooltip("Use {0} in place of the target name")]// Use {0} for origin, {1} for heading, {2} for target")]
@@ -59,6 +60,8 @@ public class TurnToPoint : ExperimentTask
     public KeyCode left = KeyCode.LeftArrow;
     public KeyCode right = KeyCode.RightArrow;
     [Tooltip("degrees per second")] public float rotSpeed = 60f; // 60 deg/s = 10 rev/min
+    [Range(0, 180)] public float hideCurrentHeadingAngle;
+    public bool colormatchTarget;
 
     [Header("Properties for stay-switch")]
     public BalancedBoolList getTopDownListFrom;
@@ -113,6 +116,7 @@ public class TurnToPoint : ExperimentTask
         netClockwiseRotation = 0f;
         onset = -1f;
         responded = false;
+        responseRecorded = false;
         hasMoved = false;
         responseMovementOnset = 0f;
         if (topDownTrialIndex > 0) {
@@ -178,7 +182,7 @@ public class TurnToPoint : ExperimentTask
                 topDownInterface.originObject.GetComponentInChildren<RawImage>().color = 
                     currentHeading.GetComponentInChildren<LM_TargetStore>().exteriorElements[0].GetComponent<Renderer>().material.color;
             }
-            if (currentTarget.GetComponentInChildren<LM_TargetStore>() != null && currentTarget.GetComponentInChildren<LM_TargetStore>().exteriorElements.Length > 0)
+            if (colormatchTarget && currentTarget.GetComponentInChildren<LM_TargetStore>() != null && currentTarget.GetComponentInChildren<LM_TargetStore>().exteriorElements.Length > 0)
             {
                 topDownInterface.targetIcon.GetComponent<Renderer>().material.color = 
                     currentTarget.GetComponentInChildren<LM_TargetStore>().exteriorElements[0].GetComponent<Renderer>().material.color;
@@ -291,6 +295,10 @@ public class TurnToPoint : ExperimentTask
         }
         else
         {
+            // ui offset won't update on frame when response is recorded (causing jittery HUD)
+            // The (hacky) solution here is to just wait another frame by checking at the top of updateTask()
+            if (responseRecorded) return true;
+
             // Take input for the top-down interface, if active
             if (topDown && !responded)
             {
@@ -298,6 +306,14 @@ public class TurnToPoint : ExperimentTask
                 topDownInterface.topDownObject.transform.Rotate(0f, netInput * rotSpeed * Time.deltaTime, 0f);
                 if (keepPromptStable) topDownInterface.targetIcon.transform.localEulerAngles =
                                         new Vector3 (0f, -1 * topDownInterface.topDownObject.transform.localEulerAngles.y, 0f);
+                
+                if (hideCurrentHeadingAngle != 0) 
+                {
+                    var wrappedNetCW = netClockwiseRotation;
+                    while (wrappedNetCW > 180) wrappedNetCW -= 360;
+                    while (wrappedNetCW <= -180) wrappedNetCW += 360;
+                    hi.SetActive(Mathf.Abs(wrappedNetCW) < hideCurrentHeadingAngle);
+                }
             }
 
             // Regardless of the perspective/format, record changes in the response orientation
@@ -317,15 +333,14 @@ public class TurnToPoint : ExperimentTask
             if (Input.GetKeyDown(submitButton) && !responded && Time.time - onset >= minResponseLatency)
             {
                 RecordResponse(true);
-                manager.RestrictMovement(true, true);
-                if (interval == 0 || terminateOnResponse) return true; // end with response unless duration/interval is specified
+                if (interval == 0 || terminateOnResponse) responseRecorded = true; // end with response unless duration/interval is specified
             }
 
             // Handle the ending for a fixed duration, whether they responded or not
             if (interval > 0 && Time.time - onset > interval / 1000)
             {
                 if (!responded) RecordResponse(false);
-                return true;
+                responseRecorded = true;
             }
         }
 
@@ -416,7 +431,6 @@ public class TurnToPoint : ExperimentTask
             if (listOfOrigins != null) listOfOrigins.incrementCurrent();
             listOfHeadings.incrementCurrent();
             listOfTargets.incrementCurrent();
-            if (topDown) PointingSource.transform.localRotation = Quaternion.Euler(Vector3.zero);
         }
 
         if (restrictMovement) manager.RestrictMovement(false, false);
@@ -424,16 +438,12 @@ public class TurnToPoint : ExperimentTask
         // update the format
         lastTopDown = topDown;
         topDownTrialIndex++;
-
-        hud.setMessage("");
-        if (offsetPrompt != Vector3.zero) hud.hudPanel.transform.position -= offsetPrompt;
-        hud.SecondsToShow = hud.GeneralDuration;
-        hud.hudPanel.GetComponent<Image>().enabled = true;
         
+        if (offsetPrompt != Vector3.zero) hud.hudPanel.transform.position -= offsetPrompt;
     }
 
     private void RecordResponse(bool responseProvided)
-    {
+    {   
         // HIDE VISUAL INFO SO WE CAN DO SOME CALCULATIONS IN PRIVATE
         if (!topDown) 
         {
@@ -474,7 +484,5 @@ public class TurnToPoint : ExperimentTask
         endRotNorthCW = topDown ?   -1 * PointingSource.transform.localEulerAngles.z : // It seems rectTransforms (i.e. gui objects) rotate differently?
                                     PointingSource.transform.eulerAngles.y; // just the y rotation of the player
         if (endRotNorthCW < 0) endRotNorthCW += 360; // wrap 0-360
-
-        
     }
 }

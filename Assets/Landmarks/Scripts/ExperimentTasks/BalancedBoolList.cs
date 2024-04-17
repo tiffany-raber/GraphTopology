@@ -112,8 +112,8 @@ public class BalancedBoolList : ExperimentTask
             }
 
         }
-        Debug.Log(sequences.SelectMany(list => list).Count());
-        Debug.Log(mirrorSequences.SelectMany(list => list).Count());
+        // Debug.Log(sequences.SelectMany(list => list).Count());
+        // Debug.Log(mirrorSequences.SelectMany(list => list).Count());
         if (includeMirroredRuns) sequences.AddRange(mirrorSequences);
        
 

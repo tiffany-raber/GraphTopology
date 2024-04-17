@@ -84,6 +84,7 @@ public class ExperimentTask : MonoBehaviour{
 	}
 	
 	public virtual void startTask() {
+
 		avatar = GameObject.FindWithTag ("Player");
 		avatarLog = avatar.GetComponentInChildren<avatarLog>() as avatarLog; //jdstokes 2015
 		hud = avatar.GetComponent("HUD") as HUD;
@@ -113,7 +114,7 @@ public class ExperimentTask : MonoBehaviour{
 
 		task_start = Experiment.Now();
 		ResetHud();
-		hud.ForceShowMessage ();
+		//hud.ForceShowMessage ();
 		//currentInterrupt = 0;        Not here since after an interuupt we will restart
 		
 		log.log("TASK_START\t" + name + "\t" + this.GetType().Name,1 );
@@ -136,8 +137,8 @@ public class ExperimentTask : MonoBehaviour{
 
 	}	
 	
-	public virtual bool updateTask () {
-
+	public virtual bool updateTask () 
+	{
 		bool attemptInterupt = false;
 		
 		if ( interruptInterval > 0 && Experiment.Now() - task_start >= interruptInterval)  {
@@ -170,15 +171,12 @@ public class ExperimentTask : MonoBehaviour{
 			}
 		}
 
-
-		
 		return false;
 	}
 
 
 	public virtual void endTask()
     {
-
         if (eegManager != null & triggerOnEnd)
         {
             var endLabel = triggerLabel;

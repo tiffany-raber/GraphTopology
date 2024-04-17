@@ -64,7 +64,8 @@ public class InstructionsTask : ExperimentTask {
             DestroyImmediate (gui.gameObject);
     }
 
-    public override void startTask () {
+    public override void startTask () 
+    {
         TASK_START();
         Debug.Log ("Starting an Instructions Task");
     }
@@ -239,7 +240,7 @@ public class InstructionsTask : ExperimentTask {
         }
 
         hud.setMessage ("");
-        hud.SecondsToShow = hud.GeneralDuration;
+        hud.SecondsToShow = 0; //hud.GeneralDuration;
         if (!textBg) hud.hudPanel.GetComponent<Image>().enabled = true;
 
         if (canIncrementLists) {
@@ -278,5 +279,4 @@ public class InstructionsTask : ExperimentTask {
 
         onset = -1f;
     }
-
 }

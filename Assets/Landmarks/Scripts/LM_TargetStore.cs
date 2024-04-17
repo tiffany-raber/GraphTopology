@@ -100,6 +100,7 @@ public class LM_TargetStore : LM_Target
                 // Color match the target store's identifying color
                 foreach (var mr in m_collisionIndicator.GetComponentsInChildren<Renderer>()) 
                 {
+                    
                     mr.material.color = exteriorElements[0].GetComponent<Renderer>().material.color;
                 }
             }
