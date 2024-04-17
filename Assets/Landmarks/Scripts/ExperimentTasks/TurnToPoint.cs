@@ -167,12 +167,6 @@ public class TurnToPoint : ExperimentTask
         //         currentReference.name == currentTarget.name
         //         );
 
-        // Set the prompt requested
-        hud.SecondsToShow = 99999;
-        prompt = currentTarget.name;
-        hud.setMessage(prompt);
-        hud.hudPanel.transform.position += offsetPrompt;
-
         // Set up the trial format
         if (topDown)
         {
@@ -255,7 +249,6 @@ public class TurnToPoint : ExperimentTask
             
 
             // Set up the rendering
-            hud.showOnlyHUD(false);
             // if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse) manager.playerCamera.orthographic = true;
         }
         else // i.e., if first-person trials
@@ -267,8 +260,14 @@ public class TurnToPoint : ExperimentTask
             targetLayer = currentHeading.layer;
             Experiment.MoveToLayer(currentHeading.transform, hud.hudLayer);
             // Experiment.MoveToLayer(currentReference.transform, hud.hudLayer);
-            hud.showOnlyHUD();
         }
+
+        // Set the prompt requested
+        hud.SecondsToShow = 99999;
+        prompt = currentTarget.name;
+        hud.setMessage(prompt);
+        if (offsetPrompt != Vector3.zero) hud.hudPanel.transform.position += offsetPrompt;
+        hud.showOnlyHUD(!topDown);
 
         // Debug.Log(   "Facing vector: " + startRotNorthCW + "°\t" + "Target vector: " + targetRotNorthCW + "°");
 
@@ -427,8 +426,10 @@ public class TurnToPoint : ExperimentTask
         topDownTrialIndex++;
 
         hud.setMessage("");
+        if (offsetPrompt != Vector3.zero) hud.hudPanel.transform.position -= offsetPrompt;
         hud.SecondsToShow = hud.GeneralDuration;
         hud.hudPanel.GetComponent<Image>().enabled = true;
+        
     }
 
     private void RecordResponse(bool responseProvided)
@@ -450,13 +451,13 @@ public class TurnToPoint : ExperimentTask
             // if (manager.userInterface == UserInterface.KeyboardSingleAxis || manager.userInterface == UserInterface.KeyboardMouse) manager.playerCamera.orthographic = false;
         }
         Experiment.MoveToLayer(currentHeading.transform, targetLayer);
-        if (interval > 0) 
-        {
-            hud.setMessage("+");
-            hud.hudPanel.GetComponent<Image>().enabled = false;
-            hud.SecondsToShow = interval;
-            hud.showOnlyHUD(false);
-        }
+        // if (interval > 0) 
+        // {
+        //     hud.setMessage("+");
+        //     hud.hudPanel.GetComponent<Image>().enabled = false;
+        //     hud.SecondsToShow = interval;
+        //     hud.showOnlyHUD(false);
+        // }
 
         // RECORD DATA
         timeAtResponse = Time.time;

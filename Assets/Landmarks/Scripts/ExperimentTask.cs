@@ -195,7 +195,7 @@ public class ExperimentTask : MonoBehaviour{
         long duration = Experiment.Now() - task_start;
 		currentInterrupt = 0;    //put here because of interrupts
 		log.log("TASK_END\t" + name + "\t" + this.GetType().Name + "\t" + duration,1 );
-        hud.showNothing();
+        //hud.showNothing();
 	}
 
 
