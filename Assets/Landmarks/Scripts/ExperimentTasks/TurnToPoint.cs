@@ -444,6 +444,9 @@ public class TurnToPoint : ExperimentTask
 
     private void RecordResponse(bool responseProvided)
     {   
+        hud.SecondsToShow = 0;
+        hud.setMessage("");
+
         // HIDE VISUAL INFO SO WE CAN DO SOME CALCULATIONS IN PRIVATE
         if (!topDown) 
         {

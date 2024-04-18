@@ -223,7 +223,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 432d27f28c1251041bd6d1753602d5f0, type: 2}
+  - {fileID: 2100000, guid: 616672e6868d042c3bfdca3674e5b13b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1694,7 +1694,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 616672e6868d042c3bfdca3674e5b13b, type: 2}
+  - {fileID: 2100000, guid: 06f96a183a93b4aeabd8c02d2b84986a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3859,7 +3859,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0.1}
-  m_SizeDelta: {x: 3, y: 3}
+  m_SizeDelta: {x: 3.6, y: 3.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &429019645255408135
 Canvas:
