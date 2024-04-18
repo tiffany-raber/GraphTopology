@@ -21,8 +21,7 @@ public class LM_GoTo : ExperimentTask
     [TextArea] public string notReadyMessage;
     [Tooltip("Only use if your player will already be at the destination \n" + 
                 "I.e, you just want them to orient from their current position")]
-    public bool immobilize;
-    private Vector3 m_immobilizedAt;
+    public bool restrictMovement;
 
     private ParticleSystem effect;
     private bool atDestination;
@@ -55,7 +54,7 @@ public class LM_GoTo : ExperimentTask
         arriveAt.SetActive(true); // show the destination if it's hidden
         if (effect != null) effect.Play(true); // start particles if we have them
         hud.ReCenter(arriveAt.transform); // move the HUD to the start location
-        hud.SecondsToShow = 0; // don't how it unless they are at the start location
+        hud.SecondsToShow = 0; // don't show it unless they are at the start location
         hud.hudPanel.SetActive(false);
         
 
@@ -74,7 +73,12 @@ public class LM_GoTo : ExperimentTask
         GetComponent<Collider>().enabled = false;
         GetComponent<Collider>().enabled = true;
 
-         if (immobilize) m_immobilizedAt = avatar.transform.position;
+         if (restrictMovement) 
+         {
+            atDestination = true; // if not, then what's the point?
+            manager.RestrictMovement(true, false);
+            if(hud != null) hud.SecondsToShow = 9999999; // because they must be at the start, right?
+         }
     }
 
 
@@ -86,8 +90,6 @@ public class LM_GoTo : ExperimentTask
             log.log("INFO    skip task    " + name, 1);
             return true;
         }
-
-        if (immobilize) avatar.transform.position = m_immobilizedAt;
 
         // Is the player at and aligned with the destination?
         if (atDestination)
@@ -130,9 +132,12 @@ public class LM_GoTo : ExperimentTask
                 }
             } else 
             {
-                hud.setMessage(notReadyMessage);
-                hud.hudPanel.SetActive(true);
-                hud.ForceShowMessage();
+                if (hud.GetMessage() == "" || hud.GetMessage() == readyMessage)
+                {
+                    hud.setMessage(notReadyMessage);
+                    hud.hudPanel.SetActive(true);
+                    hud.ForceShowMessage();
+                } 
             }
         }
         else
@@ -170,6 +175,7 @@ public class LM_GoTo : ExperimentTask
         hud.setMessage("");
         hud.SecondsToShow = hud.GeneralDuration;
         atDestination = false;
+        manager.RestrictMovement(true, true);
     }
 
     private void OnTriggerEnter(Collider collision)

@@ -99,7 +99,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4226170640125047037}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4297369772458782008
 MonoBehaviour:
@@ -477,7 +477,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4226170640125047037}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6888417329151982367
 MonoBehaviour:
@@ -1244,8 +1244,8 @@ Transform:
   m_Children:
   - {fileID: 4226665359613223498}
   - {fileID: 1741475276575278988}
-  - {fileID: 7241822573974739975}
   - {fileID: 197273353957813081}
+  - {fileID: 7241822573974739975}
   - {fileID: 3627780950959171656}
   - {fileID: 4231313859959184977}
   m_Father: {fileID: 4231417197174449043}
@@ -1516,7 +1516,7 @@ MonoBehaviour:
   orientThreshold: 1
   readyMessage: 
   notReadyMessage: Turn to face the target store.
-  immobilize: 0
+  restrictMovement: 0
 --- !u!65 &4177148285621524677
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1685,6 +1685,8 @@ MonoBehaviour:
   left: 276
   right: 275
   rotSpeed: 60
+  hideCurrentHeadingAngle: 0
+  colormatchTarget: 0
   getTopDownListFrom: {fileID: 1250547543065459335}
   topDownTrialList: 
   localOffsetFacing: {x: 0, y: 0, z: 0}
