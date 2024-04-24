@@ -77,7 +77,7 @@ public class ViewTargets : ExperimentTask {
 		}
 		
 
-	    if (blackout) hud.showOnlyTargets(virtualDesert);
+	    if (blackout) hud.showOnlyHUD(virtualDesert);
 	    else hud.showEverything();
 
         if (restrictMovement)
@@ -180,7 +180,7 @@ public class ViewTargets : ExperimentTask {
         current.SetActive(true);
 
         saveLayer = current.layer;
-		setLayer(current.transform,viewLayer);
+		MoveToLayer(current.transform, hud.hudLayer);
         hud.setMessage(current.name);
         hud.ForceShowMessage();
 		
@@ -188,21 +188,21 @@ public class ViewTargets : ExperimentTask {
 
 	}
 	
-	public override void TASK_ADD(GameObject go, string txt) {
-		if (txt == "add") {
-			saveLayer = go.layer;
-			setLayer(go.transform,viewLayer);
-		} else if (txt == "remove") {
-			setLayer(go.transform,saveLayer);
-		}
-
-	}
+	// TODO - Marked for deletion
+	// public override void TASK_ADD(GameObject go, string txt) {
+	// 	if (txt == "add") {
+	// 		saveLayer = go.layer;
+	// 		MoveToLayer(go.transform, hud.hudLayer);
+	// 	} else if (txt == "remove") {
+	// 		MoveToLayer(go.transform,saveLayer);
+	// 	}
+	// }
 	
 	public void returnCurrent() {
 		current.transform.position = position;
 		current.transform.localRotation = rotation;
 		current.transform.localScale = scale;
-		setLayer(current.transform,saveLayer);
+		MoveToLayer(current.transform,saveLayer);
 
         // turn off the object we're returning before turning on the next one
         current.SetActive(false);
@@ -242,10 +242,11 @@ public class ViewTargets : ExperimentTask {
 		}
 	}
 
-    public void setLayer(Transform t, int l) {
-		t.gameObject.layer = l;
-		foreach (Transform child in t) {
-			setLayer(child,l);
-		}
-	}
+	// TODO - Marked for deprecation (Use inherited ExperimentTask.MoveToLayer)
+    // public void setLayer(Transform t, int l) {
+	// 	t.gameObject.layer = l;
+	// 	foreach (Transform child in t) {
+	// 		setLayer(child,l);
+	// 	}
+	// }
 }
