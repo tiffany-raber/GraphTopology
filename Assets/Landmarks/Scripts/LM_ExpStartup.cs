@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using TMPro;
 using System.IO;
 using System;
+using System.Linq;
 
 #if WINDOWS_UWP && ENABLE_DOTNET
 using Windows.Storage;
@@ -18,7 +19,7 @@ using Windows.Storage;
 public class LM_ExpStartup : MonoBehaviour
 {
     [Header("Config Options")]
-    public Config configProvided;
+    public Config[] configsProvided;
 
     [Min(0)] [Tooltip(">0: Automatically select ascending from id provided\n" + "0: Manually select with GUI")]
         public int id = 0;
@@ -83,7 +84,7 @@ public class LM_ExpStartup : MonoBehaviour
         var tmp = new GameObject("defaultConfig");
         tmp.AddComponent<Config>();
         config = tmp.GetComponent<Config>();
-        if (configProvided != null)
+        if (configsProvided.Length == 1)
         {
             ChangeConfig();
             guiElements.studyCodes.gameObject.SetActive(false);
@@ -98,6 +99,9 @@ public class LM_ExpStartup : MonoBehaviour
         var opts = Resources.LoadAll<Config>("Configs/");
         foreach (Config opt in opts)
         {
+            // If specific configs were specified, only add those
+            if (configsProvided.Length > 0 && !configsProvided.Contains(opt)) continue;
+            // Update the config dropdown to relfect options
             configs.Add(opt);
             var option = new TMP_Dropdown.OptionData();
             option.text = opt.name;
@@ -309,9 +313,9 @@ public class LM_ExpStartup : MonoBehaviour
         
         if (config != null) Destroy(config.gameObject);
 
-        if (configProvided != null)
+        if (configsProvided.Length == 1)
         {
-            config = Instantiate(configProvided);
+            config = Instantiate(configsProvided[0]);
         }
         try {config = Instantiate(configs[guiElements.studyCodes.value - 1]);}
         catch (SystemException) { } 

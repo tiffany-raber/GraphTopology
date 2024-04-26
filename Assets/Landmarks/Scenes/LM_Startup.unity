@@ -8606,8 +8606,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 422f5f25c5eaee34e8a6f051a53e2217, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  configProvided: {fileID: 8018723310392941755, guid: 0ba24328df469442c9e26f5064caaa35,
-    type: 3}
+  configsProvided:
+  - {fileID: 8018723310392941755, guid: 0ba24328df469442c9e26f5064caaa35, type: 3}
+  - {fileID: 8018723310392941755, guid: 79efc9154c650401c9b056bf925c4b1b, type: 3}
   id: 0
   singleSceneBuild: 0
   guiElements:
