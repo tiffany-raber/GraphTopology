@@ -65,7 +65,7 @@ MonoBehaviour:
   overrideTrialsPerRun: {fileID: 7667983144334604515}
   controlStaySwitch: 1
   staySwitchDummyTrials: 2
-  totalRuns: 8
+  totalRuns: 4
   overrideTotalRuns: {fileID: 0}
   maxRepeat: 3
   outTrials: 

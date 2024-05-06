@@ -27105,6 +27105,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: rtcB_Landmarks_Session2
       objectReference: {fileID: 0}
+    - target: {fileID: 7588362584996962545, guid: 149a91a3df904426eb23b75dce8a5987,
+        type: 3}
+      propertyPath: message
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7588362584996962545, guid: 149a91a3df904426eb23b75dce8a5987,
+        type: 3}
+      propertyPath: masterText
+      value: 'Thank you.
+
+        You have completed this portion of the experiment
+
+        DO
+        NOT quit the application; it will close automatically.'
+      objectReference: {fileID: 0}
     - target: {fileID: 7758356855918429703, guid: 149a91a3df904426eb23b75dce8a5987,
         type: 3}
       propertyPath: m_LocalPosition.y

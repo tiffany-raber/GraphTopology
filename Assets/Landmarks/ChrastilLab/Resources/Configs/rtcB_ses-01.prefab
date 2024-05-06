@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1190775046860764567}
   - component: {fileID: 8018723310392941755}
   m_Layer: 0
-  m_Name: rtcB-01
+  m_Name: rtcB_ses-01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -56,7 +56,6 @@ MonoBehaviour:
   conditions: []
   practiceTrialCount: 1
   levelNames:
-  - rtcB_practice_50x50
   - rtcB-01_videosville_100x140
   randomSceneOrder: 0
   singleSceneBuild: 0

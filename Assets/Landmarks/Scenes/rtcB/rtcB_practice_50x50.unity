@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.074201256, g: 0.1139627, b: 0.1588386, a: 1}
+  m_IndirectSpecularColor: {r: 0.07417611, g: 0.113922335, b: 0.15878105, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2862,6 +2862,16 @@ PrefabInstance:
     - target: {fileID: 1172025183829975808, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
         type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1250547543065459335, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
+        type: 3}
+      propertyPath: totalRuns
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1250547543065459335, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
+        type: 3}
+      propertyPath: includeMirroredRuns
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1250596343083744300, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
@@ -6255,6 +6265,19 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7924974381911817173, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
+        type: 3}
+      propertyPath: message
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7924974381911817173, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
+        type: 3}
+      propertyPath: masterText
+      value: 'Great job!
+
+
+        You have completed the practice.'
       objectReference: {fileID: 0}
     - target: {fileID: 7924974381978167566, guid: d0bd07f0f2c094ac899f99ea83bb51b9,
         type: 3}
