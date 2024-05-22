@@ -60,7 +60,7 @@ public class LM_ExpStartup : MonoBehaviour
             // find an id with no data saved (don't overwrite)
             if (!Application.isEditor)
             {
-                while (Directory.Exists(appDir + "/" + config.experiment + "/" + autoID))
+                while (Directory.Exists(appDir + "/" + autoID))
                 {
                     autoID++;
                 }
@@ -160,9 +160,14 @@ public class LM_ExpStartup : MonoBehaviour
         if (!subidError && !uiError && !biosexError && !ageError)
         {
             // Create the directories if they don't exist
-            if (!Directory.Exists(appDir + "/" + config.experiment))
+            if (!Directory.Exists(appDir + "/" + config.id.ToString()))
             {
-                Directory.CreateDirectory(appDir + "/" + config.experiment);
+                Directory.CreateDirectory(appDir + "/" + config.id.ToString());
+
+                if (!Directory.Exists(appDir + "/" + config.id.ToString() + "/" + config.experiment))
+                {
+                    Directory.CreateDirectory(appDir + "/" + config.id.ToString() + "/" + config.experiment);
+                }
             }
 
             readyConfig();
@@ -265,9 +270,9 @@ public class LM_ExpStartup : MonoBehaviour
             {
                 // If this id has already been used to save data, flag an error
                 if (!Application.isEditor &
-                    Directory.Exists(appDir + "/" + config.experiment + "/" + guiElements.subID.text))
+                    Directory.Exists(appDir + "/" + guiElements.subID.text + "/" + config.experiment))
                 {
-                    if (File.Exists(appDir + "/" + config.experiment + "/" + guiElements.subID.text + "/progress.dat"))
+                    if (File.Exists(appDir + "/" + guiElements.subID.text + "/" + config.experiment + "/progress.dat"))
                     {
                         subidError = false;
                         existingData = true;

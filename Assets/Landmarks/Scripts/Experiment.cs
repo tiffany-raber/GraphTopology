@@ -243,21 +243,22 @@ public class Experiment : MonoBehaviour
             Debug.Log("SAVING BUILD DATA IN PERSISTENTDATAPATH");
             dataPath =
                 Application.persistentDataPath + "/" +
-                config.experiment + "/" +
-                config.id + "/";
+                config.id + "/" +
+                config.experiment + "/";
             if (config.appendLogFiles)
             {
                 logfile =
-                   config.experiment + "_" +
-                   config.id + ".log";
+                   "sub-" + config.id + "_" +
+                   "ses-" + config.experiment + 
+                   "_beh.log";
             }
             else
             {
                 logfile =
-                    config.experiment + "_" +
-                    config.id + "_" +
-                    config.levelNames[config.levelNumber] + "_" +
-                    config.conditions[config.levelNumber] + ".log";
+                    "sub-" + config.id + "_" +
+                    "ses-" + config.experiment + "_" +
+                    "lvl-" + config.levelNames[config.levelNumber] +
+                    "_beh.log";
             }
         }
         Debug.Log("data will be saved as " + dataPath + logfile);
